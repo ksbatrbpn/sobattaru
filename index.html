@@ -1,0 +1,2503 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title>SOBAT TARU — Sumbawa Barat dalam Tata Ruang</title>
+    
+<style id="popup-fix-2026">
+.leaflet-popup-content hr{
+border:0 !important;
+height:1px;
+background:#d0d0d0;
+margin:10px 0;
+width:100%;
+box-sizing:border-box;
+}
+</style>
+
+<style id="mobile-upload-fix">
+.sobat-header{position:absolute;top:0;left:0;right:0;height:76px;z-index:10020;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:linear-gradient(110deg,#0b3b35,#0d6655 58%,#12806a);color:#fff;box-shadow:0 4px 18px rgba(6,40,35,.24);font-family:Arial,sans-serif}.sobat-brand{display:flex;align-items:center;gap:12px;min-width:0}.sobat-logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#f6c85f,#e99d2e);display:grid;place-items:center;color:#123f39;font-size:17px;font-weight:900;letter-spacing:-1px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.38),0 3px 10px rgba(0,0,0,.18)}.sobat-copy{min-width:0}.sobat-name{font-size:22px;font-weight:900;letter-spacing:.5px;line-height:1;margin:0}.sobat-tagline{font-size:11px;letter-spacing:1.45px;text-transform:uppercase;opacity:.84;margin-top:6px;white-space:nowrap}.sobat-meta{display:flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(255,255,255,.1);font-size:12px;font-weight:700}.sobat-dot{width:7px;height:7px;border-radius:50%;background:#f6c85f}.leaflet-top{top:82px}.leaflet-control.info{display:none!important}.leaflet-bar,.leaflet-control-layers,.leaflet-control-locate,.leaflet-control-measure,.leaflet-photon{border:0!important;border-radius:12px!important;box-shadow:0 4px 16px rgba(17,51,46,.22)!important;overflow:hidden}.leaflet-bar a,.leaflet-control-locate a,.leaflet-control-measure-toggle,.leaflet-control-layers-toggle{width:42px!important;height:42px!important;line-height:42px!important;background-color:rgba(255,255,255,.97)!important;color:#174e45!important;border:0!important}.leaflet-bar a:hover,.leaflet-control-locate a:hover,.leaflet-control-measure-toggle:hover,.leaflet-control-layers-toggle:hover{background:#e7f4f0!important;color:#0b6756!important}.leaflet-control-layers-expanded{padding:12px 14px!important;max-width:min(360px,calc(100vw - 30px));max-height:calc(100vh - 110px);overflow:auto}.upload-analysis-toggle{position:absolute;right:12px;bottom:38px;z-index:10000;min-width:52px;height:48px;padding:0 15px;border:0;border-radius:12px;background:#0d6655;color:#fff;box-shadow:0 4px 16px rgba(6,56,47,.3);font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:8px}.upload-analysis-toggle:hover{background:#094e42;transform:translateY(-1px)}.upload-analysis-box{display:none;position:absolute;right:12px;bottom:94px;z-index:9999;background:rgba(255,255,255,.98);padding:13px 14px;border:1px solid #dce9e5;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.22);font-family:Arial,sans-serif;max-width:calc(100vw - 24px)}.upload-analysis-box.open{display:block}
+.upload-analysis-box input{display:block;max-width:100%;font-size:12px}
+.sobat-logo-mark{font-size:25px;line-height:1}.header-actions{display:flex;align-items:center;gap:8px}.info-data-btn{height:42px;padding:0 12px;border:1px solid rgba(255,255,255,.24);border-radius:11px;background:rgba(255,255,255,.1);color:#fff;font-size:12px;font-weight:800;cursor:pointer}.info-data-btn:hover{background:rgba(255,255,255,.2)}.basemap-switch{display:flex;align-items:center;padding:4px;background:rgba(3,49,41,.4);border:1px solid rgba(255,255,255,.22);border-radius:12px}.basemap-btn{height:34px;padding:0 13px;border:0;border-radius:8px;background:transparent;color:rgba(255,255,255,.76);font-size:12px;font-weight:800;cursor:pointer}.basemap-btn.active{background:#fff;color:#0d6655;box-shadow:0 2px 8px rgba(0,0,0,.18)}.basemap-btn:focus-visible{outline:2px solid #f6c85f;outline-offset:2px}.data-info-backdrop{display:none;position:fixed;inset:0;z-index:11000;background:rgba(4,34,29,.66);padding:18px;align-items:center;justify-content:center;font-family:Arial,sans-serif}.data-info-backdrop.open{display:flex}.data-info-dialog{width:min(680px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.34);color:#183b35}.data-info-head{padding:20px 22px 14px;border-bottom:1px solid #e1ebe8}.data-info-head h2{margin:0;color:#0d6655;font-size:22px}.data-info-head p{margin:5px 0 0;color:#678078}.data-info-body{padding:18px 22px}.data-info-intro{margin-top:0}.data-list{display:grid;gap:9px;margin:15px 0}.data-row{padding:11px 12px;border:1px solid #e0ebe7;border-radius:10px;background:#f7fbfa}.data-row b{display:block;color:#174e45}.data-row span{display:block;margin-top:2px;color:#61766f;font-size:12px}.data-warning{padding:12px 13px;border-left:4px solid #e9a833;border-radius:8px;background:#fff7e7;color:#674a12;font-size:12px;line-height:1.5}.data-info-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px 20px}.data-info-foot label{font-size:12px;color:#61766f}.data-info-ok{border:0;border-radius:10px;padding:10px 18px;background:#0d6655;color:#fff;font-weight:800;cursor:pointer}#analysisPanel{top:92px!important;border:1px solid #dbe8e4!important;border-radius:14px!important;box-shadow:0 10px 32px rgba(8,48,41,.24)!important;color:#163c35!important}#analysisPanel h3{font-size:15px;letter-spacing:.5px;color:#0d6655;border-bottom:1px solid #e2ece9;padding-bottom:10px;margin-bottom:10px!important}
+@media(max-width:640px){.sobat-header{height:70px;padding:0 8px}.sobat-brand{gap:7px}.sobat-logo{width:38px;height:38px;border-radius:10px}.sobat-logo-mark{font-size:20px}.sobat-name{font-size:16px}.sobat-tagline{font-size:7px;letter-spacing:.3px}.header-actions{gap:4px}.info-data-btn{width:34px;height:34px;padding:0;font-size:0}.info-data-btn:after{content:'i';font-size:15px;font-weight:900}.basemap-switch{padding:3px}.basemap-btn{height:29px;padding:0 7px;font-size:9px}.leaflet-top{top:76px}.upload-analysis-toggle{right:10px;bottom:34px;width:48px;min-width:48px;padding:0;justify-content:center;font-size:0}.upload-analysis-toggle .upload-icon{font-size:21px}.upload-analysis-box{right:10px;bottom:88px;width:calc(100vw - 20px);max-width:360px}.upload-analysis-title{display:inline-block;margin-right:8px}.upload-analysis-help{display:none}.data-info-backdrop{padding:10px}.data-info-head,.data-info-body{padding-left:16px;padding-right:16px}.data-info-foot{align-items:flex-start;flex-direction:column;padding-left:16px;padding-right:16px}.data-info-ok{width:100%}#analysisPanel{top:152px!important;right:8px!important;left:8px!important;width:auto!important;max-height:48vh!important}}
+</style>
+
+
+<style id="popup-final-fix">
+.leaflet-popup-content{
+    margin: 12px 16px !important;
+    overflow:hidden !important;
+}
+.leaflet-popup-content hr{
+    border:0 !important;
+    height:1px !important;
+    background:#d6d6d6 !important;
+    margin:8px 0 !important;
+    width:100% !important;
+    max-width:100% !important;
+    display:block !important;
+}
+</style>
+
+<style id="dialog-actions-fix">
+.panel-close,.upload-box-close,.data-info-close{border:0;background:#edf4f2;color:#174e45;border-radius:8px;width:32px;height:32px;font-size:20px;line-height:1;cursor:pointer}.panel-close:hover,.upload-box-close:hover,.data-info-close:hover{background:#dcebe7}.analysis-panel-head,.upload-box-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.analysis-panel-head h3{margin:0!important;border:0!important;padding:0!important}.upload-box-close{position:absolute;right:8px;top:8px}.upload-analysis-box{padding-top:12px}.data-info-dialog{width:min(520px,100%)!important;max-height:min(82vh,650px)!important;overflow:hidden!important;display:flex;flex-direction:column}.data-info-head{position:relative;padding-right:58px;flex:0 0 auto}.data-info-close{position:absolute;right:18px;top:18px}.data-info-body{overflow-y:auto;min-height:0;flex:1 1 auto;scrollbar-width:thin}.data-info-foot{flex:0 0 auto;background:#fff;border-top:1px solid #e1ebe8}.initial-data-message{font-size:13px;line-height:1.55;color:#294b45;margin:0 0 14px}.data-info-details.is-hidden{display:block}
+.tutorial-backdrop{display:none;position:fixed;inset:0;z-index:11020;background:rgba(4,34,29,.66);padding:16px;align-items:center;justify-content:center;font-family:Arial,sans-serif}.tutorial-backdrop.open{display:flex}.tutorial-dialog{width:min(480px,100%);background:#fff;border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.34);overflow:hidden;color:#183b35}.tutorial-head{position:relative;padding:18px 58px 14px 20px;border-bottom:1px solid #e1ebe8}.tutorial-head span{font-size:11px;color:#698079;font-weight:800;text-transform:uppercase;letter-spacing:.6px}.tutorial-head h2{margin:4px 0 0;color:#0d6655;font-size:21px}.tutorial-body{padding:22px 20px;min-height:210px}.tutorial-step{display:none}.tutorial-step.active{display:block}.tutorial-step p{font-size:14px;line-height:1.65;margin:12px 0 0}.tutorial-icon{width:54px;height:54px;border-radius:15px;background:#fff1ce;display:grid;place-items:center;font-size:26px}.tutorial-foot{display:flex;justify-content:space-between;gap:10px;padding:14px 20px 18px;border-top:1px solid #e1ebe8}.tutorial-secondary,.tutorial-primary{border:0;border-radius:10px;padding:10px 15px;font-weight:800;cursor:pointer}.tutorial-secondary{background:#edf4f2;color:#174e45}.tutorial-primary{background:#0d6655;color:#fff}.tutorial-secondary:disabled{opacity:.4}.tutorial-head .data-info-close{right:16px;top:16px}@media(max-width:640px){.tutorial-body{min-height:240px}.tutorial-primary,.tutorial-secondary{flex:1}}
+</style>
+
+<style id="tutorial-exact-controls-fix">
+.data-section-title{margin:0 0 4px;color:#174e45;font-size:16px}.data-section-copy{margin:0 0 12px;color:#61766f;font-size:12px;line-height:1.5}.data-warning{margin-top:16px;padding:14px 15px}.data-warning h3{margin:0 0 7px;color:#80570b;font-size:13px;letter-spacing:.25px}.data-warning p{margin:0;font-size:12px;line-height:1.55}.tutorial-demo{min-height:58px;display:flex;align-items:center;gap:10px}.tutorial-basemap-demo{display:flex;align-items:center;padding:4px;background:#0b4f43;border:1px solid #37776c;border-radius:12px}.tutorial-basemap-demo span{height:34px;padding:0 13px;border-radius:8px;color:rgba(255,255,255,.76);font-size:12px;font-weight:800;line-height:34px}.tutorial-basemap-demo .active{background:#fff;color:#0d6655;box-shadow:0 2px 8px rgba(0,0,0,.18)}.tutorial-control-demo{width:42px;height:42px;border-radius:12px;background-color:#fff;color:#174e45;box-shadow:0 4px 16px rgba(17,51,46,.22);display:grid;place-items:center;font-size:18px}.tutorial-control-demo.layer-control{background-image:url('images/layers.png');background-repeat:no-repeat;background-position:center;background-size:26px}.tutorial-map-click{padding:12px 15px;border:1px dashed #8aa9a2;border-radius:10px;background:#f7fbfa;color:#174e45;font-size:13px;font-weight:800}.tutorial-upload-demo{height:48px;padding:0 15px;border-radius:12px;background:#0d6655;color:#fff;box-shadow:0 4px 16px rgba(6,56,47,.3);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800}.tutorial-tools{display:flex;gap:9px;flex-wrap:wrap}.tutorial-zoom-demo{overflow:hidden;border-radius:12px;box-shadow:0 4px 16px rgba(17,51,46,.22)}.tutorial-zoom-demo span{width:42px;height:36px;background:#fff;color:#174e45;display:grid;place-items:center;font-size:21px}.tutorial-zoom-demo span+span{border-top:1px solid #e3ebe8}
+</style>
+<style id="tutorial-layer-icon-path-fix">.tutorial-control-demo.layer-control{background-image:none!important}.tutorial-control-demo.layer-control img{display:block;width:26px;height:26px;object-fit:contain}</style>
+<style id="about-sobat-style">.sobat-about-link{border:0;padding:0;background:transparent;color:#0677b8;text-decoration:underline;font:inherit;cursor:pointer}.sobat-about-link:hover{color:#0d6655}.about-sobat-dialog{width:min(430px,100%)}.about-sobat-list{display:grid;gap:10px;margin:0}.about-sobat-row{padding:10px 12px;border:1px solid #e0ebe7;border-radius:10px;background:#f7fbfa}.about-sobat-row dt{margin:0 0 3px;color:#61766f;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}.about-sobat-row dd{margin:0;color:#174e45;font-size:14px;font-weight:700}.about-sobat-name{margin:0 0 16px;color:#174e45;font-size:15px;line-height:1.5;font-weight:800}@media(max-width:640px){.leaflet-control-attribution{max-width:calc(100vw - 12px);font-size:9px!important}.about-sobat-dialog{max-height:84vh!important}}</style>
+<style id="sobat-header-logo-style">.sobat-logo{background:#fff;padding:3px;overflow:hidden}.sobat-logo img{display:block;width:100%;height:100%;object-fit:contain;border-radius:10px}@media(max-width:640px){.sobat-logo{padding:2px}.sobat-logo img{border-radius:7px}}</style>
+<style id="about-sobat-intro-style">.about-sobat-intro{display:flex;align-items:center;gap:14px;margin-bottom:13px}.about-sobat-logo{width:68px;height:68px;flex:0 0 68px;display:block;object-fit:contain;border:1px solid #dce9e5;border-radius:16px;background:#fff;padding:3px;box-sizing:border-box}.about-sobat-name{margin:0}.about-sobat-description{margin:0 0 17px;padding-bottom:16px;border-bottom:1px solid #e1ebe8;color:#35534d;font-size:13px;line-height:1.6}@media(max-width:420px){.about-sobat-logo{width:58px;height:58px;flex-basis:58px;border-radius:13px}.about-sobat-name{font-size:14px}}</style>
+<style id="mobile-dialog-safety-style">.data-info-backdrop,.tutorial-backdrop{box-sizing:border-box}.data-info-dialog,.tutorial-dialog{max-width:calc(100vw - 20px);max-height:calc(100vh - 20px);max-height:calc(100dvh - 20px);box-sizing:border-box}.data-info-head h2,.data-info-head p,.tutorial-head h2,.tutorial-step p,.about-sobat-description,.about-sobat-row dd{overflow-wrap:anywhere}.data-info-body,.tutorial-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.tutorial-dialog{display:flex;flex-direction:column}.tutorial-head,.tutorial-foot{flex:0 0 auto}.tutorial-body{flex:1 1 auto}.data-info-foot{flex-shrink:0}@media(max-width:640px){.data-info-dialog,.tutorial-dialog{max-height:calc(100vh - 16px)!important;max-height:calc(100dvh - 16px)!important}.data-info-backdrop,.tutorial-backdrop{padding:8px}.tutorial-body{min-height:0!important;padding:18px 16px}.tutorial-head{padding-left:16px}.tutorial-foot{padding:12px 16px 16px}.about-sobat-intro{align-items:flex-start}.data-info-foot label{line-height:1.45}}</style>
+<style id="upload-progress-style">.upload-progress{display:none;margin-top:10px;padding-top:9px;border-top:1px solid #e1ebe8}.upload-progress.show{display:block}.upload-progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;color:#35534d;font-size:11px}.upload-progress-value{color:#0d6655;font-weight:800}.upload-progress-track{height:6px;overflow:hidden;border-radius:999px;background:#dfeae7}.upload-progress-bar{width:0;height:100%;border-radius:inherit;background:#0d806a;transition:width .18s ease}.upload-progress.done .upload-progress-bar{background:#249365}.upload-progress.error .upload-progress-bar{background:#c84c3a}.upload-analysis-box.is-processing #uploadFile{pointer-events:none;opacity:.58}.upload-analysis-box.is-processing .upload-box-close{display:none}</style>
+</head>
+    <body>
+        <div id="map">
+        </div>
+
+<header class="sobat-header">
+  <div class="sobat-brand">
+    <div class="sobat-logo"><img src="assets/sobat-taru-logo.png" alt="Logo SOBAT TARU"></div>
+    <div class="sobat-copy"><div class="sobat-name">SOBAT TARU</div><div class="sobat-tagline">Sumbawa Barat dalam Tata Ruang</div></div>
+  </div>
+  <div class="header-actions"><button id="openTutorial" class="info-data-btn" type="button" aria-label="Panduan penggunaan">Panduan</button><div class="basemap-switch" role="group" aria-label="Pilih tampilan peta"><button id="baseOsm" class="basemap-btn active" type="button">OpenStreetMap</button><button id="baseSatellite" class="basemap-btn" type="button">Citra Satelit</button></div></div>
+</header>
+
+<div id="dataInfoModal" class="data-info-backdrop open" role="dialog" aria-modal="true" aria-labelledby="dataInfoTitle">
+  <div class="data-info-dialog"><div class="data-info-head"><h2 id="dataInfoTitle">Informasi Data SOBAT TARU</h2><p>Informasi sumber data dan ketentuan penggunaan</p><button id="closeDataInfo" class="data-info-close" type="button" aria-label="Tutup">×</button></div><div class="data-info-body">
+    <h3 class="data-section-title">Sumber Informasi Data Spasial</h3><p class="data-section-copy">Data tata ruang yang tersedia pada aplikasi ini meliputi:</p>
+    <div id="dataInfoDetails" class="data-info-details"><div class="data-list">
+      <div class="data-row"><b>RTRW Kabupaten Sumbawa Barat 2020–2040</b><span>Peraturan Daerah Kabupaten Sumbawa Barat Nomor 11 Tahun 2020.</span></div>
+      <div class="data-row"><b>RDTR Kawasan Perkotaan Taliwang 2015–2035</b><span>Peraturan Daerah Kabupaten Sumbawa Barat Nomor 12 Tahun 2016. Dokumen sedang dalam proses revisi.</span></div>
+      <div class="data-row"><b>RDTR Sekitar Kawasan Industri Maluk 2023–2043</b><span>Peraturan Bupati Sumbawa Barat Nomor 4 Tahun 2023.</span></div>
+      <div class="data-row"><b>Lahan Sawah Dilindungi (LSD)</b><span>Data indikatif sesuai layer yang tersedia pada aplikasi.</span></div>
+      <div class="data-row"><b>Lahan Pertanian Pangan Berkelanjutan (LP2B)</b><span>Data indikatif sesuai layer yang tersedia pada aplikasi.</span></div>
+    </div></div><section class="data-warning"><h3>⚠ BATAS PENGGUNAAN INFORMASI TATA RUANG</h3><p>SOBAT TARU merupakan media informasi dan identifikasi awal tata ruang Kabupaten Sumbawa Barat. Informasi dan hasil analisis pada aplikasi bersifat informatif. Posisi, luas, dan persinggungan dapat dipengaruhi oleh ketelitian geometri, skala, sistem koordinat, serta pembaruan data. Informasi dan hasil analisis tidak menggantikan dokumen tata ruang, keputusan, maupun produk hukum resmi. Untuk keperluan resmi dan kepastian pemanfaatan ruang, lakukan konfirmasi kepada perangkat daerah yang berwenang.</p></section>
+  </div><div class="data-info-foot"><label><input id="hideDataInfo" type="checkbox"> Jangan tampilkan lagi di perangkat ini</label><button id="acceptDataInfo" class="data-info-ok" type="button">Saya Mengerti</button></div></div>
+</div>
+<script>if(localStorage.getItem('sobatTaruHideDataInfo')==='1'){document.getElementById('dataInfoModal').classList.remove('open');}</script>
+
+<div id="tutorialModal" class="tutorial-backdrop" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
+  <div class="tutorial-dialog"><div class="tutorial-head"><div><span id="tutorialCounter">Langkah 1 dari 5</span><h2 id="tutorialTitle">Pilih tampilan peta</h2></div><button id="closeTutorial" class="data-info-close" type="button" aria-label="Tutup panduan">×</button></div><div class="tutorial-body">
+    <div class="tutorial-step active" data-step="0"><div class="tutorial-demo"><div class="tutorial-basemap-demo"><span class="active">OpenStreetMap</span><span>Citra Satelit</span></div></div><p>Gunakan pilihan <b>OpenStreetMap</b> atau <b>Citra Satelit</b> pada header. Contoh di atas memiliki bentuk dan warna yang sama seperti tombol aslinya.</p></div>
+    <div class="tutorial-step" data-step="1"><div class="tutorial-demo"><span class="tutorial-control-demo layer-control"><img src="css/images/layers.png" alt="Ikon pengaturan layer"></span></div><p>Tekan tombol layer seperti contoh di atas pada kanan atas peta, kemudian aktifkan <b>RTRW, RDTR Taliwang, RDTR Maluk, LSD,</b> atau <b>LP2B</b>.</p></div>
+    <div class="tutorial-step" data-step="2"><div class="tutorial-demo"><span class="tutorial-map-click">Klik langsung pada area peta</span></div><p>Klik satu titik pada peta untuk melihat koordinat, peruntukan RTRW, zona RDTR, serta status persinggungan dengan LSD dan LP2B.</p></div>
+    <div class="tutorial-step" data-step="3"><div class="tutorial-demo"><span class="tutorial-upload-demo"><span>📂</span> Analisis Spasial</span></div><p>Tekan tombol hijau <b>Analisis Spasial</b> seperti contoh di atas untuk mengunggah KML atau ZIP Shapefile. ZIP minimal memuat SHP, SHX, dan DBF.</p></div>
+    <div class="tutorial-step" data-step="4"><div class="tutorial-demo tutorial-tools"><span class="tutorial-zoom-demo"><span>+</span><span>−</span></span><span class="tutorial-control-demo"><i class="fas fa-map-marker-alt"></i></span><span class="tutorial-control-demo"><i class="fas fa-ruler"></i></span><span class="tutorial-control-demo"><i class="fas fa-search"></i></span><span class="tutorial-control-demo layer-control"><img src="css/images/layers.png" alt="Ikon pengaturan layer"></span></div><p>Gunakan kontrol yang bentuk dan warnanya sama seperti di peta untuk zoom, lokasi perangkat, pengukuran, pencarian, dan pengaturan layer.</p></div>
+  </div><div class="tutorial-foot"><button id="tutorialPrev" class="tutorial-secondary" type="button">Sebelumnya</button><button id="tutorialNext" class="tutorial-primary" type="button">Berikutnya</button></div></div>
+</div>
+
+<div id="aboutSobatModal" class="data-info-backdrop" role="dialog" aria-modal="true" aria-labelledby="aboutSobatTitle">
+  <div class="data-info-dialog about-sobat-dialog"><div class="data-info-head"><h2 id="aboutSobatTitle">Tentang SOBAT TARU</h2><p>Informasi pengembangan WebGIS</p><button id="closeAboutSobat" class="data-info-close" type="button" aria-label="Tutup informasi">×</button></div><div class="data-info-body">
+    <div class="about-sobat-intro"><img class="about-sobat-logo" src="assets/sobat-taru-logo.png" alt="Logo SOBAT TARU"><p class="about-sobat-name">WebGIS SOBAT TARU Kabupaten Sumbawa Barat</p></div>
+    <p class="about-sobat-description">SOBAT TARU merupakan media informasi tata ruang dan peta tematik yang dikembangkan untuk mendukung proses pelayanan pertanahan di Kabupaten Sumbawa Barat melalui penyajian informasi spasial secara cepat, mudah, dan terpadu.</p>
+    <dl class="about-sobat-list"><div class="about-sobat-row"><dt>Inisiator &amp; Konseptor</dt><dd>Ferdian Setyo Wibowo</dd></div><div class="about-sobat-row"><dt>Pengembang Teknis</dt><dd>I Made Arjita</dd></div><div class="about-sobat-row"><dt>Versi</dt><dd>1.0</dd></div><div class="about-sobat-row"><dt>Terakhir Diperbarui</dt><dd>1 Juli 2026</dd></div></dl>
+  </div></div>
+</div>
+
+<button id="uploadToggle" class="upload-analysis-toggle" type="button" aria-label="Unggah data analisis" title="Unggah data analisis"><span class="upload-icon">📂</span><span>Analisis Spasial</span></button>
+<div id="uploadBox" class="upload-analysis-box"><button id="closeUploadBox" class="upload-box-close" type="button" aria-label="Tutup panel unggah">×</button>
+
+<div class="upload-analysis-title" style="
+font-size:13px;
+font-weight:600;
+margin-bottom:4px;
+color:#333;
+">
+📂 Upload Data Analisis
+</div>
+
+<input
+type="file"
+id="uploadFile"
+accept=".kml,.zip">
+
+<div class="upload-analysis-help" style="
+font-size:11px;
+color:#666;
+margin-top:4px;
+">
+Format: KML atau ZIP Shapefile
+</div>
+<div id="uploadProgress" class="upload-progress" role="status" aria-live="polite"><div class="upload-progress-head"><span id="uploadProgressText">Menyiapkan berkas…</span><span id="uploadProgressValue" class="upload-progress-value">0%</span></div><div id="uploadProgressTrack" class="upload-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="uploadProgressBar" class="upload-progress-bar"></div></div></div>
+
+</div>
+
+<svg id="analysisConnector" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;"></svg>
+<div id="analysisPanel" style="position:absolute;top:120px;right:10px;z-index:9999;width:360px;max-height:75vh;overflow:auto;background:white;padding:12px;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.3);display:none;font-family:Arial,sans-serif;font-size:13px;line-height:1.4;">
+<div class="analysis-panel-head"><h3>HASIL ANALISIS</h3><button id="closeAnalysisPanel" class="panel-close" type="button" aria-label="Tutup hasil analisis">×</button></div><div id="analysisContent"></div></div>
+
+<script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+<script>
+window.map=L.map('map',{zoomControl:false,maxZoom:28,minZoom:1}).setView([-8.753883,116.853075],17);
+window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{opacity:1,minZoom:1,maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(window.map);
+</script>
+<script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+        <script src="data/RDTRMALUK_1.js"></script>
+        <script src="data/RDTRTALIWANG_2.js"></script>
+        <script src="data/RTRWSUMBAWABARAT20202040_3.js"></script>
+        <script src="data/LSD_Kabupaten_Sumbawa_Barat_4.js"></script>
+        <script src="data/LP2BSUMBAWABARAT_5.js"></script>
+        <script>
+        var map = window.map;
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<button id="openAboutSobat" class="sobat-about-link" type="button">Tentang SOBAT TARU</button>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // modify popup if contains media
+        function addClassToPopupIfMedia(content, popup) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            var imgTd = tempDiv.querySelector('td img');
+            if (imgTd) {
+                var src = imgTd.getAttribute('src');
+                if (/\.(jpg|jpeg|png|gif|bmp|webp|avif)$/i.test(src)) {
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp3|wav|ogg|aac)$/i.test(src)) {
+                    var audio = document.createElement('audio');
+                    audio.controls = true;
+                    audio.src = src;
+                    imgTd.parentNode.replaceChild(audio, imgTd);
+                    popup._contentNode.classList.add('media');
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else if (/\.(mp4|webm|ogg|mov)$/i.test(src)) {
+                    var video = document.createElement('video');
+                    video.controls = true;
+                    video.src = src;
+                    video.style.width = "400px";
+                    video.style.height = "300px";
+                    video.style.maxHeight = "60vh";
+                    video.style.maxWidth = "60vw";
+                    imgTd.parentNode.replaceChild(video, imgTd);
+                    popup._contentNode.classList.add('media');
+                    // Aggiorna il popup quando il video carica i metadati
+                    video.addEventListener('loadedmetadata', function() {
+                        popup.update();
+                    });
+                    setTimeout(function() {
+                        popup.setContent(tempDiv.innerHTML);
+                        popup.update();
+                    }, 10);
+                } else {
+                    popup._contentNode.classList.remove('media');
+                }
+            } else {
+                popup._contentNode.classList.remove('media');
+            }
+        }
+        var title = new L.Control({'position':'topright'});
+        title.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+        title.update = function () {
+            this._div.innerHTML = '<h2>PETA INFORMASI TATA RUANG KABUPATEN SUMBAWA BARAT</h2>';
+        };
+        title.addTo(map);
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleSatellite_0');
+        map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
+        var layer_GoogleSatellite_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatellite_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleSatellite_0;
+        function pop_RDTRMALUK_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NAMOBJ'] !== null ? autolinker.link(String(feature.properties['NAMOBJ']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			// popup bawaan dinonaktifkan
+        }
+
+        function style_RDTRMALUK_1_0(feature) {
+            switch(String(feature.properties['NAMOBJ'])) {
+                case 'Badan Air':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(129,236,132,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Badan Jalan':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(202,176,116,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Hortikultura':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(95,131,210,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Hutan Produksi Tetap':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(99,238,77,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Instalasi Pengolahan Air Limbah (IPAL)':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(183,200,115,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Instalasi Pengolahan Air Minum (IPAM)':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(142,140,238,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Jalur Hijau':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(100,119,228,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pariwisata':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(129,239,186,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pemakaman':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(71,203,205,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pembangkitan Tenaga Listrik':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(200,101,180,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pengelolaan Persampahan':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(196,202,22,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perdagangan dan Jasa Skala Kota':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,105,77,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perdagangan dan Jasa Skala SWP':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(220,26,214,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perdagangan dan Jasa Skala WP':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(212,22,111,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pergudangan':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,64,58,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perikanan Budi Daya':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(104,223,205,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perkantoran':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(216,107,233,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perkebunan':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(155,231,88,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perlindungan Setempat':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(228,89,177,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pertahanan dan Keamanan':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(172,30,233,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perumahan Kepadatan Rendah':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(68,236,183,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perumahan Kepadatan Sedang':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(108,201,125,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perumahan Kepadatan Tinggi':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(133,237,88,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Rimba Kota':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(128,65,235,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'SPU Skala Kecamatan':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(67,36,205,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'SPU Skala Kelurahan':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(80,214,127,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'SPU Skala Kota':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(26,157,227,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'SPU Skala RW':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(37,122,212,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Taman Kecamatan':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(216,152,80,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Taman Kelurahan':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(52,205,240,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Taman Kota':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(220,137,89,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Taman RW':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(162,220,63,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Taman Wisata Alam':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(210,68,110,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Tanaman Pangan':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,222,127,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Transportasi':
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(159,102,208,0.5)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_RDTRMALUK_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,131,143,0.5)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_RDTRMALUK_1');
+        map.getPane('pane_RDTRMALUK_1').style.zIndex = 401;
+        map.getPane('pane_RDTRMALUK_1').style['mix-blend-mode'] = 'normal';
+        var layer_RDTRMALUK_1 = new L.geoJson(json_RDTRMALUK_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RDTRMALUK_1',
+            layerName: 'layer_RDTRMALUK_1',
+            pane: 'pane_RDTRMALUK_1',
+            onEachFeature: pop_RDTRMALUK_1,
+            style: style_RDTRMALUK_1_0,
+        });
+        bounds_group.addLayer(layer_RDTRMALUK_1);
+        map.addLayer(layer_RDTRMALUK_1);
+        function pop_RDTRTALIWANG_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NAMAOBJ'] !== null ? autolinker.link(String(feature.properties['NAMAOBJ']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			// popup bawaan dinonaktifkan
+        }
+
+        function style_RDTRTALIWANG_2_0(feature) {
+            switch(String(feature.properties['NAMAOBJ'])) {
+                case 'Badan Air':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(223,173,34,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Badan Jalan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(26,234,64,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Cagar Budaya':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(161,129,225,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Campuran Intensitas Menengah/Sedang':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(55,167,208,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Campuran Intensitas Tinggi':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(225,135,141,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Ekosistem Mangrove':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(116,208,159,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Hortikultura':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(190,201,115,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Hutan Lindung':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(54,207,41,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Hutan Produksi Terbatas':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(216,108,233,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Hutan Produksi Tetap':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(122,212,97,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Imbuhan Air Tanah':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(239,70,28,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Instalasi Pengolahan Air Minum (IPAM)':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(107,115,227,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Jalur Hijau':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(229,229,135,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Peruntukan Industri':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(187,210,118,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pariwisata':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(212,41,143,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pemakaman':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(226,175,99,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pembangkitan Tenaga Listrik':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(79,151,233,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pengelolaan Persampahan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(180,227,103,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perdagangan dan Jasa Skala Kota':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(80,42,229,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perdagangan dan Jasa Skala SWP':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,97,43,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perdagangan dan Jasa Skala WP':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(94,84,234,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pergudangan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(215,203,126,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perikanan Budi Daya':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(233,139,220,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perkantoran':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(162,226,128,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perkebunan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(206,115,157,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perlindungan Setempat':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,33,166,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Pertahanan dan Keamanan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(218,50,106,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perumahan Kepadatan Rendah':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(240,25,68,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perumahan Kepadatan Sangat Rendah':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(136,235,43,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perumahan Kepadatan Sedang':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(75,209,173,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Perumahan Kepadatan Tinggi':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(99,200,104,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Peruntukan Pertambangan Batuan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(70,214,195,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Peternakan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(90,203,158,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Rimba Kota':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(135,59,222,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'SPU Skala Kecamatan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(182,93,215,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'SPU Skala Kelurahan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(123,152,209,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'SPU Skala Kota':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(129,188,228,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'SPU Skala RW':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,38,221,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Taman Kelurahan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(170,111,209,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Taman Kota':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(105,192,205,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Taman RW':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(109,227,148,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Taman Wisata Alam':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(237,131,38,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Tanaman Pangan':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,49,37,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Transportasi':
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(134,153,228,0.5)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_RDTRTALIWANG_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(99,223,223,0.5)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_RDTRTALIWANG_2');
+        map.getPane('pane_RDTRTALIWANG_2').style.zIndex = 402;
+        map.getPane('pane_RDTRTALIWANG_2').style['mix-blend-mode'] = 'normal';
+        var layer_RDTRTALIWANG_2 = new L.geoJson(json_RDTRTALIWANG_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RDTRTALIWANG_2',
+            layerName: 'layer_RDTRTALIWANG_2',
+            pane: 'pane_RDTRTALIWANG_2',
+            onEachFeature: pop_RDTRTALIWANG_2,
+            style: style_RDTRTALIWANG_2_0,
+        });
+        bounds_group.addLayer(layer_RDTRTALIWANG_2);
+        function pop_RTRWSUMBAWABARAT20202040_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NAMOBJ'] !== null ? autolinker.link(String(feature.properties['NAMOBJ']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			// popup bawaan dinonaktifkan
+        }
+
+        function style_RTRWSUMBAWABARAT20202040_3_0(feature) {
+            switch(String(feature.properties['NAMOBJ'])) {
+                case 'Kawasan Ekosistem Mangrove':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(29,107,14,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Hortikultura':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(212,184,119,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Hutan Lindung':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(20,160,119,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Hutan Produksi Terbatas':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(180,217,21,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Hutan Produksi Tetap':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(139,163,39,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Imbuhan Air Tanah':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(184,151,224,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Perikanan Budidaya':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(84,87,218,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Perkebunan':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(242,114,41,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Permukiman Pedesaan':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(162,28,28,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Permukiman Perkotaan':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(217,9,129,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Peruntukan Industri':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(96,6,144,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Peternakan':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(218,101,23,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Sekitar Danau atau Waduk':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(105,225,203,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Suaka Alam (KSA)':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(27,93,47,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Kawasan Tanaman Pangan':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(4,208,92,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Sempadan Pantai':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(144,240,229,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Sempadan Sungai':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(63,207,178,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Suaka Pesisir':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(52,128,177,0.5)',
+                interactive: true,
+            }
+                    break;
+                case 'Taman Wisata Alam':
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(23,217,239,0.5)',
+                interactive: true,
+            }
+                    break;
+                default:
+                    return {
+                pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(172,114,213,0.5)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_RTRWSUMBAWABARAT20202040_3');
+        map.getPane('pane_RTRWSUMBAWABARAT20202040_3').style.zIndex = 403;
+        map.getPane('pane_RTRWSUMBAWABARAT20202040_3').style['mix-blend-mode'] = 'normal';
+        var layer_RTRWSUMBAWABARAT20202040_3 = new L.geoJson(json_RTRWSUMBAWABARAT20202040_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RTRWSUMBAWABARAT20202040_3',
+            layerName: 'layer_RTRWSUMBAWABARAT20202040_3',
+            pane: 'pane_RTRWSUMBAWABARAT20202040_3',
+            onEachFeature: pop_RTRWSUMBAWABARAT20202040_3,
+            style: style_RTRWSUMBAWABARAT20202040_3_0,
+        });
+        bounds_group.addLayer(layer_RTRWSUMBAWABARAT20202040_3);
+        function pop_LSD_Kabupaten_Sumbawa_Barat_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LSD'] !== null ? autolinker.link(String(feature.properties['LSD']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			// popup bawaan dinonaktifkan
+        }
+
+        function style_LSD_Kabupaten_Sumbawa_Barat_4_0() {
+            return {
+                pane: 'pane_LSD_Kabupaten_Sumbawa_Barat_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,61,25,0.5)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_LSD_Kabupaten_Sumbawa_Barat_4');
+        map.getPane('pane_LSD_Kabupaten_Sumbawa_Barat_4').style.zIndex = 404;
+        map.getPane('pane_LSD_Kabupaten_Sumbawa_Barat_4').style['mix-blend-mode'] = 'normal';
+        var layer_LSD_Kabupaten_Sumbawa_Barat_4 = new L.geoJson(json_LSD_Kabupaten_Sumbawa_Barat_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_LSD_Kabupaten_Sumbawa_Barat_4',
+            layerName: 'layer_LSD_Kabupaten_Sumbawa_Barat_4',
+            pane: 'pane_LSD_Kabupaten_Sumbawa_Barat_4',
+            onEachFeature: pop_LSD_Kabupaten_Sumbawa_Barat_4,
+            style: style_LSD_Kabupaten_Sumbawa_Barat_4_0,
+        });
+        bounds_group.addLayer(layer_LSD_Kabupaten_Sumbawa_Barat_4);
+        function pop_LP2BSUMBAWABARAT_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Keterangan'] !== null ? autolinker.link(String(feature.properties['Keterangan']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			// popup bawaan dinonaktifkan
+        }
+
+        function style_LP2BSUMBAWABARAT_5_0() {
+            return {
+                pane: 'pane_LP2BSUMBAWABARAT_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,0.5)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,235,15,0.5)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_LP2BSUMBAWABARAT_5');
+        map.getPane('pane_LP2BSUMBAWABARAT_5').style.zIndex = 405;
+        map.getPane('pane_LP2BSUMBAWABARAT_5').style['mix-blend-mode'] = 'normal';
+        var layer_LP2BSUMBAWABARAT_5 = new L.geoJson(json_LP2BSUMBAWABARAT_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_LP2BSUMBAWABARAT_5',
+            layerName: 'layer_LP2BSUMBAWABARAT_5',
+            pane: 'pane_LP2BSUMBAWABARAT_5',
+            onEachFeature: pop_LP2BSUMBAWABARAT_5,
+            style: style_LP2BSUMBAWABARAT_5_0,
+        });
+        bounds_group.addLayer(layer_LP2BSUMBAWABARAT_5);
+        const url = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&",
+        "France BAN": "https://api-adresse.data.gouv.fr/search/?"}
+        var photonControl = L.control.photon({
+            url: url["Nominatim OSM"],
+            feedbackLabel: '',
+            position: 'topleft',
+            includePosition: true,
+            initial: true,
+            // resultsHandler: myHandler,
+        }).addTo(map);
+        photonControl._container.childNodes[0].style.borderRadius="10px"
+        // Create a variable to store the geoJSON data
+        var x = null;
+        // Create a variable to store the marker
+        var marker = null;
+        // Add an event listener to the Photon control to create a marker from the returned geoJSON data
+        var z = null;
+        photonControl.on('selected', function(e) {
+            console.log(photonControl.search.resultsContainer);
+            if (x != null) {
+                map.removeLayer(obj3.marker);
+                map.removeLayer(x);
+            }
+            obj2.gcd = e.choice;
+            x = L.geoJSON(obj2.gcd).addTo(map);
+            var label = typeof obj2.gcd.properties.label === 'undefined' ? obj2.gcd.properties.display_name : obj2.gcd.properties.label;
+            obj3.marker = L.marker(x.getLayers()[0].getLatLng()).bindPopup(label).addTo(map);
+            map.setView(x.getLayers()[0].getLatLng(), 17);
+            z = typeof e.choice.properties.label === 'undefined'? e.choice.properties.display_name : e.choice.properties.label;
+            console.log(e);
+            e.target.input.value = z;
+        });
+        var search = document.getElementsByClassName("leaflet-photon leaflet-control")[0];
+        search.classList.add("leaflet-control-search")
+        search.style.display = "flex";
+        search.style.backgroundColor="rgba(255,255,255,0.5)" 
+
+        // Create the new button element
+        var button = document.createElement("div");
+        button.id = "gcd-button-control";
+        button.className = "gcd-gl-btn fa fa-search search-button";
+
+        // Insert the button at the beginning of the search control
+        search.insertBefore(button, search.firstChild);
+        last = search.lastChild;
+        last.style.display = "none";
+        button.addEventListener("click", function (e) {
+            if (last.style.display === "none") {
+                last.style.display = "block";
+            } else {
+                last.style.display = "none";
+            }
+        });
+        var overlaysTree = [
+            {label: '<img src="legend/LP2BSUMBAWABARAT_5.png" /> LP2B SUMBAWA BARAT', layer: layer_LP2BSUMBAWABARAT_5},
+            {label: '<img src="legend/LSD_Kabupaten_Sumbawa_Barat_4.png" /> LSD_Kabupaten_Sumbawa_Barat', layer: layer_LSD_Kabupaten_Sumbawa_Barat_4},
+            {label: 'RTRW SUMBAWA BARAT 2020-2040<br /><table><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanEkosistemMangrove0.png" /></td><td>Kawasan Ekosistem Mangrove</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanHortikultura1.png" /></td><td>Kawasan Hortikultura</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanHutanLindung2.png" /></td><td>Kawasan Hutan Lindung</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanHutanProduksiTerbatas3.png" /></td><td>Kawasan Hutan Produksi Terbatas</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanHutanProduksiTetap4.png" /></td><td>Kawasan Hutan Produksi Tetap</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanImbuhanAirTanah5.png" /></td><td>Kawasan Imbuhan Air Tanah</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanPerikananBudidaya6.png" /></td><td>Kawasan Perikanan Budidaya</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanPerkebunan7.png" /></td><td>Kawasan Perkebunan</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanPermukimanPedesaan8.png" /></td><td>Kawasan Permukiman Pedesaan</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanPermukimanPerkotaan9.png" /></td><td>Kawasan Permukiman Perkotaan</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanPeruntukanIndustri10.png" /></td><td>Kawasan Peruntukan Industri</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanPeternakan11.png" /></td><td>Kawasan Peternakan</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanSekitarDanauatauWaduk12.png" /></td><td>Kawasan Sekitar Danau atau Waduk</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanSuakaAlamKSA13.png" /></td><td>Kawasan Suaka Alam (KSA)</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_KawasanTanamanPangan14.png" /></td><td>Kawasan Tanaman Pangan</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_SempadanPantai15.png" /></td><td>Sempadan Pantai</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_SempadanSungai16.png" /></td><td>Sempadan Sungai</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_SuakaPesisir17.png" /></td><td>Suaka Pesisir</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_TamanWisataAlam18.png" /></td><td>Taman Wisata Alam</td></tr><tr><td style="text-align: center;"><img src="legend/RTRWSUMBAWABARAT20202040_3_19.png" /></td><td></td></tr></table>', layer: layer_RTRWSUMBAWABARAT20202040_3},
+            {label: 'RDTR TALIWANG<br /><table><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_BadanAir0.png" /></td><td>Badan Air</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_BadanJalan1.png" /></td><td>Badan Jalan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_CagarBudaya2.png" /></td><td>Cagar Budaya</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_CampuranIntensitasMenengahSedang3.png" /></td><td>Campuran Intensitas Menengah/Sedang</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_CampuranIntensitasTinggi4.png" /></td><td>Campuran Intensitas Tinggi</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_EkosistemMangrove5.png" /></td><td>Ekosistem Mangrove</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_Hortikultura6.png" /></td><td>Hortikultura</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_HutanLindung7.png" /></td><td>Hutan Lindung</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_HutanProduksiTerbatas8.png" /></td><td>Hutan Produksi Terbatas</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_HutanProduksiTetap9.png" /></td><td>Hutan Produksi Tetap</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_ImbuhanAirTanah10.png" /></td><td>Imbuhan Air Tanah</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_InstalasiPengolahanAirMinumIPAM11.png" /></td><td>Instalasi Pengolahan Air Minum (IPAM)</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_JalurHijau12.png" /></td><td>Jalur Hijau</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_KawasanPeruntukanIndustri13.png" /></td><td>Kawasan Peruntukan Industri</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_Pariwisata14.png" /></td><td>Pariwisata</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_Pemakaman15.png" /></td><td>Pemakaman</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PembangkitanTenagaListrik16.png" /></td><td>Pembangkitan Tenaga Listrik</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PengelolaanPersampahan17.png" /></td><td>Pengelolaan Persampahan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PerdagangandanJasaSkalaKota18.png" /></td><td>Perdagangan dan Jasa Skala Kota</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PerdagangandanJasaSkalaSWP19.png" /></td><td>Perdagangan dan Jasa Skala SWP</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PerdagangandanJasaSkalaWP20.png" /></td><td>Perdagangan dan Jasa Skala WP</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_Pergudangan21.png" /></td><td>Pergudangan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PerikananBudiDaya22.png" /></td><td>Perikanan Budi Daya</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_Perkantoran23.png" /></td><td>Perkantoran</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_Perkebunan24.png" /></td><td>Perkebunan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PerlindunganSetempat25.png" /></td><td>Perlindungan Setempat</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PertahanandanKeamanan26.png" /></td><td>Pertahanan dan Keamanan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PerumahanKepadatanRendah27.png" /></td><td>Perumahan Kepadatan Rendah</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PerumahanKepadatanSangatRendah28.png" /></td><td>Perumahan Kepadatan Sangat Rendah</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PerumahanKepadatanSedang29.png" /></td><td>Perumahan Kepadatan Sedang</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PerumahanKepadatanTinggi30.png" /></td><td>Perumahan Kepadatan Tinggi</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_PeruntukanPertambanganBatuan31.png" /></td><td>Peruntukan Pertambangan Batuan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_Peternakan32.png" /></td><td>Peternakan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_RimbaKota33.png" /></td><td>Rimba Kota</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_SPUSkalaKecamatan34.png" /></td><td>SPU Skala Kecamatan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_SPUSkalaKelurahan35.png" /></td><td>SPU Skala Kelurahan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_SPUSkalaKota36.png" /></td><td>SPU Skala Kota</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_SPUSkalaRW37.png" /></td><td>SPU Skala RW</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_TamanKelurahan38.png" /></td><td>Taman Kelurahan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_TamanKota39.png" /></td><td>Taman Kota</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_TamanRW40.png" /></td><td>Taman RW</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_TamanWisataAlam41.png" /></td><td>Taman Wisata Alam</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_TanamanPangan42.png" /></td><td>Tanaman Pangan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_Transportasi43.png" /></td><td>Transportasi</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRTALIWANG_2_44.png" /></td><td></td></tr></table>', layer: layer_RDTRTALIWANG_2},
+            {label: 'RDTR MALUK<br /><table><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_BadanAir0.png" /></td><td>Badan Air</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_BadanJalan1.png" /></td><td>Badan Jalan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_Hortikultura2.png" /></td><td>Hortikultura</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_HutanProduksiTetap3.png" /></td><td>Hutan Produksi Tetap</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_InstalasiPengolahanAirLimbahIPAL4.png" /></td><td>Instalasi Pengolahan Air Limbah (IPAL)</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_InstalasiPengolahanAirMinumIPAM5.png" /></td><td>Instalasi Pengolahan Air Minum (IPAM)</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_JalurHijau6.png" /></td><td>Jalur Hijau</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_Pariwisata7.png" /></td><td>Pariwisata</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_Pemakaman8.png" /></td><td>Pemakaman</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PembangkitanTenagaListrik9.png" /></td><td>Pembangkitan Tenaga Listrik</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PengelolaanPersampahan10.png" /></td><td>Pengelolaan Persampahan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PerdagangandanJasaSkalaKota11.png" /></td><td>Perdagangan dan Jasa Skala Kota</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PerdagangandanJasaSkalaSWP12.png" /></td><td>Perdagangan dan Jasa Skala SWP</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PerdagangandanJasaSkalaWP13.png" /></td><td>Perdagangan dan Jasa Skala WP</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_Pergudangan14.png" /></td><td>Pergudangan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PerikananBudiDaya15.png" /></td><td>Perikanan Budi Daya</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_Perkantoran16.png" /></td><td>Perkantoran</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_Perkebunan17.png" /></td><td>Perkebunan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PerlindunganSetempat18.png" /></td><td>Perlindungan Setempat</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PertahanandanKeamanan19.png" /></td><td>Pertahanan dan Keamanan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PerumahanKepadatanRendah20.png" /></td><td>Perumahan Kepadatan Rendah</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PerumahanKepadatanSedang21.png" /></td><td>Perumahan Kepadatan Sedang</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_PerumahanKepadatanTinggi22.png" /></td><td>Perumahan Kepadatan Tinggi</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_RimbaKota23.png" /></td><td>Rimba Kota</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_SPUSkalaKecamatan24.png" /></td><td>SPU Skala Kecamatan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_SPUSkalaKelurahan25.png" /></td><td>SPU Skala Kelurahan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_SPUSkalaKota26.png" /></td><td>SPU Skala Kota</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_SPUSkalaRW27.png" /></td><td>SPU Skala RW</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_TamanKecamatan28.png" /></td><td>Taman Kecamatan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_TamanKelurahan29.png" /></td><td>Taman Kelurahan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_TamanKota30.png" /></td><td>Taman Kota</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_TamanRW31.png" /></td><td>Taman RW</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_TamanWisataAlam32.png" /></td><td>Taman Wisata Alam</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_TanamanPangan33.png" /></td><td>Tanaman Pangan</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_Transportasi34.png" /></td><td>Transportasi</td></tr><tr><td style="text-align: center;"><img src="legend/RDTRMALUK_1_35.png" /></td><td></td></tr></table>', layer: layer_RDTRMALUK_1},
+            ]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: true,
+        });
+        lay.addTo(map);
+        function setBasemap(mode){
+            const osmButton=document.getElementById('baseOsm');
+            const satelliteButton=document.getElementById('baseSatellite');
+            if(mode==='satellite'){
+                if(map.hasLayer(window.layer_OpenStreetMap_0)) map.removeLayer(window.layer_OpenStreetMap_0);
+                if(!map.hasLayer(layer_GoogleSatellite_0)) map.addLayer(layer_GoogleSatellite_0);
+                osmButton.classList.remove('active');satelliteButton.classList.add('active');
+            }else{
+                if(map.hasLayer(layer_GoogleSatellite_0)) map.removeLayer(layer_GoogleSatellite_0);
+                if(!map.hasLayer(window.layer_OpenStreetMap_0)) map.addLayer(window.layer_OpenStreetMap_0);
+                satelliteButton.classList.remove('active');osmButton.classList.add('active');
+            }
+        }
+        document.getElementById('baseOsm').addEventListener('click',function(){setBasemap('osm');});
+        document.getElementById('baseSatellite').addEventListener('click',function(){setBasemap('satellite');});
+        const dataInfoModal=document.getElementById('dataInfoModal');
+        function showDataInfo(){dataInfoModal.classList.add('open');}
+        function closeDataInfo(){
+            if(document.getElementById('hideDataInfo').checked){localStorage.setItem('sobatTaruHideDataInfo','1');}
+            dataInfoModal.classList.remove('open');
+        }
+        document.getElementById('acceptDataInfo').addEventListener('click',closeDataInfo);
+        document.getElementById('closeDataInfo').addEventListener('click',closeDataInfo);
+        dataInfoModal.addEventListener('click',function(e){if(e.target===dataInfoModal)closeDataInfo();});
+        document.addEventListener('keydown',function(e){if(e.key==='Escape'&&dataInfoModal.classList.contains('open'))closeDataInfo();});
+        if(localStorage.getItem('sobatTaruHideDataInfo')!=='1')showDataInfo();
+        const aboutSobatModal=document.getElementById('aboutSobatModal');
+        function closeAboutSobat(){aboutSobatModal.classList.remove('open');}
+        document.addEventListener('click',function(e){
+            const aboutLink=e.target.closest&&e.target.closest('#openAboutSobat');
+            if(!aboutLink)return;
+            e.preventDefault();e.stopPropagation();aboutSobatModal.classList.add('open');
+        });
+        document.getElementById('closeAboutSobat').addEventListener('click',closeAboutSobat);
+        aboutSobatModal.addEventListener('click',function(e){if(e.target===aboutSobatModal)closeAboutSobat();});
+        document.addEventListener('keydown',function(e){if(e.key==='Escape'&&aboutSobatModal.classList.contains('open'))closeAboutSobat();});
+        const tutorialModal=document.getElementById('tutorialModal');
+        const tutorialTitles=['Pilih tampilan peta','Aktifkan data tata ruang','Identifikasi lokasi','Analisis bidang','Gunakan alat bantu peta'];
+        let tutorialStep=0;
+        function renderTutorial(){
+            document.querySelectorAll('.tutorial-step').forEach(function(el,i){el.classList.toggle('active',i===tutorialStep);});
+            document.getElementById('tutorialCounter').textContent='Langkah '+(tutorialStep+1)+' dari 5';
+            document.getElementById('tutorialTitle').textContent=tutorialTitles[tutorialStep];
+            document.getElementById('tutorialPrev').disabled=tutorialStep===0;
+            document.getElementById('tutorialNext').textContent=tutorialStep===4?'Selesai':'Berikutnya';
+        }
+        function openTutorial(){tutorialStep=0;renderTutorial();tutorialModal.classList.add('open');}
+        function closeTutorial(){tutorialModal.classList.remove('open');}
+        document.getElementById('openTutorial').addEventListener('click',openTutorial);
+        document.getElementById('closeTutorial').addEventListener('click',closeTutorial);
+        document.getElementById('tutorialPrev').addEventListener('click',function(){if(tutorialStep>0){tutorialStep--;renderTutorial();}});
+        document.getElementById('tutorialNext').addEventListener('click',function(){if(tutorialStep<4){tutorialStep++;renderTutorial();}else closeTutorial();});
+        tutorialModal.addEventListener('click',function(e){if(e.target===tutorialModal)closeTutorial();});
+        document.addEventListener('keydown',function(e){if(e.key==='Escape'&&tutorialModal.classList.contains('open'))closeTutorial();});
+        setBounds();
+var uploadLayer;
+
+document.getElementById('uploadToggle').addEventListener('click',function(){
+    const box=document.getElementById('uploadBox');
+    const open=box.classList.toggle('open');
+    this.setAttribute('aria-expanded',open?'true':'false');
+});
+document.getElementById('closeUploadBox').addEventListener('click',function(){
+    document.getElementById('uploadBox').classList.remove('open');
+    document.getElementById('uploadToggle').setAttribute('aria-expanded','false');
+});
+document.getElementById('closeAnalysisPanel').addEventListener('click',function(){
+    document.getElementById('analysisPanel').style.display='none';
+    document.getElementById('analysisConnector').innerHTML='';
+    window.lastUploadedFeature=null;
+});
+
+const optionalScripts={};
+function loadOptionalScript(url,globalName){
+    if(window[globalName]) return Promise.resolve();
+    if(optionalScripts[url]) return optionalScripts[url];
+    optionalScripts[url]=new Promise(function(resolve,reject){
+        const script=document.createElement('script');
+        script.src=url;
+        script.async=true;
+        script.onload=resolve;
+        script.onerror=function(){delete optionalScripts[url];reject(new Error('Gagal memuat alat unggah'));};
+        document.head.appendChild(script);
+    });
+    return optionalScripts[url];
+}
+
+function setUploadProgress(value,text,state){
+    const progress=document.getElementById('uploadProgress');
+    const safeValue=Math.max(0,Math.min(100,value));
+    progress.classList.add('show');
+    progress.classList.toggle('done',state==='done');
+    progress.classList.toggle('error',state==='error');
+    document.getElementById('uploadProgressText').textContent=text;
+    document.getElementById('uploadProgressValue').textContent=safeValue+'%';
+    document.getElementById('uploadProgressBar').style.width=safeValue+'%';
+    document.getElementById('uploadProgressTrack').setAttribute('aria-valuenow',safeValue);
+}
+function uploadFailed(message){
+    document.getElementById('uploadBox').classList.remove('is-processing');
+    setUploadProgress(100,message,'error');
+}
+function performUploadAnalysis(geojson){
+    setUploadProgress(88,'Bidang sudah tampil — menghitung persinggungan…');
+    requestAnimationFrame(function(){setTimeout(function(){
+        try{
+            runAnalysis(geojson);
+            setUploadProgress(100,'Analisis selesai','done');
+            setTimeout(function(){
+                document.getElementById('uploadBox').classList.remove('open','is-processing');
+                document.getElementById('uploadToggle').setAttribute('aria-expanded','false');
+            },650);
+        }catch(err){uploadFailed('Analisis gagal. Periksa data lalu coba lagi.');}
+    },20);});
+}
+
+document.getElementById('uploadFile')
+.addEventListener('change', async function(e){
+
+    const file = e.target.files[0];
+
+    if(!file) return;
+
+    document.getElementById('uploadBox').classList.add('is-processing');
+    setUploadProgress(8,'Memeriksa berkas…');
+
+    const ext =
+    file.name.split('.').pop().toLowerCase();
+
+    if(ext === 'kml'){
+
+        setUploadProgress(20,'Menyiapkan pembaca KML…');
+        try{await loadOptionalScript('https://unpkg.com/@tmcw/togeojson','toGeoJSON');}
+        catch(err){uploadFailed('Pembaca KML gagal dimuat.');return;}
+
+        const reader = new FileReader();
+
+        setUploadProgress(38,'Membaca data KML…');
+
+        reader.onload = function(evt){
+
+            const parser = new DOMParser();
+
+            const kml =
+            parser.parseFromString(
+                evt.target.result,
+                'text/xml'
+            );
+
+            if(kml.querySelector('parsererror')){uploadFailed('Struktur KML tidak valid.');return;}
+
+            const geojson =
+            toGeoJSON.kml(kml);
+
+            setUploadProgress(68,'Menyiapkan tampilan bidang…');
+
+            if(uploadLayer){
+                map.removeLayer(uploadLayer);
+            }
+
+            uploadLayer =
+            L.geoJSON(geojson,{
+                style:{
+                    color:'red',
+                    weight:3,
+                    fillOpacity:0.3
+                }
+            }).addTo(map);
+
+            map.fitBounds(uploadLayer.getBounds()); performUploadAnalysis(uploadLayer.toGeoJSON());
+
+        };
+
+        reader.onerror=function(){uploadFailed('Berkas KML gagal dibaca.');};
+
+        reader.readAsText(file);
+
+    }
+
+    if(ext === 'zip'){
+
+        setUploadProgress(20,'Menyiapkan pembaca Shapefile…');
+        try{await loadOptionalScript('https://unpkg.com/shpjs@latest/dist/shp.min.js','shp');}
+        catch(err){uploadFailed('Pembaca Shapefile gagal dimuat.');return;}
+
+        const reader =
+        new FileReader();
+
+        reader.onload =
+        function(evt){
+
+            setUploadProgress(48,'Mengubah Shapefile menjadi data peta…');
+            shp(evt.target.result)
+            .then(function(geojson){
+
+                setUploadProgress(68,'Menyiapkan tampilan bidang…');
+
+                if(uploadLayer){
+                    map.removeLayer(uploadLayer);
+                }
+
+                uploadLayer =
+                L.geoJSON(geojson,{
+                    style:{
+                        color:'red',
+                        weight:3,
+                        fillOpacity:0.3
+                    }
+                }).addTo(map);
+
+                map.fitBounds(uploadLayer.getBounds());
+                performUploadAnalysis(uploadLayer.toGeoJSON());
+            }).catch(function(){uploadFailed('Shapefile tidak dapat dibaca.');});
+
+        };
+
+        reader.onerror=function(){uploadFailed('Berkas ZIP gagal dibaca.');};
+
+        reader.readAsArrayBuffer(file);
+
+    }
+
+    if(ext!=='kml'&&ext!=='zip') uploadFailed('Format berkas tidak didukung.');
+
+});
+
+        
+
+
+var uploadLayer=null;
+function fmt(a){return Number(a).toLocaleString('id-ID',{maximumFractionDigits:0})+' m²';}
+function runAnalysis(geojson){
+
+ window.lastUploadedFeature = geojson;
+ setTimeout(function(){
+   if(typeof drawAnalysisConnector==='function'){
+      drawAnalysisConnector(geojson);
+   }
+ },300);
+
+ const uploadFlat=turf.flatten(geojson);
+ let total=0;
+ uploadFlat.features.forEach(f=>{try{total+=turf.area(f)}catch(e){}});
+
+ function fmt2(a){
+   if(a>=10000) return (a/10000).toFixed(2)+' Ha';
+   return Math.round(a)+' m²';
+ }
+
+ function collect(layer,field,prefix){
+   const totals=new Map();
+   layer.eachLayer(function(l){
+      let luas=0;
+      let zona=l.toGeoJSON();
+      uploadFlat.features.forEach(function(f){
+         try{
+           if(turf.booleanIntersects(f,zona)){
+             let inter=turf.intersect(f,zona);
+             if(inter) luas+=turf.area(inter);
+           }
+         }catch(e){}
+      });
+      if(luas>0){
+         const nama=prefix+(l.feature.properties[field]||'-');
+         totals.set(nama,(totals.get(nama)||0)+luas);
+      }
+   });
+   let found=Array.from(totals,function(item){return {nama:item[0],luas:item[1]};});
+   found.sort((a,b)=>b.luas-a.luas);
+   return found;
+ }
+
+ let rtrw=collect(layer_RTRWSUMBAWABARAT20202040_3,'NAMOBJ','');
+ let rdtr=[...collect(layer_RDTRTALIWANG_2,'NAMAOBJ','RDTR Taliwang - '),...collect(layer_RDTRMALUK_1,'NAMOBJ','RDTR Maluk - ')];
+ rdtr.sort((a,b)=>b.luas-a.luas);
+
+ let lp2b='TIDAK';
+ if(collect(layer_LP2BSUMBAWABARAT_5,'Keterangan','').length>0) lp2b='YA';
+ let lsd='TIDAK';
+ if(collect(layer_LSD_Kabupaten_Sumbawa_Barat_4,'LSD','').length>0) lsd='YA';
+
+ let h='';
+ h+='<b>Luas Bidang Upload :</b> '+fmt2(total)+'<hr>';
+
+ h+='<b>RTRW Kabupaten Sumbawa Barat</b><br>';
+ if(rtrw.length){
+   rtrw.forEach(z=>{
+      h+='• '+z.nama+' ('+fmt2(z.luas)+' | '+((z.luas/total)*100).toFixed(1)+'%)<br>';
+   });
+ } else h+='Tidak beririsan';
+ h+='<hr>';
+
+ h+='<b>RDTR</b><br>';
+ if(rdtr.length){
+   rdtr.forEach(z=>{
+      h+='• '+z.nama+' ('+fmt2(z.luas)+' | '+((z.luas/total)*100).toFixed(1)+'%)<br>';
+   });
+ } else h+='Tidak berada pada wilayah RDTR';
+ h+='<hr>';
+
+ h+='<b>LP2B</b> : '+lp2b+'<br>';
+ h+='<b>LSD</b> : '+lsd+'<hr>';
+
+
+ document.getElementById('analysisPanel').style.display='block';
+ document.getElementById('analysisContent').innerHTML=h;
+}
+
+/* ===== IDENTIFIKASI TATA RUANG SAAT KLIK PETA ===== */
+function cekLayerPoint(layer, point, judul, field, hasil){
+    layer.eachLayer(function(l){
+        try{
+            let geojson = l.toGeoJSON();
+            if (turf.booleanPointInPolygon(point, geojson)){
+                hasil.push("<b>"+judul+"</b><br>"+(geojson.properties[field] || "YA"));
+            }
+        }catch(err){}
+    });
+}
+
+
+function identifikasiLokasi(latlng){
+
+    const pt = turf.point([latlng.lng, latlng.lat]);
+
+    let rtrw = "Tidak ditemukan";
+    let rdtr = "Tidak berada pada wilayah RDTR";
+    let lsd = "TIDAK";
+    let lp2b = "TIDAK";
+
+    try{
+        layer_RTRWSUMBAWABARAT20202040_3.eachLayer(function(l){
+            let g=l.toGeoJSON();
+            if(turf.booleanPointInPolygon(pt,g)){ rtrw=g.properties.NAMOBJ; }
+        });
+    }catch(e){}
+
+    try{
+        layer_RDTRTALIWANG_2.eachLayer(function(l){
+            let g=l.toGeoJSON();
+            if(turf.booleanPointInPolygon(pt,g)){ rdtr="RDTR Kecamatan Taliwang<br>Zona : "+g.properties.NAMAOBJ; }
+        });
+    }catch(e){}
+
+    try{
+        layer_RDTRMALUK_1.eachLayer(function(l){
+            let g=l.toGeoJSON();
+            if(turf.booleanPointInPolygon(pt,g)){ rdtr="RDTR Kecamatan Maluk<br>Zona : "+g.properties.NAMOBJ; }
+        });
+    }catch(e){}
+
+    try{
+        layer_LSD_Kabupaten_Sumbawa_Barat_4.eachLayer(function(l){
+            let g=l.toGeoJSON();
+            if(turf.booleanPointInPolygon(pt,g)){ lsd="YA"; }
+        });
+    }catch(e){}
+
+    try{
+        layer_LP2BSUMBAWABARAT_5.eachLayer(function(l){
+            let g=l.toGeoJSON();
+            if(turf.booleanPointInPolygon(pt,g)){ lp2b="YA"; }
+        });
+    }catch(e){}
+
+    const isi = `
+    <div style="min-width:340px">
+    <h3 style="margin-bottom:10px">IDENTIFIKASI SPASIAL</h3>
+
+    <b>Koordinat</b><br>
+    ${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}
+    <hr>
+
+    <b>RTRW Kabupaten Sumbawa Barat</b><br>
+    ${rtrw}
+    <hr>
+
+    <b>RDTR</b><br>
+    ${rdtr}
+    <hr>
+
+    <b>LP2B</b><br>
+    ${lp2b}
+    <hr>
+
+    <b>LSD</b><br>
+    ${lsd}
+    <hr>
+
+    <div style="font-size:11px;color:#666">
+    Informasi ini merupakan hasil identifikasi spasial dan bukan merupakan produk hukum.
+    </div>
+    </div>`;
+
+    L.popup().setLatLng(latlng).setContent(isi).openOn(map);
+}
+
+map.on('click', function(e){
+    identifikasiLokasi(e.latlng);
+});
+
+
+</script>        
+<script>
+window.lastUploadedFeature=null;
+
+function drawAnalysisConnector(feature){
+ try{
+   if(!feature || !window.map) return;
+   const svg=document.getElementById('analysisConnector');
+   const panel=document.getElementById('analysisPanel');
+   if(!svg || !panel || panel.style.display==='none') return;
+
+   const centroid=turf.centroid(feature);
+   const latlng=L.latLng(
+      centroid.geometry.coordinates[1],
+      centroid.geometry.coordinates[0]
+   );
+
+   const pt=map.latLngToContainerPoint(latlng);
+   const rect=panel.getBoundingClientRect();
+   const mapRect=map.getContainer().getBoundingClientRect();
+
+   const startX=rect.left-mapRect.left;
+   const startY=rect.top+rect.height/2-mapRect.top;
+
+   svg.innerHTML = `
+<defs>
+ <filter id="shadow">
+   <feDropShadow dx="0" dy="0" stdDeviation="1"/>
+ </filter>
+</defs>
+
+<line x1="${startX}" y1="${startY}"
+      x2="${pt.x}" y2="${pt.y}"
+      stroke="#ffffff"
+      stroke-width="3"
+      filter="url(#shadow)"/>
+
+<circle cx="${pt.x}" cy="${pt.y}"
+        r="6"
+        fill="#ffffff"
+        stroke="#5f6368"
+        stroke-width="2"/>
+`;
+ }catch(e){console.log(e);}
+}
+
+map.on('zoomend moveend',function(){
+ if(window.lastUploadedFeature){
+   drawAnalysisConnector(window.lastUploadedFeature);
+ }
+});
+
+setInterval(function(){
+ if(window.lastUploadedFeature &&
+    document.getElementById('analysisPanel') &&
+    document.getElementById('analysisPanel').style.display!=='none'){
+    drawAnalysisConnector(window.lastUploadedFeature);
+ }
+},1000);
+</script>
+</body>
+
+
+</html>
