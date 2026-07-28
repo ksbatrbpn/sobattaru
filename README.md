@@ -34,8 +34,10 @@ Pintasan berjalan tanpa menampilkan jendela CMD.
 Saat seluruh isi folder ini diunggah sebagai repositori GitHub:
 
 - GitHub Actions menjalankan sinkronisasi SIGAP otomatis setiap 6 jam.
-- Sinkronisasi juga dapat dijalankan manual melalui workflow
-  **Sinkronkan SIGAP**.
+- Tombol **Sinkronkan** di web memeriksa status dan memuat ulang data terbaru
+  tanpa membuka atau memindahkan pengguna ke repositori.
+- Pengelola repositori tetap dapat menjalankan workflow **Sinkronkan SIGAP**
+  secara manual dari GitHub bila membutuhkan pembaruan sumber segera.
 - Jika SIGAP menolak koneksi, status kegagalan ditampilkan pada legenda dan
   data terakhir yang berhasil tetap digunakan.
 - Layer SIGAP tidak aktif saat awal dibuka. Analisis SIGAP tetap bekerja dari

@@ -2265,7 +2265,7 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
             {key:'produksi_tetap',label:'Hutan Produksi Tetap',rgb:[255,255,115],hex:'#ffff73',meaning:'Kawasan hutan untuk produksi hasil hutan secara tetap.',action:'Periksa pengelola/PBPH, status perizinan, dan persetujuan penggunaan kawasan hutan.'},
             {key:'produksi_terbatas',label:'Hutan Produksi Terbatas',rgb:[163,255,115],hex:'#a3ff73',meaning:'Kawasan produksi dengan pembatasan pemanfaatan karena kondisi fisik.',action:'Periksa batasan pemanfaatan, pengelola/PBPH, dan persetujuan penggunaan kawasan hutan.'},
             {key:'produksi_konversi',label:'Hutan Produksi yang Dapat Dikonversi',rgb:[245,122,122],hex:'#f57a7a',meaning:'Kawasan produksi yang secara kebijakan dapat dilepas untuk penggunaan lain.',action:'Status ini belum otomatis menjadi APL; periksa keputusan pelepasan kawasan hutan.'},
-            {key:'apl',label:'APL (Bukan Kawasan Hutan)',rgb:[255,255,255],hex:'#ffffff',meaning:'Areal Penggunaan Lain; bukan kawasan hutan menurut peta fungsi kawasan.',action:'Lanjutkan pemeriksaan RTRW/RDTR, hak atas tanah, dan pembatasan sektoral lainnya.'},
+            {key:'apl',label:'APL (Bukan Kawasan Hutan)',rgb:[255,255,255],hex:'#ffffff',meaning:'APL merupakan wilayah di luar kawasan hutan menurut peta fungsi kawasan.',action:'Lanjutkan pemeriksaan RTRW/RDTR, hak atas tanah, dan pembatasan sektoral lainnya.'},
             {key:'air',label:'Tubuh Air',rgb:[0,197,255],hex:'#00c5ff',meaning:'Perairan yang dipetakan dalam data kawasan hutan.',action:'Periksa sempadan, kewenangan perairan, dan kesesuaian rencana kegiatan.'},
             {key:'tidak_terdefinisi',label:'Tidak Terdefinisi',rgb:[255,0,0],hex:'#ff0000',meaning:'Objek belum memiliki klasifikasi fungsi yang terdefinisi.',action:'Jangan mengambil kesimpulan; minta konfirmasi resmi kepada BPKH/Kementerian Kehutanan.'}
         ];
@@ -2362,9 +2362,15 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
             button.setAttribute('aria-busy', 'true');
             try {
                 if(location.hostname.endsWith('github.io')){
-                    var parts=location.pathname.split('/').filter(Boolean),owner=location.hostname.split('.')[0],repo=parts[0];
-                    window.open('https://github.com/'+owner+'/'+repo+'/actions/workflows/sync-sigap.yml','_blank','noopener');
-                    showSigapMessage('Halaman sinkronisasi GitHub dibuka. Jalankan workflow untuk memperbarui data.');
+                    var githubStatusResponse=await fetch('data/sigap_status.json?v='+Date.now(),{cache:'no-store'});
+                    var githubStatus=await githubStatusResponse.json();
+                    if(!githubStatusResponse.ok)throw new Error('Status sinkronisasi belum dapat dibaca.');
+                    updateSigapStatusUI(githubStatus);
+                    layer_KawasanHutanKemenhut.setUrl('data/kawasan_hutan_sigap_ksb.png?v='+Date.now());
+                    var rasterReloaded=await loadSigapRaster(true);
+                    if(!rasterReloaded)throw new Error('Data SIGAP terbaru belum dapat dimuat.');
+                    if(githubStatus.status==='error')throw new Error(githubStatus.message||'Server SIGAP sedang bermasalah.');
+                    showSigapMessage('Data SIGAP terbaru berhasil dimuat tanpa meninggalkan Sobat Taru.');
                     return;
                 }
                 var response = await fetch('/api/sync-sigap', {method: 'POST'});
