@@ -22,7 +22,7 @@
             margin: 0;
         }
         </style>
-        <title>SOBAT TARU — Analisis Pertanahan dan Tata Ruang</title>
+        <title>SOBAT TARU v1.5 — Analisis Pertanahan dan Tata Ruang</title>
     
 <style id="popup-fix-2026">
 .leaflet-popup-content hr{
@@ -272,7 +272,7 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
 
 <div id="dataInfoModal" class="data-info-backdrop open" role="dialog" aria-modal="true" aria-labelledby="dataInfoTitle">
   <div class="data-info-dialog"><div class="data-info-head"><h2 id="dataInfoTitle">Informasi Data SOBAT TARU</h2><p>Batas penggunaan dan sumber informasi data</p><button id="closeDataInfo" class="data-info-close" type="button" aria-label="Tutup">×</button></div><div class="data-info-body">
-    <section class="data-warning"><h3>⚠ BATAS PENGGUNAAN INFORMASI TATA RUANG</h3><p>SOBAT TARU merupakan media informasi dan identifikasi awal tata ruang Kabupaten Sumbawa Barat. Informasi dan hasil analisis pada aplikasi bersifat informatif. Posisi, luas, dan persinggungan dapat dipengaruhi oleh ketelitian geometri, skala, sistem koordinat, serta pembaruan data. Informasi dan hasil analisis tidak menggantikan dokumen tata ruang, keputusan, maupun produk hukum resmi. Untuk keperluan resmi dan kepastian pemanfaatan ruang, lakukan konfirmasi kepada perangkat daerah yang berwenang.</p></section>
+    <section class="data-warning"><h3>⚠ BATAS PENGGUNAAN INFORMASI TATA RUANG</h3><p>SOBAT TARU v1.5 merupakan media informasi dan identifikasi spasial awal Kabupaten Sumbawa Barat. Seluruh hasil bersifat indikatif, termasuk klasifikasi lokasi, persinggungan, jarak, persentase, dan estimasi luas. Hasil dapat dipengaruhi oleh skala dan tanggal sumber data, ketelitian geometri, sistem koordinat, generalisasi peta, serta perbedaan antara luas atribut dan luas geometri. Layer yang ditampilkan atau disembunyikan hanya mengatur visual peta; analisis tetap memeriksa seluruh dataset yang tersedia. Data daring dapat gagal diperbarui ketika server sumber atau koneksi bermasalah, dan dalam kondisi tersebut aplikasi mempertahankan data terakhir yang berhasil dimuat serta menampilkan status kegagalan. Informasi ini bukan survei kadastral, bukan bukti hak atas tanah, bukan persetujuan pemanfaatan ruang, dan tidak menggantikan peta, keputusan, perizinan, maupun produk hukum resmi. Konfirmasikan kebutuhan resmi kepada instansi berwenang dan dokumen sumber yang berlaku.</p><p><b>Versi aplikasi:</b> 1.5<br><b>Terakhir diperbarui:</b> 29 Juli 2026</p></section>
     <section class="data-source-section"><h3 class="data-section-title">Sumber Informasi Data Spasial</h3><p class="data-section-copy">Data tata ruang yang tersedia pada aplikasi ini meliputi:</p>
     <div id="dataInfoDetails" class="data-info-details"><div class="data-list">
       <div class="data-row"><b>RTRW Kabupaten Sumbawa Barat 2020–2040</b><span>Peraturan Daerah Kabupaten Sumbawa Barat Nomor 11 Tahun 2020.</span></div>
@@ -318,7 +318,7 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
   <div class="data-info-dialog about-sobat-dialog"><div class="data-info-head"><h2 id="aboutSobatTitle">Tentang SOBAT TARU</h2><p>Informasi pengembangan WebGIS</p><button id="closeAboutSobat" class="data-info-close" type="button" aria-label="Tutup informasi">×</button></div><div class="data-info-body">
     <div class="about-sobat-intro"><img class="about-sobat-logo" src="assets/sobat-taru-logo.png" alt="Logo SOBAT TARU"><p class="about-sobat-name">WebGIS SOBAT TARU Kabupaten Sumbawa Barat</p></div>
     <p class="about-sobat-description">SOBAT TARU merupakan media informasi tata ruang dan peta tematik yang dikembangkan untuk mendukung proses pelayanan pertanahan di Kabupaten Sumbawa Barat melalui penyajian informasi spasial secara cepat, mudah, dan terpadu.</p>
-<dl class="about-sobat-list"><div class="about-sobat-row"><dt>Inisiator &amp; Konseptor</dt><dd>Ferdian Setyo Wibowo</dd></div><div class="about-sobat-row"><dt>Pengembang Teknis</dt><dd>I Made Arjita</dd></div><div class="about-sobat-row"><dt>Versi</dt><dd>1.3</dd></div><div class="about-sobat-row"><dt>Terakhir Diperbarui</dt><dd>23 Juli 2026</dd></div></dl>
+<dl class="about-sobat-list"><div class="about-sobat-row"><dt>Inisiator &amp; Konseptor</dt><dd>Ferdian Setyo Wibowo</dd></div><div class="about-sobat-row"><dt>Pengembang Teknis</dt><dd>I Made Arjita</dd></div><div class="about-sobat-row"><dt>Versi</dt><dd>1.5</dd></div><div class="about-sobat-row"><dt>Terakhir Diperbarui</dt><dd>29 Juli 2026</dd></div></dl>
   </div></div>
 </div>
 
@@ -384,6 +384,11 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
         <script src="data/LSD_Kabupaten_Sumbawa_Barat_4.js"></script>
         <script src="data/LP2BSUMBAWABARAT_5.js"></script>
         <script src="data/LBS_Kabupaten_Sumbawa_Barat_6.js"></script>
+        <script src="data/kawasan_hutan_sigap_ksb.js"></script>
+        <script src="data/pippib_2025_ntb.js"></script>
+        <script src="data/sigap_status.js"></script>
+        <script src="data/batas_kecamatan_ksb.js"></script>
+        <script src="data/jaringan_jalan_ksb.js"></script>
         <script>
         var map = window.map;
         var hash = new L.Hash(map);
@@ -2247,7 +2252,8 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
                 last.style.display = "none";
             }
         });
-        var layer_KawasanHutanKemenhut = L.imageOverlay(
+        function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+        var layer_KawasanHutanRasterFallback = L.imageOverlay(
             'data/kawasan_hutan_sigap_ksb.png',
             [[-9.15, 116.55], [-8.35, 117.25]],
             {
@@ -2257,18 +2263,53 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
                 attribution: 'Kawasan Hutan: Kementerian Kehutanan RI (SIGAP)'
             }
         );
+        var layer_KawasanHutanKemenhut = L.geoJSON(null,{
+            style:function(feature){
+                var category=sigapCategoryFromFeature(feature);
+                return{color:category?category.hex:'#777',weight:.7,opacity:.85,fillColor:category?category.hex:'#777',fillOpacity:.62};
+            },
+            onEachFeature:function(feature,layer){
+                var category=sigapCategoryFromFeature(feature),properties=feature.properties||{};
+                layer.bindPopup('<div class="sigap-identification"><div class="sigap-identification-head"><span class="sigap-swatch" style="background:'+(category?category.hex:'#777')+'"></span><strong>'+(category?category.label:'Tidak Terdefinisi')+'</strong></div><p><b>Nama objek:</b> '+escapeHtml(properties.namobj||'-')+'</p><p><b>No. SK:</b> '+escapeHtml(properties.noskpnjk||'-')+'</p><p><b>Keterangan:</b> '+escapeHtml(properties.keterangan||properties.remark||'-')+'</p></div>');
+            },
+            attribution:'Vektor kawasan hutan: Kementerian Kehutanan RI (SIGAP)'
+        });
         var SIGAP_BOUNDS={west:116.55,south:-9.15,east:117.25,north:-8.35};
         var SIGAP_CATEGORIES=[
-            {key:'konservasi',label:'Kawasan Konservasi',rgb:[173,63,255],hex:'#ad3fff',meaning:'Fungsi pokok pengawetan keanekaragaman hayati dan ekosistem.',action:'Batasi rencana pemanfaatan dan konfirmasikan ke BKSDA/BPKH serta dokumen penetapannya.'},
-            {key:'konservasi_laut',label:'Kawasan Konservasi Laut',rgb:[197,0,255],hex:'#c500ff',meaning:'Kawasan konservasi pada wilayah perairan/laut.',action:'Periksa zonasi konservasi perairan dan kewenangan instansi pengelola.'},
-            {key:'lindung',label:'Hutan Lindung',rgb:[76,230,0],hex:'#4ce600',meaning:'Perlindungan tata air, pencegahan banjir, erosi, dan kesuburan tanah.',action:'Periksa kesesuaian kegiatan kehutanan dan kebutuhan persetujuan penggunaan kawasan hutan.'},
-            {key:'produksi_tetap',label:'Hutan Produksi Tetap',rgb:[255,255,115],hex:'#ffff73',meaning:'Kawasan hutan untuk produksi hasil hutan secara tetap.',action:'Periksa pengelola/PBPH, status perizinan, dan persetujuan penggunaan kawasan hutan.'},
-            {key:'produksi_terbatas',label:'Hutan Produksi Terbatas',rgb:[163,255,115],hex:'#a3ff73',meaning:'Kawasan produksi dengan pembatasan pemanfaatan karena kondisi fisik.',action:'Periksa batasan pemanfaatan, pengelola/PBPH, dan persetujuan penggunaan kawasan hutan.'},
-            {key:'produksi_konversi',label:'Hutan Produksi yang Dapat Dikonversi',rgb:[245,122,122],hex:'#f57a7a',meaning:'Kawasan produksi yang secara kebijakan dapat dilepas untuk penggunaan lain.',action:'Status ini belum otomatis menjadi APL; periksa keputusan pelepasan kawasan hutan.'},
-            {key:'apl',label:'APL (Bukan Kawasan Hutan)',rgb:[255,255,255],hex:'#ffffff',meaning:'APL merupakan wilayah di luar kawasan hutan menurut peta fungsi kawasan.',action:'Lanjutkan pemeriksaan RTRW/RDTR, hak atas tanah, dan pembatasan sektoral lainnya.'},
-            {key:'air',label:'Tubuh Air',rgb:[0,197,255],hex:'#00c5ff',meaning:'Perairan yang dipetakan dalam data kawasan hutan.',action:'Periksa sempadan, kewenangan perairan, dan kesesuaian rencana kegiatan.'},
-            {key:'tidak_terdefinisi',label:'Tidak Terdefinisi',rgb:[255,0,0],hex:'#ff0000',meaning:'Objek belum memiliki klasifikasi fungsi yang terdefinisi.',action:'Jangan mengambil kesimpulan; minta konfirmasi resmi kepada BPKH/Kementerian Kehutanan.'}
+            {key:'konservasi',codes:[100000,100200,100210,100220,100230,100240,100250,100260],label:'Kawasan Konservasi',rgb:[173,63,255],hex:'#ad3fff',meaning:'Fungsi pokok pengawetan keanekaragaman hayati dan ekosistem.',action:'Batasi rencana pemanfaatan dan konfirmasikan ke BKSDA/BPKH serta dokumen penetapannya.'},
+            {key:'konservasi_laut',codes:[100201,100211,100221,100241,100251],label:'Kawasan Konservasi Laut',rgb:[197,0,255],hex:'#c500ff',meaning:'Kawasan konservasi pada wilayah perairan/laut.',action:'Periksa zonasi konservasi perairan dan kewenangan instansi pengelola.'},
+            {key:'lindung',codes:[100100],label:'Hutan Lindung',rgb:[76,230,0],hex:'#4ce600',meaning:'Perlindungan tata air, pencegahan banjir, erosi, dan kesuburan tanah.',action:'Periksa kesesuaian kegiatan kehutanan dan kebutuhan persetujuan penggunaan kawasan hutan.'},
+            {key:'produksi_tetap',codes:[100300],label:'Hutan Produksi Tetap',rgb:[255,255,115],hex:'#ffff73',meaning:'Kawasan hutan untuk produksi hasil hutan secara tetap.',action:'Periksa pengelola/PBPH, status perizinan, dan persetujuan penggunaan kawasan hutan.'},
+            {key:'produksi_terbatas',codes:[100400],label:'Hutan Produksi Terbatas',rgb:[163,255,115],hex:'#a3ff73',meaning:'Kawasan produksi dengan pembatasan pemanfaatan karena kondisi fisik.',action:'Periksa batasan pemanfaatan, pengelola/PBPH, dan persetujuan penggunaan kawasan hutan.'},
+            {key:'produksi_konversi',codes:[100500],label:'Hutan Produksi yang Dapat Dikonversi',rgb:[245,122,122],hex:'#f57a7a',meaning:'Kawasan produksi yang secara kebijakan dapat dilepas untuk penggunaan lain.',action:'Status ini belum otomatis menjadi APL; periksa keputusan pelepasan kawasan hutan.'},
+            {key:'apl',codes:[100700],label:'APL (Bukan Kawasan Hutan)',rgb:[255,255,255],hex:'#ffffff',meaning:'APL merupakan wilayah di luar kawasan hutan menurut peta fungsi kawasan.',action:'Lanjutkan pemeriksaan RTRW/RDTR, hak atas tanah, dan pembatasan sektoral lainnya.'},
+            {key:'air',codes:[500100,500300],label:'Tubuh Air',rgb:[0,197,255],hex:'#00c5ff',meaning:'Perairan yang dipetakan dalam data kawasan hutan.',action:'Periksa sempadan, kewenangan perairan, dan kesesuaian rencana kegiatan.'},
+            {key:'tidak_terdefinisi',codes:[0],label:'Tidak Terdefinisi',rgb:[255,0,0],hex:'#ff0000',meaning:'Objek belum memiliki klasifikasi fungsi yang terdefinisi.',action:'Jangan mengambil kesimpulan; minta konfirmasi resmi kepada BPKH/Kementerian Kehutanan.'}
         ];
+        var sigapVector={ready:false,features:[],updatedAt:null};
+        function sigapCategoryFromCode(code){
+            code=Number(code);
+            return SIGAP_CATEGORIES.find(function(category){return category.codes.indexOf(code)>=0;})||SIGAP_CATEGORIES[SIGAP_CATEGORIES.length-1];
+        }
+        function sigapCategoryFromFeature(feature){return sigapCategoryFromCode(feature&&feature.properties&&feature.properties.fungsikws);}
+        function loadSigapVector(cacheBust){
+            function applyVectorData(data){
+                if(!data||!data.features||!data.features.length)throw new Error('GeoJSON SIGAP kosong.');
+                sigapVector={ready:true,features:data.features,updatedAt:sigapVector.updatedAt};
+                layer_KawasanHutanKemenhut.clearLayers();
+                layer_KawasanHutanKemenhut.addData(data);
+                return true;
+            }
+            if(location.protocol==='file:'&&window.SIGAP_VECTOR_DATA){
+                try{return Promise.resolve(applyVectorData(window.SIGAP_VECTOR_DATA));}catch(_error){return Promise.resolve(false);}
+            }
+            return fetch('data/kawasan_hutan_sigap_ksb.geojson'+(cacheBust?'?v='+Date.now():''),{cache:cacheBust?'no-store':'default'})
+                .then(function(response){if(!response.ok)throw new Error('GeoJSON SIGAP tidak tersedia.');return response.json();})
+                .then(applyVectorData).catch(function(){
+                    if(window.SIGAP_VECTOR_DATA){try{return applyVectorData(window.SIGAP_VECTOR_DATA);}catch(_error){}}
+                    sigapVector.ready=false;return false;
+                });
+        }
         var sigapRaster={ready:false,width:0,height:0,data:null,updatedAt:null};
         function classifySigapPixel(red,green,blue,alpha){
             if(alpha<16)return null;
@@ -2295,13 +2336,53 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
             });
         }
         function sigapPixelAt(longitude,latitude){
+            if(sigapVector.ready){
+                var point=turf.point([longitude,latitude]),found=null;
+                sigapVector.features.some(function(feature){
+                    try{if(turf.booleanPointInPolygon(point,feature)){found=sigapCategoryFromFeature(feature);return true;}}catch(_error){}
+                    return false;
+                });
+                return found;
+            }
             if(!sigapRaster.ready||longitude<SIGAP_BOUNDS.west||longitude>SIGAP_BOUNDS.east||latitude<SIGAP_BOUNDS.south||latitude>SIGAP_BOUNDS.north)return null;
             var x=Math.max(0,Math.min(sigapRaster.width-1,Math.floor((longitude-SIGAP_BOUNDS.west)/(SIGAP_BOUNDS.east-SIGAP_BOUNDS.west)*sigapRaster.width)));
             var y=Math.max(0,Math.min(sigapRaster.height-1,Math.floor((SIGAP_BOUNDS.north-latitude)/(SIGAP_BOUNDS.north-SIGAP_BOUNDS.south)*sigapRaster.height)));
             var index=(y*sigapRaster.width+x)*4;
             return classifySigapPixel(sigapRaster.data[index],sigapRaster.data[index+1],sigapRaster.data[index+2],sigapRaster.data[index+3]);
         }
+        function sigapFeatureAt(longitude,latitude){
+            if(!sigapVector.ready)return null;
+            var point=turf.point([longitude,latitude]),found=null;
+            sigapVector.features.some(function(feature){
+                try{if(turf.booleanPointInPolygon(point,feature)){found=feature;return true;}}catch(_error){}
+                return false;
+            });
+            return found;
+        }
         function analyzeSigapGeometry(geojson,totalArea){
+            if(sigapVector.ready){
+                var totals={},coveredArea=0,inputFeatures=geojson.type==='FeatureCollection'?geojson.features:[geojson.type==='Feature'?geojson:turf.feature(geojson)];
+                var inputBoxes=inputFeatures.map(function(feature){try{return turf.bbox(feature);}catch(_error){return null;}});
+                sigapVector.features.forEach(function(zone){
+                    var zoneBox;try{zoneBox=turf.bbox(zone);}catch(_error){return;}
+                    inputFeatures.forEach(function(input,index){
+                        var box=inputBoxes[index];
+                        if(box&&(box[0]>zoneBox[2]||box[2]<zoneBox[0]||box[1]>zoneBox[3]||box[3]<zoneBox[1]))return;
+                        try{
+                            if(!turf.booleanIntersects(input,zone))return;
+                            var intersection=turf.intersect(input,zone);
+                            if(!intersection)return;
+                            var area=turf.area(intersection);
+                            if(area<.01)return;
+                            var category=sigapCategoryFromFeature(zone);
+                            totals[category.key]=(totals[category.key]||0)+area;
+                            coveredArea+=area;
+                        }catch(_error){}
+                    });
+                });
+                var vectorItems=SIGAP_CATEGORIES.filter(function(category){return totals[category.key];}).map(function(category){return{category:category,area:totals[category.key],percent:coveredArea?totals[category.key]/coveredArea*100:0};}).sort(function(a,b){return b.area-a.area;});
+                return{ready:true,items:vectorItems,coveredArea:coveredArea,sourceType:'vector'};
+            }
             if(!sigapRaster.ready)return{ready:false,items:[],coveredArea:0};
             var canvas=document.createElement('canvas'),width=sigapRaster.width,height=sigapRaster.height;
             canvas.width=width;canvas.height=height;
@@ -2336,15 +2417,15 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
             }}
             var scale=classified>0&&totalArea>0?totalArea/classified:0;
             var items=SIGAP_CATEGORIES.filter(function(category){return counts[category.key];}).map(function(category){return{category:category,area:counts[category.key]*scale,percent:classified?counts[category.key]/classified*100:0};}).sort(function(a,b){return b.area-a.area;});
-            return{ready:true,items:items,coveredArea:items.reduce(function(sum,item){return sum+item.area;},0)};
+            return{ready:true,items:items,coveredArea:items.reduce(function(sum,item){return sum+item.area;},0),sourceType:'raster'};
         }
         function sigapLegendHtml(){
-            return'<div class="sigap-legend-list">'+SIGAP_CATEGORIES.map(function(category){return'<div class="sigap-legend-item" title="'+category.meaning+'"><span class="sigap-swatch" style="background:'+category.hex+'"></span><span>'+category.label+'</span></div>';}).join('')+'</div><div class="sigap-legend-meta">Sumber: Kementerian Kehutanan RI, SIGAP.<div data-sigap-status class="sigap-status-line"><span class="sigap-status-dot"></span><span>Memeriksa pembaruan...</span></div><div data-sigap-updated></div></div><div class="sigap-estimate-disclaimer"><b>Catatan:</b> Luas irisan SIGAP merupakan estimasi dari raster, bukan luas legal atau hasil pengukuran kadastral.</div>';
+            return'<div class="sigap-legend-list">'+SIGAP_CATEGORIES.map(function(category){return'<div class="sigap-legend-item" title="'+category.meaning+'"><span class="sigap-swatch" style="background:'+category.hex+'"></span><span>'+category.label+'</span></div>';}).join('')+'</div><div class="sigap-legend-meta">Sumber vektor: Kementerian Kehutanan RI, SIGAP.<div data-sigap-status class="sigap-status-line"><span class="sigap-status-dot"></span><span>Memeriksa pembaruan...</span></div><div data-sigap-updated></div></div><div class="sigap-estimate-disclaimer"><b>Catatan:</b> Analisis memakai geometri poligon SIGAP dan tetap perlu dikonfirmasi dengan dokumen penetapan resmi.</div>';
         }
         function updateSigapStatusUI(result){
             document.querySelectorAll('[data-sigap-status]').forEach(function(line){line.className='sigap-status-line '+(result.status||'');line.querySelector('span:last-child').textContent=result.message||'Status tidak tersedia.';});
             document.querySelectorAll('[data-sigap-updated]').forEach(function(date){if(result.updatedAt)date.textContent='Diperbarui: '+new Date(result.updatedAt).toLocaleString('id-ID');});
-            if(result.updatedAt)sigapRaster.updatedAt=result.updatedAt;
+            if(result.updatedAt){sigapRaster.updatedAt=result.updatedAt;sigapVector.updatedAt=result.updatedAt;}
             document.querySelectorAll('[data-sigap-sync]').forEach(function(button){button.classList.toggle('sync-error',result.status==='error');button.classList.toggle('is-syncing',result.status==='syncing');});
         }
         function showSigapMessage(message) {
@@ -2366,9 +2447,11 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
                     var githubStatus=await githubStatusResponse.json();
                     if(!githubStatusResponse.ok)throw new Error('Status sinkronisasi belum dapat dibaca.');
                     updateSigapStatusUI(githubStatus);
-                    layer_KawasanHutanKemenhut.setUrl('data/kawasan_hutan_sigap_ksb.png?v='+Date.now());
+                    var vectorReloaded=await loadSigapVector(true);
+                    layer_KawasanHutanRasterFallback.setUrl('data/kawasan_hutan_sigap_ksb.png?v='+Date.now());
+                    refreshPippibLayer();
                     var rasterReloaded=await loadSigapRaster(true);
-                    if(!rasterReloaded)throw new Error('Data SIGAP terbaru belum dapat dimuat.');
+                    if(!vectorReloaded&&!rasterReloaded)throw new Error('Data SIGAP terbaru belum dapat dimuat.');
                     if(githubStatus.status==='error')throw new Error(githubStatus.message||'Server SIGAP sedang bermasalah.');
                     showSigapMessage('Data SIGAP terbaru berhasil dimuat tanpa meninggalkan Sobat Taru.');
                     return;
@@ -2376,8 +2459,11 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
                 var response = await fetch('/api/sync-sigap', {method: 'POST'});
                 var result = await response.json();
                 if (!response.ok || !result.ok) throw new Error(result.message || 'Sinkronisasi gagal.');
-                layer_KawasanHutanKemenhut.setUrl('data/kawasan_hutan_sigap_ksb.png?v=' + Date.now());
+                var vectorReloaded=await loadSigapVector(true);
+                layer_KawasanHutanRasterFallback.setUrl('data/kawasan_hutan_sigap_ksb.png?v=' + Date.now());
+                refreshPippibLayer();
                 await loadSigapRaster(true);
+                if(!vectorReloaded)throw new Error('Sinkronisasi selesai, tetapi vektor SIGAP belum dapat dimuat.');
                 updateSigapStatusUI(result);
                 showSigapMessage('Sinkronisasi SIGAP berhasil. Peta, identifikasi, dan analisis telah diperbarui.');
             } catch (error) {
@@ -2392,8 +2478,8 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
         }
         async function checkAutomaticSigapSync(attempt){
             if(location.protocol==='file:'){
-                try{var fileStatus=await fetch('data/sigap_status.json?v='+Date.now()).then(function(response){return response.json();});updateSigapStatusUI(fileStatus);}catch(_error){}
-                await loadSigapRaster(false);
+                if(window.SIGAP_SYNC_STATUS)updateSigapStatusUI(window.SIGAP_SYNC_STATUS);
+                await loadSigapVector(false);
                 return;
             }
             try{
@@ -2403,23 +2489,155 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
                 updateSigapStatusUI(result);
                 if(!github&&result.status==='syncing'&&attempt<90){window.setTimeout(function(){checkAutomaticSigapSync(attempt+1);},1000);return;}
                 if(result.status==='success'){
-                    layer_KawasanHutanKemenhut.setUrl('data/kawasan_hutan_sigap_ksb.png?v='+Date.now());
-                    await loadSigapRaster(true);
+                    layer_KawasanHutanRasterFallback.setUrl('data/kawasan_hutan_sigap_ksb.png?v='+Date.now());
+                    refreshPippibLayer();
+                    await Promise.all([loadSigapVector(true),loadSigapRaster(true)]);
                 }else if(result.status==='error'){
-                    await loadSigapRaster(false);
+                    await Promise.all([loadSigapVector(false),loadSigapRaster(false)]);
                     showSigapMessage(result.message+' Gunakan tombol sinkronisasi pada layer SIGAP untuk mencoba lagi.');
                 }
             }catch(error){
-                updateSigapStatusUI({status:'error',message:'Layanan sinkronisasi lokal tidak tersambung.'});
-                await loadSigapRaster(false);
-                showSigapMessage('Sinkronisasi otomatis gagal. Klik tombol Sinkronkan SIGAP untuk mencoba lagi.');
+                try{
+                    var staticStatus=await fetch('data/sigap_status.json?v='+Date.now(),{cache:'no-store'}).then(function(statusResponse){if(!statusResponse.ok)throw new Error();return statusResponse.json();});
+                    updateSigapStatusUI(staticStatus);
+                    await Promise.all([loadSigapVector(false),loadSigapRaster(false)]);
+                }catch(_staticError){
+                    updateSigapStatusUI({status:'error',message:'Layanan sinkronisasi lokal tidak tersambung.'});
+                    await Promise.all([loadSigapVector(false),loadSigapRaster(false)]);
+                    showSigapMessage('Sinkronisasi otomatis gagal. Klik tombol Sinkronkan SIGAP untuk mencoba lagi.');
+                }
             }
         }
         window.setTimeout(function(){checkAutomaticSigapSync(0);},700);
+        var PIPPIB_METADATA={
+            title:'PIPPIB 2025 Periode I',
+            decision:'Keputusan Menteri Kehutanan Nomor 554 Tahun 2025',
+            scale:'1:250.000',
+            coverage:'Provinsi Nusa Tenggara Barat',
+            importedAt:'2026-07-29',
+            featureCount:818
+        };
+        var pippibVector={data:null,importedAt:null};
+        function pippibCategory(properties){
+            var text=Object.keys(properties||{}).map(function(key){return String(properties[key]||'');}).join(' ').toUpperCase();
+            if(text.indexOf('PRIMER')>=0)return{label:'PIPPIB Primer',color:'#087f62'};
+            return{label:'PIPPIB Kawasan',color:'#45c96b'};
+        }
+        function pippibStyle(feature){
+            var category=pippibCategory(feature&&feature.properties);
+            return{color:'#075f4c',weight:1.25,opacity:.95,fillColor:category.color,fillOpacity:.58};
+        }
+        function pippibPopup(feature){
+            var properties=feature.properties||{};
+            var category=pippibCategory(properties);
+            var details=Object.keys(properties).filter(function(key){
+                return properties[key]!==null&&properties[key]!==''&&!/^objectid$/i.test(key);
+            }).slice(0,8).map(function(key){
+                return'<br><b>'+escapeHtml(key.replace(/_/g,' '))+':</b> '+escapeHtml(String(properties[key]));
+            }).join('');
+            return'<div class="sigap-identification"><div class="sigap-identification-head"><span class="sigap-swatch" style="background:'+category.color+'"></span><strong>'+category.label+'</strong></div><p><b>Sumber:</b> Dataset vektor Kementerian Kehutanan RI.'+details+'</p><p><b>Dasar:</b> '+escapeHtml(PIPPIB_METADATA.decision)+'.<br><b>Cakupan:</b> '+escapeHtml(PIPPIB_METADATA.coverage)+'.</p><p><b>Metode:</b> Identifikasi langsung pada poligon vektor skala '+PIPPIB_METADATA.scale+'.</p></div>';
+        }
+        var layer_PIPPIB2025=L.geoJSON(null,{
+            style:pippibStyle,
+            onEachFeature:function(feature,layer){layer.bindPopup(pippibPopup(feature),{maxWidth:360});},
+            attribution:'PIPPIB 2025 Periode I: Kementerian Kehutanan RI'
+        });
+        function applyPippibVector(data){
+            if(!data||data.type!=='FeatureCollection'||!Array.isArray(data.features)||!data.features.length)throw new Error('GeoJSON PIPPIB kosong.');
+            layer_PIPPIB2025.clearLayers();
+            layer_PIPPIB2025.addData(data);
+            pippibVector.data=data;
+            pippibVector.importedAt=PIPPIB_METADATA.importedAt;
+            return true;
+        }
+        function refreshPippibLayer(silent){
+            if(location.protocol==='file:'&&window.PIPPIB_VECTOR_DATA){
+                try{return Promise.resolve(applyPippibVector(window.PIPPIB_VECTOR_DATA));}catch(_error){return Promise.resolve(false);}
+            }
+            return fetch('data/pippib_2025_ntb.geojson?v='+Date.now(),{cache:'no-store'})
+                .then(function(response){if(!response.ok)throw new Error('Vektor PIPPIB belum tersedia.');return response.json();})
+                .then(applyPippibVector)
+                .catch(function(){
+                    if(window.PIPPIB_VECTOR_DATA){try{return applyPippibVector(window.PIPPIB_VECTOR_DATA);}catch(_error){}}
+                    if(!silent)showSigapMessage('Berkas vektor PIPPIB lokal tidak dapat dimuat. Data perlu diperiksa atau dipublikasikan ulang.');
+                    return false;
+                });
+        }
+        refreshPippibLayer(true);
+        layer_PIPPIB2025.on('add',function(){
+            if(!pippibVector.data){
+                refreshPippibLayer(true).then(function(loaded){
+                    if(!loaded){
+                        if(map.hasLayer(layer_PIPPIB2025))map.removeLayer(layer_PIPPIB2025);
+                        showSigapMessage('Berkas vektor PIPPIB lokal tidak tersedia atau rusak. Layer dinonaktifkan agar peta tetap dapat digunakan.');
+                    }
+                });
+            }
+        });
+        function pippibLegendHtml(){
+            return'<div class="sigap-legend-list">'
+                +'<div class="sigap-legend-item"><span class="sigap-swatch" style="background:#45c96b"></span><span>PIPPIB Kawasan</span></div>'
+                +'<div class="sigap-legend-item"><span class="sigap-swatch" style="background:#087f62"></span><span>PIPPIB Primer</span></div>'
+                +'</div><div class="sigap-legend-meta">Sumber: Dataset vektor Kementerian Kehutanan RI.<br>Periode: Tahun 2025 Periode I.<br>Dasar: '+PIPPIB_METADATA.decision+'.<br>Cakupan: '+PIPPIB_METADATA.coverage+'.<br>Skala sumber: '+PIPPIB_METADATA.scale+'.<br>Impor ke SOBAT TARU: 29 Juli 2026 ('+PIPPIB_METADATA.featureCount+' poligon).</div>'
+                +'<div class="sigap-estimate-disclaimer"><b>Catatan:</b> PIPPIB merupakan indikasi pembatasan pemberian perizinan baru, bukan bukti kepemilikan tanah atau larangan otomatis terhadap seluruh kegiatan.</div>';
+        }
         var kawasanHutanKemenhutEntry = {
             label: '<div class="sigap-layer-title"><span><i class="fas fa-tree" aria-hidden="true"></i> Kawasan Hutan Kemenhut (SIGAP)</span><span class="sigap-layer-tools"><button class="sigap-layer-tool" type="button" data-sigap-legend aria-expanded="false"><i class="fas fa-list"></i> Legenda</button><button class="sigap-layer-tool" type="button" data-sigap-sync><i class="fas fa-sync-alt"></i> Sinkronkan</button></span></div><div class="sigap-inline-legend">'+sigapLegendHtml()+'</div>',
             layer: layer_KawasanHutanKemenhut
         };
+        var pippib2025Entry={
+            label:'<div class="sigap-layer-title"><span><i class="fas fa-shield-alt" aria-hidden="true"></i> PIPPIB 2025 Periode I <small>(Vektor)</small></span><span class="sigap-layer-tools"><button class="sigap-layer-tool" type="button" data-pippib-legend aria-expanded="false"><i class="fas fa-list"></i> Legenda</button></span></div><div class="sigap-inline-legend">'+pippibLegendHtml()+'</div>',
+            layer:layer_PIPPIB2025
+        };
+        function localDataPopup(feature,title,source,fields){
+            var properties=feature.properties||{};
+            var keys=(fields||Object.keys(properties)).filter(function(key){
+                return properties[key]!==null&&properties[key]!==''&&!/^objectid$/i.test(key);
+            });
+            var details=keys.slice(0,8).map(function(key){
+                return'<br><b>'+escapeHtml(key.replace(/_/g,' '))+':</b> '+escapeHtml(String(properties[key]));
+            }).join('');
+            return'<div class="sigap-identification"><strong>'+escapeHtml(title)+'</strong><p><b>Sumber:</b> '+escapeHtml(source)+details+'</p></div>';
+        }
+        function makeLocalLayer(data,title,source,style,fields){
+            return L.geoJSON(data,{
+                style:style,
+                onEachFeature:function(feature,layer){layer.bindPopup(localDataPopup(feature,title,source,fields),{maxWidth:360});}
+            });
+        }
+        var layer_BatasKecamatanKSB=makeLocalLayer(window.LOCAL_BATAS_KECAMATAN,'Batas Administrasi Kecamatan','Data shapefile Batas Administrasi Kecamatan KSB',{
+            color:'#ffe66d',weight:2.5,opacity:1,fillColor:'#ffe66d',fillOpacity:.025,dashArray:'8 4'
+        },['KECAMATAN','KABUPATEN','SUMBERDATA']);
+        var layer_JaringanJalanKSB=makeLocalLayer(window.LOCAL_JALAN,'Jaringan Jalan','Data shapefile Jaringan Jalan KSB',function(feature){
+            var name=String(feature.properties&&feature.properties.NAMOBJ||'').toUpperCase();
+            return{color:name.indexOf('NASIONAL')>=0?'#d62828':name.indexOf('PROVINSI')>=0?'#f77f00':'#fcbf49',weight:name.indexOf('NASIONAL')>=0?3.5:2.3,opacity:.95};
+        },['NAMOBJ','SBDATA']);
+        function rtrwSempadanLayer(category,color){
+            return L.geoJSON(json_RTRWSUMBAWABARAT20202040_3,{
+                filter:function(feature){
+                    return String(feature.properties&&feature.properties.NAMOBJ||'').toLowerCase()===category.toLowerCase();
+                },
+                style:{color:color,weight:2,opacity:1,dashArray:'7 4',fillColor:color,fillOpacity:.18},
+                onEachFeature:function(feature,layer){
+                    layer.bindPopup('<div class="sigap-identification"><strong>'+escapeHtml(category)+'</strong><p><b>Sumber:</b> RTRW Kabupaten Sumbawa Barat 2020-2040.</p><p><b>Makna:</b> Zona perlindungan setempat; verifikasi ketentuan jarak dan kegiatan pada dokumen/peraturan yang berlaku.</p></div>');
+                }
+            });
+        }
+        var layer_SempadanSungaiRTRW=rtrwSempadanLayer('Sempadan Sungai','#226fd1');
+        var layer_SempadanPantaiRTRW=rtrwSempadanLayer('Sempadan Pantai','#d43c8d');
+        function lineLegend(color,dashed){
+            return'<span style="display:inline-block;width:20px;margin-right:7px;vertical-align:middle;border-top:3px '+(dashed?'dashed':'solid')+' '+color+'"></span>';
+        }
+        var administrationEntries=[
+            {label:lineLegend('#ffe66d',true)+'Batas Administrasi Kecamatan',layer:layer_BatasKecamatanKSB},
+        ];
+        var infrastructureEntries=[
+            {label:lineLegend('#d62828',false)+'Jalan nasional / '+lineLegend('#f77f00',false)+'provinsi / '+lineLegend('#fcbf49',false)+'lainnya',layer:layer_JaringanJalanKSB}
+        ];
+        var restrictionEntries=[
+            {label:lineLegend('#226fd1',true)+'Sempadan Sungai <small>(RTRW)</small>',layer:layer_SempadanSungaiRTRW},
+            {label:lineLegend('#d43c8d',true)+'Sempadan Pantai <small>(RTRW)</small>',layer:layer_SempadanPantaiRTRW}
+        ];
         var overlaysTreeRaw = [
             {label: '<span style="display:inline-block;width:16px;height:16px;margin-right:5px;vertical-align:middle;background:rgba(38,184,148,.75);border:1px solid rgba(17,82,70,.8)"></span> LBS', layer: layer_LBS_Kabupaten_Sumbawa_Barat_6},
             {label: '<img src="legend/LP2BSUMBAWABARAT_5.png" /> LP2B', layer: layer_LP2BSUMBAWABARAT_5},
@@ -2440,7 +2658,10 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
         [overlaysTreeRaw[3],overlaysTreeRaw[4],overlaysTreeRaw[5]].forEach(makeLegendCollapsible);
         var overlaysTree=[
             {label:'<b>Rencana Tata Ruang</b>',selectAllCheckbox:true,children:[overlaysTreeRaw[3],overlaysTreeRaw[4],overlaysTreeRaw[5]]},
-            {label:'<b>Peta Tematik</b>',selectAllCheckbox:true,children:[kawasanHutanKemenhutEntry,overlaysTreeRaw[2],overlaysTreeRaw[1],overlaysTreeRaw[0]]}
+            {label:'<b>Peta Tematik</b>',selectAllCheckbox:true,children:[kawasanHutanKemenhutEntry,pippib2025Entry,overlaysTreeRaw[2],overlaysTreeRaw[1],overlaysTreeRaw[0]]},
+            {label:'<b>Data Administrasi</b>',selectAllCheckbox:true,children:administrationEntries},
+            {label:'<b>Infrastruktur</b>',selectAllCheckbox:true,children:infrastructureEntries},
+            {label:'<b>Pembatasan Ruang</b>',selectAllCheckbox:true,children:restrictionEntries}
         ];
         var lay = L.control.layers.tree(null, overlaysTree,{
             //namedToggle: true,
@@ -2465,6 +2686,15 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
             }
             var sigapSyncButton=e.target.closest&&e.target.closest('[data-sigap-sync]');
             if(sigapSyncButton){e.preventDefault();e.stopPropagation();runManualSigapSync(sigapSyncButton);return;}
+            var pippibLegendButton=e.target.closest&&e.target.closest('[data-pippib-legend]');
+            if(pippibLegendButton){
+                e.preventDefault();e.stopPropagation();
+                var pippibLegend=pippibLegendButton.closest('.sigap-layer-title').nextElementSibling;
+                var pippibLegendOpen=!pippibLegend.classList.contains('open');
+                pippibLegend.classList.toggle('open',pippibLegendOpen);
+                pippibLegendButton.setAttribute('aria-expanded',String(pippibLegendOpen));
+                return;
+            }
             var toggle=e.target.closest&&e.target.closest('.legend-toggle');
             if(!toggle)return;
             e.preventDefault();e.stopPropagation();
@@ -2792,8 +3022,8 @@ function bhumiUrlForGeojson(geojson){try{const point=turf.pointOnFeature(geojson
 function projectToUtm50S(coordinate){const lon=Number(coordinate[0]);const lat=Number(coordinate[1]);const a=6378137;const eccSquared=0.00669438;const k0=0.9996;const lonOrigin=117;const latRad=lat*Math.PI/180;const lonRad=lon*Math.PI/180;const lonOriginRad=lonOrigin*Math.PI/180;const eccPrimeSquared=eccSquared/(1-eccSquared);const N=a/Math.sqrt(1-eccSquared*Math.sin(latRad)*Math.sin(latRad));const T=Math.tan(latRad)*Math.tan(latRad);const C=eccPrimeSquared*Math.cos(latRad)*Math.cos(latRad);const A=Math.cos(latRad)*(lonRad-lonOriginRad);const M=a*((1-eccSquared/4-3*eccSquared*eccSquared/64-5*eccSquared*eccSquared*eccSquared/256)*latRad-(3*eccSquared/8+3*eccSquared*eccSquared/32+45*eccSquared*eccSquared*eccSquared/1024)*Math.sin(2*latRad)+(15*eccSquared*eccSquared/256+45*eccSquared*eccSquared*eccSquared/1024)*Math.sin(4*latRad)-(35*eccSquared*eccSquared*eccSquared/3072)*Math.sin(6*latRad));const easting=k0*N*(A+(1-T+C)*Math.pow(A,3)/6+(5-18*T+T*T+72*C-58*eccPrimeSquared)*Math.pow(A,5)/120)+500000;let northing=k0*(M+N*Math.tan(latRad)*(A*A/2+(5-T+9*C+4*C*C)*Math.pow(A,4)/24+(61-58*T+T*T+600*C-330*eccPrimeSquared)*Math.pow(A,6)/720));if(lat<0)northing+=10000000;return[easting,northing];}
 function utmRingArea(ring){let sum=0;if(!Array.isArray(ring)||ring.length<3)return 0;for(let i=0;i<ring.length;i++){const a=projectToUtm50S(ring[i]);const b=projectToUtm50S(ring[(i+1)%ring.length]);sum+=a[0]*b[1]-b[0]*a[1];}return Math.abs(sum)/2;}
 function utm50Area(input){const geometry=input&&input.type==='Feature'?input.geometry:input;if(!geometry)return 0;const polygonArea=function(rings){if(!rings||!rings.length)return 0;let area=utmRingArea(rings[0]);for(let i=1;i<rings.length;i++)area-=utmRingArea(rings[i]);return Math.max(0,area);};if(geometry.type==='Polygon')return polygonArea(geometry.coordinates);if(geometry.type==='MultiPolygon')return geometry.coordinates.reduce(function(sum,polygon){return sum+polygonArea(polygon);},0);if(geometry.type==='FeatureCollection')return geometry.features.reduce(function(sum,feature){return sum+utm50Area(feature);},0);return 0;}
-function analysisLayerGroups(){return{sigap:[layer_KawasanHutanKemenhut],rtrw:[layer_RTRWSUMBAWABARAT20202040_3],rdtr:[layer_RDTRTALIWANG_2,layer_RDTRMALUK_1],lp2b:[layer_LP2BSUMBAWABARAT_5],lsd:[layer_LSD_Kabupaten_Sumbawa_Barat_4],lbs:[layer_LBS_Kabupaten_Sumbawa_Barat_6]};}
-function buildLayerActivationPanel(){const item=function(key,label){const layers=analysisLayerGroups()[key]||[];const active=layers.some(function(layer){return map.hasLayer(layer);});return '<label class="layer-switch"><span class="layer-switch-name">'+label+'</span><input type="checkbox" data-layer-switch="'+key+'"'+(active?' checked':'')+'><span class="layer-switch-control"><i class="layer-switch-track" aria-hidden="true"></i><b class="layer-switch-status">'+(active?'ON':'OFF')+'</b></span></label>';};return '<details class="layer-activation-panel"><summary><span><i class="fas fa-list-alt" aria-hidden="true"></i> Aktifkan Layer Tata Ruang &amp; Tematik</span></summary><div class="layer-switch-scroll"><div class="layer-switch-row">'+item('sigap','SIGAP')+item('rtrw','RTRW')+item('rdtr','RDTR')+item('lp2b','LP2B')+item('lsd','LSD')+item('lbs','LBS')+'</div></div></details>';}
+function analysisLayerGroups(){return{sigap:[layer_KawasanHutanKemenhut],pippib:[layer_PIPPIB2025],rtrw:[layer_RTRWSUMBAWABARAT20202040_3],rdtr:[layer_RDTRTALIWANG_2,layer_RDTRMALUK_1],lp2b:[layer_LP2BSUMBAWABARAT_5],lsd:[layer_LSD_Kabupaten_Sumbawa_Barat_4],lbs:[layer_LBS_Kabupaten_Sumbawa_Barat_6],administrasi:[layer_BatasKecamatanKSB],jalan:[layer_JaringanJalanKSB],sempadan:[layer_SempadanSungaiRTRW,layer_SempadanPantaiRTRW]};}
+function buildLayerActivationPanel(){const item=function(key,label){const layers=analysisLayerGroups()[key]||[];const active=layers.some(function(layer){return map.hasLayer(layer);});return '<label class="layer-switch"><span class="layer-switch-name">'+label+'</span><input type="checkbox" data-layer-switch="'+key+'"'+(active?' checked':'')+'><span class="layer-switch-control"><i class="layer-switch-track" aria-hidden="true"></i><b class="layer-switch-status">'+(active?'ON':'OFF')+'</b></span></label>';};return '<details class="layer-activation-panel"><summary><span><i class="fas fa-list-alt" aria-hidden="true"></i> Aktifkan Layer Tata Ruang &amp; Tematik</span></summary><div class="layer-switch-scroll"><div class="layer-switch-row">'+item('sigap','SIGAP')+item('pippib','PIPPIB')+item('rtrw','RTRW')+item('rdtr','RDTR')+item('lp2b','LP2B')+item('lsd','LSD')+item('lbs','LBS')+item('administrasi','Batas Kecamatan')+item('jalan','Jaringan Jalan')+item('sempadan','Sempadan')+'</div></div></details>';}
 document.addEventListener('change',function(event){const input=event.target.closest&&event.target.closest('[data-layer-switch]');if(!input)return;event.stopPropagation();const layers=analysisLayerGroups()[input.getAttribute('data-layer-switch')]||[];layers.forEach(function(layer){if(input.checked&&!map.hasLayer(layer))map.addLayer(layer);if(!input.checked&&map.hasLayer(layer))map.removeLayer(layer);});document.querySelectorAll('[data-layer-switch="'+input.getAttribute('data-layer-switch')+'"]').forEach(function(other){other.checked=input.checked;const status=other.closest('.layer-switch').querySelector('.layer-switch-status');if(status)status.textContent=input.checked?'ON':'OFF';});});
 function runAnalysis(geojson){
 
@@ -2812,10 +3042,9 @@ function runAnalysis(geojson){
  const hasCadastral=cadastralValues.length>0&&cadastralValues.every(function(area){return area>0;});
  const cadastralTotal=hasCadastral?cadastralValues.reduce(function(sum,area){return sum+area;},0):0;
  const isMeasured=sourceFeatures.some(function(feature){const properties=feature&&feature.properties||{};return properties.__SOBAT_MEASURED===true||/HASIL PENGUKURAN/i.test(String(properties.NAMA||properties.Nama||''));});
- const total=hasCadastral?cadastralTotal:geometryTotal;
+ const total=geometryTotal;
  const hasDisplayArea=Number.isFinite(total)&&total>0;
- const areaScale=hasDisplayArea&&geometryTotal>0?total/geometryTotal:0;
- const areaLabel=hasCadastral?'Luas bidang berdasarkan atribut':(isMeasured?'Luas hasil pengukuran':'Perkiraan luas geometri');
+ const areaLabel=isMeasured?'Estimasi luas geometri hasil pengukuran':'Estimasi luas geometri';
 
  function fmt2(a){
    const value=Number(a)||0;return value>=10000?(value/10000).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:4})+' ha ('+Math.round(value).toLocaleString('id-ID')+' m²)':Math.round(value).toLocaleString('id-ID')+' m²';
@@ -2833,7 +3062,7 @@ function runAnalysis(geojson){
           try{
             if(turf.booleanIntersects(f,zona)){
               let inter=turf.intersect(f,zona);
-              if(inter){const rawArea=utm50Area(inter)||turf.area(inter)||0;if(rawArea>=1){intersected=true;if(areaScale>0)luas+=rawArea*areaScale;}}
+              if(inter){const rawArea=utm50Area(inter)||turf.area(inter)||0;if(rawArea>=1){intersected=true;luas+=rawArea;}}
             }
          }catch(e){}
       });
@@ -2847,9 +3076,33 @@ function runAnalysis(geojson){
    return found;
  }
 
+ function collectIntersectionNames(layer,field){
+   const names=new Set();
+   layer.eachLayer(function(itemLayer){
+     const candidate=itemLayer.toGeoJSON();
+     let candidateBox=null;
+     try{candidateBox=turf.bbox(candidate);}catch(_bboxError){}
+     uploadPrepared.some(function(item){
+       const fieldBox=item.box;
+       if(fieldBox&&candidateBox&&(fieldBox[0]>candidateBox[2]||fieldBox[2]<candidateBox[0]||fieldBox[1]>candidateBox[3]||fieldBox[3]<candidateBox[1]))return false;
+       try{
+         if(turf.booleanIntersects(item.feature,candidate)){
+           names.add(String(candidate.properties&&candidate.properties[field]||'Ruas jalan tanpa nama'));
+           return true;
+         }
+       }catch(_intersectionError){}
+       return false;
+     });
+   });
+   return Array.from(names).sort(function(a,b){return a.localeCompare(b,'id-ID');});
+ }
+
  function mergeUnique(items){const unique=new Map();items.forEach(function(item){const clean=String(item.nama||'-').replace(/\s+/g,' ').trim(),key=clean.toLocaleLowerCase('id-ID');if(!unique.has(key))unique.set(key,{nama:clean,luas:0});unique.get(key).luas+=Number(item.luas)||0;});return Array.from(unique.values()).sort(function(a,b){return b.luas-a.luas||a.nama.localeCompare(b.nama,'id-ID');});}
  let rtrw=mergeUnique(collect(layer_RTRWSUMBAWABARAT20202040_3,'NAMOBJ',''));
  let rdtr=mergeUnique([...collect(layer_RDTRTALIWANG_2,'NAMAOBJ','RDTR Taliwang - '),...collect(layer_RDTRMALUK_1,'NAMOBJ','RDTR Maluk - ')]);
+ let kecamatan=mergeUnique(collect(layer_BatasKecamatanKSB,'KECAMATAN',''));
+ let sempadan=mergeUnique([...collect(layer_SempadanSungaiRTRW,'NAMOBJ',''),...collect(layer_SempadanPantaiRTRW,'NAMOBJ','')]);
+ let jalan=collectIntersectionNames(layer_JaringanJalanKSB,'NAMOBJ');
 
  let lp2bFound=collect(layer_LP2BSUMBAWABARAT_5,'Keterangan','');
  let lp2b=lp2bFound.length?'YA':'TIDAK';
@@ -2861,23 +3114,35 @@ function runAnalysis(geojson){
  let lbs=lbsFound.length?'YA':'TIDAK';
  let lbsLuas=Math.min(total||Infinity,lbsFound.reduce(function(sum,item){return sum+item.luas;},0));if(!Number.isFinite(lbsLuas))lbsLuas=0;
  let sigapAnalysis=analyzeSigapGeometry(geojson,total);
+ let pippibFound=mergeUnique(collect(layer_PIPPIB2025,'PIPPIB',''));
+ let pippibLuas=Math.min(total||Infinity,pippibFound.reduce(function(sum,item){return sum+item.luas;},0));if(!Number.isFinite(pippibLuas))pippibLuas=0;
 
  let h='';
  const hasExplorerCard=sourceFeatures.some(function(feature){return feature.properties&&feature.properties.__SOBAT_EXPLORER_SELECTED===true;});
- if(!hasExplorerCard)h+='<div class="analysis-area-summary"><i class="fas fa-object-group" aria-hidden="true"></i><div><span>'+areaLabel+'</span><b>'+(hasDisplayArea?fmt2(total):'Tidak tersedia')+'</b></div></div>';
+ if(!hasExplorerCard)h+='<div class="analysis-area-summary"><i class="fas fa-object-group" aria-hidden="true"></i><div><span>'+areaLabel+'</span><b>'+(hasDisplayArea?fmt2(total):'Tidak tersedia')+'</b>'+(hasCadastral?'<span>Luas atribut bidang: '+fmt2(cadastralTotal)+'; tidak digunakan untuk mengubah luas irisan.</span>':'')+'</div></div>';
 
- h+='<section class="analysis-result-card sigap-analysis-card"><div class="analysis-section-head"><b><i class="fas fa-tree"></i> Fungsi Kawasan Hutan (SIGAP)</b></div><div class="analysis-result-list">';
+ h+='<section class="analysis-result-card sigap-analysis-card"><div class="analysis-section-head"><b><i class="fas fa-tree"></i> Status Kehutanan</b></div><div class="analysis-result-list">';
  if(!sigapAnalysis.ready){
    h+='<div class="analysis-empty">Data analisis SIGAP sedang dimuat. Coba analisis kembali setelah sinkronisasi selesai.</div>';
  }else if(sigapAnalysis.items.length){
    sigapAnalysis.items.forEach(function(item){
-      h+='<div class="analysis-result-row sigap-analysis-row"><span class="sigap-swatch" style="background:'+item.category.hex+'"></span><span title="'+item.category.meaning+'">'+item.category.label+'</span><span class="analysis-result-metric">Estimasi ± '+fmt2(item.area)+' · '+item.percent.toFixed(1)+'%</span></div>';
+      h+='<div class="analysis-result-row sigap-analysis-row"><span class="sigap-swatch" style="background:'+item.category.hex+'"></span><span title="'+item.category.meaning+'">'+item.category.label+'</span><span class="analysis-result-metric">'+(sigapAnalysis.sourceType==='vector'?'Hitungan vektor ± ':'Estimasi raster ± ')+fmt2(item.area)+' · '+item.percent.toFixed(1)+'%</span></div>';
    });
-   h+='<div class="sigap-analysis-note"><b>Tindak lanjut fungsi dominan:</b> '+sigapAnalysis.items[0].category.action+'</div>';
+   h+='<div class="sigap-analysis-note"><b>Sumber dan metode:</b> Kementerian Kehutanan RI melalui SIGAP. '+(sigapAnalysis.sourceType==='vector'?'Luas dihitung dari irisan poligon vektor skala 1:250.000.':'Analisis sementara menggunakan klasifikasi piksel raster cadangan.')+'</div>';
  }else{
-   h+='<div class="analysis-empty">Bidang berada di luar cakupan raster SIGAP atau tidak memiliki klasifikasi.</div>';
+   h+='<div class="analysis-empty">Bidang berada di luar cakupan SIGAP atau tidak memiliki klasifikasi.</div>';
  }
- h+='</div><div class="sigap-estimate-disclaimer"><b>Disclaimer:</b> Luas irisan adalah estimasi berbasis piksel raster SIGAP, bukan luas pasti, luas legal, atau hasil pengukuran kadastral. Konfirmasikan terhadap data vektor dan dokumen penetapan kawasan hutan yang berlaku.</div><div class="sigap-analysis-note">'+(sigapRaster.updatedAt?'Data diperbarui '+new Date(sigapRaster.updatedAt).toLocaleString('id-ID')+'.':'Tanggal pembaruan belum tersedia.')+'</div></section>';
+ h+='</div><div class="sigap-estimate-disclaimer"><b>Disclaimer:</b> '+(sigapAnalysis.sourceType==='vector'?'Irisan dihitung dari poligon vektor SIGAP skala 1:250.000, bukan batas kadastral atau penetapan hukum baru.':'Cadangan raster sedang digunakan sehingga luas merupakan estimasi piksel.')+' Konfirmasikan dengan dokumen SK kawasan hutan yang berlaku.</div><div class="sigap-analysis-note">'+(sigapVector.updatedAt||sigapRaster.updatedAt?'Data diperbarui '+new Date(sigapVector.updatedAt||sigapRaster.updatedAt).toLocaleString('id-ID')+'.':'Tanggal pembaruan belum tersedia.')+'</div></section>';
+
+ h+='<section class="analysis-result-card"><div class="analysis-section-head"><b><i class="fas fa-shield-alt"></i> PIPPIB 2025 Periode I</b></div><div class="analysis-result-list">';
+ if(!pippibVector.data){
+   h+='<div class="analysis-empty">Berkas vektor PIPPIB lokal tidak tersedia atau gagal dimuat.</div>';
+ }else if(pippibFound.length){
+   pippibFound.forEach(function(item){h+='<div class="analysis-result-row"><span><i class="fas fa-check-circle"></i>'+escapeHtml(item.nama)+'</span><span class="analysis-result-metric">Estimasi irisan ± '+fmt2(item.luas)+(hasDisplayArea?' · '+Math.min(100,(item.luas/total)*100).toFixed(1)+'%':'')+'</span></div>';});
+ }else{
+   h+='<div class="analysis-empty">Tidak masuk PIPPIB</div>';
+ }
+ h+='</div><div class="sigap-estimate-disclaimer"><b>Disclaimer:</b> Luas merupakan estimasi irisan geometri poligon PIPPIB skala 1:250.000, bukan ukuran kadastral dan bukan penetapan hak atas tanah.</div><div class="sigap-analysis-note"><b>Sumber dan pembaruan:</b> '+PIPPIB_METADATA.decision+'. Dataset diimpor ke SOBAT TARU pada 29 Juli 2026; periode data tetap 2025 Periode I.</div></section>';
 
  h+='<section class="analysis-result-card"><div class="analysis-section-head"><b>RTRW Kabupaten Sumbawa Barat</b></div><div class="analysis-result-list">';
  if(rtrw.length){
@@ -2886,6 +3151,13 @@ function runAnalysis(geojson){
    });
  } else h+='<div class="analysis-empty">Tidak beririsan</div>';
  h+='</div></section>';
+
+ h+='<section class="analysis-result-card"><div class="analysis-section-head"><b>Administrasi dan Pembatasan</b></div><div class="analysis-result-list">';
+ h+=kecamatan.length?kecamatan.map(function(item){return'<div class="analysis-result-row"><span><i class="fas fa-map-marker-alt"></i>Kecamatan '+escapeHtml(String(item.nama).replace(/^Kec\\.\\s*/i,''))+'</span><span class="analysis-result-metric">Irisan sekitar '+fmt2(item.luas)+'</span></div>';}).join(''):'<div class="analysis-empty">Kecamatan tidak teridentifikasi</div>';
+ h+=sempadan.length?sempadan.map(function(item){return'<div class="analysis-result-row"><span><i class="fas fa-exclamation-triangle"></i>'+escapeHtml(item.nama)+'</span><span class="analysis-result-metric">Estimasi irisan '+fmt2(item.luas)+'</span></div>';}).join(''):'<div class="analysis-empty">Tidak beririsan dengan sempadan sungai atau pantai RTRW</div>';
+ h+=jalan.length?jalan.slice(0,5).map(function(name){return'<div class="analysis-result-row"><span><i class="fas fa-road"></i>'+escapeHtml(name)+'</span><span class="analysis-result-metric">Memotong bidang</span></div>';}).join(''):'<div class="analysis-empty">Tidak ada ruas jalan yang memotong bidang</div>';
+ if(jalan.length>5)h+='<div class="sigap-analysis-note">Ada '+jalan.length+' ruas yang memotong bidang; lima nama pertama ditampilkan.</div>';
+ h+='</div><div class="sigap-estimate-disclaimer"><b>Catatan:</b> Sempadan mengikuti zonasi RTRW yang tersedia. Jarak ketentuan sempadan harus diperiksa pada peraturan dan dokumen teknis yang berlaku.</div></section>';
 
  h+='<section class="analysis-result-card"><div class="analysis-section-head"><b>RDTR</b></div><div class="analysis-result-list">';
  if(rdtr.length){
@@ -2900,7 +3172,7 @@ function runAnalysis(geojson){
  if(isMeasured)h+='<div class="digitized-actions"><button class="digitized-action digitized-export" type="button" data-digitized-action="export"><i class="fas fa-download"></i> Export SHP</button><button class="digitized-action digitized-delete" type="button" data-digitized-action="delete"><i class="fas fa-trash-alt"></i> Hapus Bidang</button></div>';
  h+=buildLayerActivationPanel();
  if(!hasExplorerCard&&!hasNib)h+='<a class="bhumi-coordinate-link field-bhumi-link" href="'+bhumiUrlForGeojson(geojson)+'" target="_blank" rel="noopener noreferrer"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Cek di BHUMI ATR/BPN</a>';
- h+='<div class="spatial-result-footer">Informasi ini merupakan hasil identifikasi spasial dan bukan merupakan produk hukum.</div>';
+ h+='<div class="spatial-result-footer">Hasil SOBAT TARU v1.5 bersifat indikatif, memakai seluruh dataset yang tersedia meskipun layer disembunyikan, dan bukan produk hukum. Terakhir diperbarui 29 Juli 2026.</div>';
 
 
  document.getElementById('analysisPanel').style.display='block';
@@ -2942,6 +3214,9 @@ async function identifikasiLokasi(latlng){
     let lsd = "TIDAK";
     let lp2b = "TIDAK";
     let lbs = "TIDAK";
+    let kecamatan = "Tidak teridentifikasi";
+    let pippib = "Tidak masuk";
+    let sempadan = [];
 
     try{
         layer_RTRWSUMBAWABARAT20202040_3.eachLayer(function(l){
@@ -2984,9 +3259,27 @@ async function identifikasiLokasi(latlng){
             if(turf.booleanPointInPolygon(pt,g)){ lbs="YA"; }
         });
     }catch(e){}
-    const sigapCategory=sigapPixelAt(latlng.lng,latlng.lat);
+    try{
+        layer_BatasKecamatanKSB.eachLayer(function(l){
+            let g=l.toGeoJSON();
+            if(turf.booleanPointInPolygon(pt,g)){ kecamatan=String(g.properties.KECAMATAN||'-').replace(/^Kec\.\s*/i,''); }
+        });
+    }catch(e){}
+    try{
+        layer_PIPPIB2025.eachLayer(function(l){
+            let g=l.toGeoJSON();
+            if(turf.booleanPointInPolygon(pt,g)){ pippib=pippibCategory(g.properties).label; }
+        });
+    }catch(e){}
+    [layer_SempadanSungaiRTRW,layer_SempadanPantaiRTRW].forEach(function(sourceLayer){
+        try{sourceLayer.eachLayer(function(l){let g=l.toGeoJSON();if(turf.booleanPointInPolygon(pt,g)){sempadan.push(g.properties.NAMOBJ||'Sempadan');}});}catch(e){}
+    });
+    const sigapFeature=sigapFeatureAt(latlng.lng,latlng.lat);
+    const sigapCategory=sigapFeature?sigapCategoryFromFeature(sigapFeature):sigapPixelAt(latlng.lng,latlng.lat);
+    const sigapProperties=sigapFeature&&sigapFeature.properties||{};
+    const sigapSupportUpdated=sigapVector.updatedAt||sigapRaster.updatedAt;
     const sigapHtml=sigapCategory
-        ? '<div class="sigap-identification"><div class="sigap-identification-head"><span class="sigap-swatch" style="background:'+sigapCategory.hex+'"></span><strong>'+sigapCategory.label+'</strong></div><p>'+sigapCategory.meaning+'</p><p><b>Tindak lanjut:</b> '+sigapCategory.action+'</p></div>'
+        ? '<div class="sigap-identification"><div class="sigap-identification-head"><span class="sigap-swatch" style="background:'+sigapCategory.hex+'"></span><strong>'+sigapCategory.label+'</strong></div>'+(sigapFeature?'<p><b>Nama objek:</b> '+escapeHtml(sigapProperties.namobj||'-')+'<br><b>No. SK:</b> '+escapeHtml(sigapProperties.noskpnjk||'-')+'<br><b>Keterangan:</b> '+escapeHtml(sigapProperties.keterangan||sigapProperties.remark||'-')+'</p>':'<p><b>Sumber cadangan raster.</b></p>')+'<p>'+sigapCategory.meaning+'</p><p><b>Sumber dan metode:</b> Kementerian Kehutanan RI melalui SIGAP. '+(sigapFeature?'Identifikasi menggunakan poligon vektor skala 1:250.000.':'Identifikasi sementara menggunakan raster cadangan.')+'</p><p><b>Pembaruan data:</b> '+(sigapSupportUpdated?new Date(sigapSupportUpdated).toLocaleString('id-ID'):'Tanggal pembaruan belum tersedia.')+'</p></div>'
         : '<div class="analysis-empty">Tidak ada klasifikasi fungsi kawasan SIGAP pada titik ini.</div>';
 
     var bhumiBounds=map.getBounds();
@@ -3010,8 +3303,12 @@ async function identifikasiLokasi(latlng){
     </a>
     <hr>
 
-    <div class="analysis-section-head"><b>Fungsi Kawasan Hutan (SIGAP)</b></div>
+    <div class="analysis-section-head"><b>Status Kehutanan (SIGAP)</b></div>
     ${sigapHtml}
+    <hr>
+
+    <div class="analysis-section-head"><b>Administrasi dan Pembatasan</b></div>
+    <div class="analysis-value"><b>Kecamatan:</b> ${escapeHtml(kecamatan)}<br><b>PIPPIB 2025 Periode I:</b> ${escapeHtml(pippib)}<br><b>Sempadan RTRW:</b> ${sempadan.length?escapeHtml(Array.from(new Set(sempadan)).join(', ')):'Tidak masuk'}</div>
     <hr>
 
     <div class="analysis-section-head"><b>RTRW Kabupaten Sumbawa Barat</b></div>
@@ -3030,7 +3327,7 @@ async function identifikasiLokasi(latlng){
     ${buildLayerActivationPanel()}
 
     <div class="popup-disclaimer spatial-result-footer">
-    Informasi ini merupakan hasil identifikasi spasial dan bukan merupakan produk hukum.
+    Hasil SOBAT TARU v1.5 bersifat indikatif, memakai seluruh dataset yang tersedia meskipun layer disembunyikan, dan bukan produk hukum. Terakhir diperbarui 29 Juli 2026.
     </div>
     <button class="inline-restore-map-tools" type="button"><i class="fas fa-sliders-h" aria-hidden="true"></i> Tutup hasil &amp; tampilkan alat peta</button>
     </div>`;
@@ -3041,6 +3338,28 @@ async function identifikasiLokasi(latlng){
     showIdentificationPulse(latlng);
     L.popup(popupOptions).setLatLng(latlng).setContent(isi).openOn(map);
 }
+
+function enableUnifiedIdentification(){
+    const registered=new Set();
+    function bindFeatureLayer(featureLayer){
+        if(!featureLayer||featureLayer.__sobatUnifiedIdentification)return;
+        featureLayer.__sobatUnifiedIdentification=true;
+        if(featureLayer.unbindPopup)featureLayer.unbindPopup();
+        featureLayer.on('click',function(event){
+            if(event.originalEvent)L.DomEvent.stopPropagation(event.originalEvent);
+            identifikasiLokasi(event.latlng);
+        });
+    }
+    Object.values(analysisLayerGroups()).forEach(function(layers){
+        layers.forEach(function(sourceLayer){
+            if(!sourceLayer||registered.has(sourceLayer))return;
+            registered.add(sourceLayer);
+            sourceLayer.eachLayer(bindFeatureLayer);
+            sourceLayer.on('layeradd',function(event){bindFeatureLayer(event.layer);});
+        });
+    });
+}
+enableUnifiedIdentification();
 
 map.on('click', function(e){
     if(e.originalEvent&&e.originalEvent.target&&e.originalEvent.target.closest&&e.originalEvent.target.closest('.leaflet-control')) return;

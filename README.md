@@ -2,12 +2,15 @@
 Web Gis Informasi Ruang Kabupaten Sumbawa Barat
 
 Versi ini menambahkan layer tematik **Kawasan Hutan Kemenhut (SIGAP)** ke
-kelompok **Peta Tematik**. Citra transparan kawasan hutan Sumbawa Barat disimpan
-di dalam proyek agar tetap tampil meskipun sertifikat layanan SIGAP sedang
-bermasalah. Layer aktif otomatis saat aplikasi dibuka.
+kelompok **Peta Tematik**. Data utama berupa poligon GeoJSON dari layanan Query
+resmi SIGAP. Salinan raster tetap disimpan hanya sebagai cadangan ketika layanan
+vektor bermasalah. Layer tidak aktif saat aplikasi dibuka.
 
 Sumber:
 https://geoportal.menlhk.go.id/server/rest/services/SIGAP_Interaktif/Kawasan_Hutan/MapServer
+
+Sumber vektor:
+https://geoportal.menlhk.go.id/server/rest/services/SIGAP_AnalisisSpasial/kh/MapServer/0
 
 ## Menjalankan dan memperbarui SIGAP
 
@@ -22,9 +25,10 @@ Pintasan berjalan tanpa menampilkan jendela CMD.
 
 ## Fungsi SIGAP
 
-- Legenda fungsi kawasan hutan selalu tersedia pada peta.
-- Klik peta menampilkan kategori fungsi kawasan beserta maknanya.
-- Analisis bidang menampilkan luas dan persentase setiap fungsi kawasan.
+- Legenda fungsi kawasan tersedia langsung pada layer.
+- Klik peta menampilkan kategori, nama objek, nomor SK, dan keterangan.
+- Analisis bidang memakai irisan poligon vektor dan menampilkan luas serta
+  persentase setiap fungsi kawasan.
 - Waktu pembaruan dan status sinkronisasi ditampilkan pada legenda.
 - Hasil merupakan identifikasi awal dan perlu dikonfirmasi dengan dokumen
   penetapan kawasan hutan yang berlaku.
@@ -41,5 +45,6 @@ Saat seluruh isi folder ini diunggah sebagai repositori GitHub:
 - Jika SIGAP menolak koneksi, status kegagalan ditampilkan pada legenda dan
   data terakhir yang berhasil tetap digunakan.
 - Layer SIGAP tidak aktif saat awal dibuka. Analisis SIGAP tetap bekerja dari
-  raster tersembunyi meskipun layer visual belum dicentang.
-- Luas irisan SIGAP selalu ditampilkan sebagai estimasi raster.
+  GeoJSON yang dimuat di belakang layar meskipun layer visual belum dicentang.
+- Perhitungan irisan memakai geometri vektor SIGAP skala 1:250.000. Raster hanya
+  digunakan sebagai cadangan apabila data vektor gagal dimuat.
