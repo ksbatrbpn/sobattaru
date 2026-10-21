@@ -49,6 +49,7 @@ jobs:
           git config user.email "sobat-taru-sync@users.noreply.github.com"
           git add data/RDTRMALUK_1.js data/RDTRTALIWANG_2.js \
                   data/RTRWSUMBAWABARAT20202040_3.js \
+                  data/RTRWPROVINSINTB20242044_7.js \
                   data/LSD_Kabupaten_Sumbawa_Barat_4.js \
                   data/LP2BSUMBAWABARAT_5.js \
                   data/LBS_Kabupaten_Sumbawa_Barat_6.js \
