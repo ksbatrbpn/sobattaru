@@ -199,6 +199,18 @@ body.st-layers-open .leaflet-top.leaflet-left{left:352px}
 .leaflet-touch .leaflet-bar,.leaflet-bar{border:0!important;border-radius:var(--st-radius-md)!important;box-shadow:var(--st-shadow-sm)!important;overflow:hidden;background:var(--st-glass-strong)!important;-webkit-backdrop-filter:var(--st-blur);backdrop-filter:var(--st-blur)}
 .leaflet-bar a,.leaflet-touch .leaflet-bar a{width:34px!important;height:34px!important;line-height:34px!important;background:transparent!important;color:var(--st-ink)!important;border-bottom-color:var(--st-line)!important;font-weight:400!important}
 .leaflet-bar a:hover{background:var(--st-fill)!important}
+/* Tombol navigasi peta (lokasi saya, seluruh wilayah, zoom ke titik/bidang aktif) dan buka panel layer */
+.st-map-nav button,.st-layer-open button{display:flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;border:0;border-bottom:.5px solid var(--st-line);background:transparent;color:var(--st-ink);font-size:13px;cursor:pointer}
+.st-map-nav button:last-child{border-bottom:0}
+.st-map-nav button:hover,.st-layer-open button:hover{background:var(--st-fill)}
+.st-map-nav button:focus-visible,.st-layer-open button:focus-visible{outline:3px solid rgba(15,122,99,.4);outline-offset:-3px}
+.st-layer-open button{width:auto;gap:7px;padding:0 12px;border:0;font:500 13px var(--st-font);color:var(--st-green-700)}
+.st-layer-open .st-ico{width:14px;height:14px;fill:currentColor}
+body.st-layers-open .st-layer-open{display:none}
+/* Pasang aplikasi */
+.sobat-header .st-nav-btn.st-install-btn{order:9;background:rgba(255,255,255,.14)}
+.sobat-header .st-nav-btn.st-install-btn:hover{background:rgba(255,255,255,.24)}
+.st-install-phone{display:none}
 .leaflet-control-scale-line{border-color:rgba(0,0,0,.55)!important;background:rgba(255,255,255,.8)!important;color:var(--st-ink)!important;font:500 11px var(--st-font)!important;border-radius:0 0 3px 3px}
 .leaflet-control-attribution{border-radius:7px 0 0 0;background:rgba(255,255,255,.78)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font:400 11px var(--st-font)!important;color:var(--st-muted)!important}
 .leaflet-control-attribution a,.sobat-about-link{color:var(--st-accent)!important}
@@ -608,6 +620,11 @@ body.st-result-open .tutorial-coach,body.st-layers-open .tutorial-coach{display:
   .leaflet-top{top:calc(var(--st-header-h) + 62px)!important}
   body.st-layers-open .leaflet-top.leaflet-left{left:0}
   .leaflet-control-zoom{display:none!important}
+  .st-layer-open{display:none}
+  .st-map-nav button{width:44px;height:44px;font-size:16px}
+  .st-install-phone:not([hidden]){display:inline-flex;align-items:center;gap:6px;position:absolute;right:12px;top:calc(env(safe-area-inset-top,0px) + 9px);height:34px;padding:0 13px;border:0;border-radius:999px;background:#fff;color:var(--st-green-700);font:600 14px var(--st-font);box-shadow:0 1px 2px rgba(0,0,0,.18);cursor:pointer}
+  body.st-layers-open .tool-toast,body.st-result-open .tool-toast{top:calc(var(--st-header-h) + 62px);bottom:auto!important}
+  .tool-toast{border-radius:14px!important}
   .leaflet-bottom{bottom:calc(var(--st-nav-h) + env(safe-area-inset-bottom,0px))!important}
   .leaflet-control-attribution{font-size:11px!important}
   .sobat-about-link{display:inline-block;padding:8px 6px!important;font-size:12px!important}

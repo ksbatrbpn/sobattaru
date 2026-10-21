@@ -96,15 +96,46 @@
   window.brToast=function(text,duration){showToast(text,duration);};
 
   /* ---------- Pasang Aplikasi (PWA), sama seperti Bale Ruang NTB ---------- */
-  var installPrompt=null,installItem=toolsMenu.querySelector('[data-st-tool="install"]');
+  var installPrompt=null,promptSeen=false,installItem=toolsMenu.querySelector('[data-st-tool="install"]');
   function standalone(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}
-  function refreshInstallItem(){installItem.hidden=standalone()||!(installPrompt||/iphone|ipad|ipod/i.test(navigator.userAgent));}
+  // Tombol pasang tetap tampil selama aplikasi belum terpasang di perangkat ini dan hilang setelah terpasang.
+  // Browser Chromium hanya mengirim beforeinstallprompt bila aplikasi belum terpasang; browser lain diberi petunjuk manual.
+  var installButtons=[];
+  (function(){
+    var nav=document.querySelector('.st-nav'),upload=$('stNavUpload'),header=document.querySelector('.sobat-header');
+    var desk=document.createElement('button');
+    desk.className='st-nav-btn st-install-btn';desk.type='button';desk.hidden=true;desk.title='Pasang SOBAT TARU sebagai aplikasi di perangkat ini';
+    desk.innerHTML='<i class="fas fa-download" aria-hidden="true"></i><span>Pasang Aplikasi</span>';
+    if(nav)nav.insertBefore(desk,upload||null);
+    var phone=document.createElement('button');
+    phone.className='st-install-phone';phone.type='button';phone.hidden=true;phone.setAttribute('aria-label','Pasang aplikasi di HP');
+    phone.innerHTML='<i class="fas fa-download" aria-hidden="true"></i><span>Pasang</span>';
+    if(header)header.appendChild(phone);
+    installButtons=[desk,phone];
+    installButtons.forEach(function(button){button.addEventListener('click',function(){installApp();});});
+  })();
+  function canInstall(){
+    if(standalone()||store('sobatTaruInstalled')==='1')return false;
+    if(installPrompt||promptSeen)return true;
+    if('onbeforeinstallprompt' in window)return false;
+    var ua=navigator.userAgent;
+    // Safari (iPhone/iPad/Mac) dan browser HP lain bisa memasang lewat menunya sendiri; Firefox desktop tidak bisa.
+    return /iphone|ipad|ipod|android/i.test(ua)||(/macintosh/i.test(ua)&&/safari/i.test(ua)&&!/chrome|chromium|firefox|edg/i.test(ua));
+  }
+  function refreshInstallItem(){
+    if(standalone())store('sobatTaruInstalled','1');
+    var show=canInstall();
+    installItem.hidden=!show;
+    installButtons.forEach(function(button){button.hidden=!show;});
+  }
+  // Bila aplikasi dihapus dari perangkat, browser kembali mengirim beforeinstallprompt sehingga tanda terpasang direset.
   function installApp(){
     if(installPrompt){installPrompt.prompt();installPrompt.userChoice.then(function(){installPrompt=null;refreshInstallItem();});return;}
-    showToast(/iphone|ipad|ipod/i.test(navigator.userAgent)?'Di iPhone/iPad: ketuk tombol Bagikan, lalu “Tambahkan ke Layar Utama”.':'Buka menu browser (⋮), lalu pilih “Instal aplikasi” atau “Tambahkan ke layar utama”.',6000);
+    var ua=navigator.userAgent;
+    showToast(/iphone|ipad|ipod/i.test(ua)?'Di iPhone/iPad: ketuk tombol Bagikan, lalu “Tambahkan ke Layar Utama”.':/macintosh/i.test(ua)&&/safari/i.test(ua)&&!/chrome|chromium|edg/i.test(ua)?'Di Safari Mac: buka menu File, lalu pilih “Tambahkan ke Dock”.':'Buka menu browser (⋮), lalu pilih “Instal aplikasi” atau “Tambahkan ke layar utama”.',6000);
   }
-  window.addEventListener('beforeinstallprompt',function(event){event.preventDefault();installPrompt=event;refreshInstallItem();});
-  window.addEventListener('appinstalled',function(){installPrompt=null;refreshInstallItem();showToast('SOBAT TARU terpasang di perangkat Anda.');});
+  window.addEventListener('beforeinstallprompt',function(event){event.preventDefault();installPrompt=event;promptSeen=true;store('sobatTaruInstalled','0');refreshInstallItem();});
+  window.addEventListener('appinstalled',function(){installPrompt=null;promptSeen=false;store('sobatTaruInstalled','1');refreshInstallItem();showToast('SOBAT TARU terpasang di perangkat Anda.');});
   refreshInstallItem();
   function registerWorker(){navigator.serviceWorker.register('sw.js').catch(function(){});}
   if('serviceWorker' in navigator&&location.protocol!=='file:'){if(document.readyState==='complete')registerWorker();else window.addEventListener('load',registerWorker);}
@@ -499,6 +530,62 @@
     var target=L.point((rect.left+rect.right)/2,(rect.top+rect.bottom)/2);
     map.panBy(point.subtract(target),{animate:true,duration:.35});
   }
+
+  /* ---------- Tombol navigasi peta, sama seperti Bale Ruang NTB ---------- */
+  function activeGeometry(){
+    if(lastIdentification&&lastIdentification.mode==='polygon'&&lastIdentification.geojson)return lastIdentification.geojson;
+    if(window.uploadLayer&&map.hasLayer(window.uploadLayer)){try{return window.uploadLayer.toGeoJSON();}catch(_uploadError){}}
+    return null;
+  }
+  function zoomToActive(){
+    var geometry=activeGeometry();
+    if(geometry){
+      var bounds=L.geoJSON(geometry).getBounds();
+      if(!bounds.isValid()){showToast('Geometri bidang aktif tidak dapat ditampilkan.');return;}
+      var rect=visibleMapRect();
+      map.fitBounds(bounds,{animate:true,maxZoom:19,paddingTopLeft:[rect.left+30,rect.top+30],paddingBottomRight:[window.innerWidth-rect.right+30,window.innerHeight-rect.bottom+30]});
+      showToast('Peta diarahkan ke bidang yang sedang aktif.');return;
+    }
+    if(lastIdentification&&lastIdentification.latlng){
+      map.setView(lastIdentification.latlng,Math.max(18,map.getZoom()),{animate:true});
+      setTimeout(function(){keepPointVisible(lastIdentification.latlng);},450);
+      showToast('Peta diperbesar ke titik koordinat yang sedang aktif.');return;
+    }
+    showToast('Belum ada titik atau bidang aktif. Klik peta, cari koordinat, atau unggah SHP/KML terlebih dahulu.',4200);
+  }
+  function zoomToHome(){
+    var bounds=window.layer_BatasKecamatanKSB&&layer_BatasKecamatanKSB.getBounds();
+    if(bounds&&bounds.isValid())map.fitBounds(bounds,fitPadding());else map.setView([-8.85,116.85],10);
+    showToast('Peta kembali ke tampilan seluruh Sumbawa Barat.');
+  }
+  function locateMe(){
+    var locate=document.querySelector('.leaflet-control-locate a');
+    if(locate)locate.click();else showToast('Fitur lokasi belum siap.');
+  }
+  var MapNavControl=L.Control.extend({options:{position:'topleft'},onAdd:function(){
+    var box=L.DomUtil.create('div','leaflet-bar st-map-nav');
+    function button(icon,label,handler){
+      var b=L.DomUtil.create('button','',box);b.type='button';b.title=label;b.setAttribute('aria-label',label);
+      b.innerHTML='<i class="fas '+icon+'" aria-hidden="true"></i>';L.DomEvent.on(b,'click',function(e){L.DomEvent.stop(e);handler();});return b;
+    }
+    button('fa-crosshairs','Tampilkan lokasi saya di peta',locateMe);
+    button('fa-home','Tampilkan seluruh wilayah Sumbawa Barat',zoomToHome);
+    button('fa-bullseye','Zoom ke titik koordinat atau bidang aktif',zoomToActive);
+    L.DomEvent.disableClickPropagation(box);L.DomEvent.disableScrollPropagation(box);
+    return box;
+  }});
+  new MapNavControl().addTo(map);
+  // Saat panel layer tertutup di desktop, tombol "Buka Panel Layer" muncul di samping peta.
+  var LayerOpenControl=L.Control.extend({options:{position:'topleft'},onAdd:function(){
+    var box=L.DomUtil.create('div','leaflet-bar st-layer-open'),b=L.DomUtil.create('button','',box);
+    b.type='button';b.title='Buka panel layer';b.setAttribute('aria-label','Buka panel layer');
+    b.innerHTML=layersIcon+'<span>Layer</span>';
+    L.DomEvent.on(b,'click',function(e){L.DomEvent.stop(e);setLayersOpen(true,true);});
+    L.DomEvent.disableClickPropagation(box);
+    return box;
+  }});
+  var layerOpenControl=new LayerOpenControl().addTo(map);
+  var corner=layerOpenControl.getContainer().parentNode;if(corner)corner.insertBefore(layerOpenControl.getContainer(),corner.firstChild);
 
   /* ---------- Pencarian di header ---------- */
   var searchForm=$('stSearch'),searchInput=$('stSearchInput');
@@ -986,7 +1073,7 @@
       var hasNib=features.length&&features.every(function(f){var p=props(f);return p.__SOBAT_HAS_NIB===true||Object.keys(p).some(function(k){return /^(NIB|NIBIDANG|NOMORNIB)$/.test(String(k).toUpperCase().replace(/[^A-Z0-9]/g,''))&&String(p[k]||'').trim();});});
       var model=analysePolygon(geojson);
       var options={measured:measured,cadastral:cadastral,areaLabel:measured?'Luas hasil pengukuran':'Luas bidang',bhumiUrl:!explorer&&!hasNib&&typeof window.bhumiUrlForGeojson==='function'?window.bhumiUrlForGeojson(geojson):''};
-      lastIdentification={mode:'polygon',latlng:model.latlng,kecamatan:model.kecamatan};
+      lastIdentification={mode:'polygon',latlng:model.latlng,kecamatan:model.kecamatan,geojson:geojson};
       hideHint(true);
       if(explorer){
         // Bidang dari eksplorasi tetap tampil di panel eksplorasi (kartu bidang ditambahkan di atasnya).
