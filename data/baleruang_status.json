@@ -1,9 +1,9 @@
 {
   "status": "success",
   "message": "Layer disinkronkan dari Bale Ruang NTB.",
-  "updatedAt": "2026-10-21T11:04:08+08:00",
+  "updatedAt": "2026-10-21T12:14:22+08:00",
   "source": "https://github.com/atrbpnproject/baleruangntb",
-  "ref": "3c2a483f2a13171e22b801d8dd3ab4d588fc249d",
+  "ref": "0539f60daf19b40009ba773bd2f043a80fb2385c",
   "layers": [
     {
       "layer": "RDTR Maluk",
@@ -34,7 +34,7 @@
       "key": "lsd",
       "file": "LSD_Kabupaten_Sumbawa_Barat_4.js",
       "features": 1013,
-      "previous": 1108,
+      "previous": 1013,
       "source": "NTB_LSD.zip (LSD Provinsi Nusa Tenggara Barat)"
     },
     {
@@ -42,7 +42,7 @@
       "key": "lp2b",
       "file": "LP2BSUMBAWABARAT_5.js",
       "features": 582,
-      "previous": 1076,
+      "previous": 582,
       "source": "Usulan Final LP2B Kab-Kota NTB (hasil verifikasi Kementerian ATR/BPN, surat Dirjen Tata Ruang 6 Okt 2026)"
     },
     {
