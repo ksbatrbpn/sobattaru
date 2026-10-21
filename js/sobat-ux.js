@@ -663,11 +663,11 @@
     (groups[key]||[]).forEach(function(layer){if(!layer)return;if(on&&!map.hasLayer(layer))map.addLayer(layer);if(!on&&map.hasLayer(layer))map.removeLayer(layer);});
   }
   function syncShowSwitches(){
-    resultPanel.querySelectorAll('[data-st-layer]').forEach(function(input){input.checked=layerKeyActive(input.dataset.stLayer);});
+    document.querySelectorAll('[data-st-layer]').forEach(function(input){input.checked=layerKeyActive(input.dataset.stLayer);});
   }
-  map.on('layeradd layerremove',function(){if(!resultPanel.hidden)syncShowSwitches();});
-  resultPanel.addEventListener('change',function(event){
-    var input=event.target.closest('[data-st-layer]');if(!input)return;
+  map.on('layeradd layerremove',syncShowSwitches);
+  document.addEventListener('change',function(event){
+    var input=event.target.closest&&event.target.closest('[data-st-layer]');if(!input)return;
     setLayerKey(input.dataset.stLayer,input.checked);syncShowSwitches();
   });
 
@@ -679,7 +679,8 @@
     var lat=latlng.lat.toFixed(6),lng=latlng.lng.toFixed(6);
     return location.origin+location.pathname+'?titik='+lat+','+lng+'#'+Math.max(map.getZoom(),16)+'/'+lat+'/'+lng;
   }
-  resultPanel.addEventListener('click',function(event){
+  document.addEventListener('click',function(event){
+    if(!event.target.closest)return;
     var copy=event.target.closest('[data-st-copy]');
     if(copy){copyText(copy.dataset.stCopy,'Salin koordinat:',function(){showToast('Koordinat disalin');});return;}
     var share=event.target.closest('[data-st-share]');
@@ -711,91 +712,300 @@
   }
   var protectedPattern=/lindung|konservasi|mangrove|cagar|suaka|taman nasional|taman wisata alam|taman hutan raya|resapan|rawan bencana|ruang terbuka hijau|sempadan|perlindungan setempat/i;
 
-  window.sobatRenderIdentification=function(data){
-    lastIdentification=data;
-    hideHint(true);
-    var lat=data.latlng.lat,lng=data.latlng.lng;
-    var utm=null;try{if(typeof window.projectToUtm50S==='function')utm=window.projectToUtm50S([lng,lat]);}catch(_utmError){}
-    var rtrwFound=data.rtrw&&data.rtrw!=='Tidak ditemukan';
-    var rtrwProtected=rtrwFound&&protectedPattern.test(String(data.rtrw));
-    var rdtrFound=!!data.rdtrZona;
-    var sigap=data.sigapCategory;
-    var sigapForest=!!sigap&&sigap.key!=='apl';
-    var pippibIn=data.pippib&&data.pippib!=='Tidak masuk';
-    var lp2bIn=data.lp2b==='YA',lsdIn=data.lsd==='YA',lbsIn=data.lbs==='YA';
-    var sempadanIn=data.sempadan&&data.sempadan.length>0;
-    // Pembatas mengikuti Bale Ruang NTB: LSD dan PIPPIB adalah ketentuan khusus. LP2B 2026 masih hasil verifikasi
-    // usulan (belum penetapan) dan LBS adalah data baku sawah, jadi keduanya ditampilkan sebagai informasi, bukan pembatas.
-    var constraints=[
-      sigapForest&&{name:'Kawasan hutan',danger:true},
-      pippibIn&&{name:'PIPPIB',danger:true},
-      rtrwProtected&&{name:'Kawasan lindung RTRW',danger:false},
-      lsdIn&&{name:'LSD',danger:false},
-      sempadanIn&&{name:'Sempadan',danger:false}
-    ].filter(Boolean);
-    var severe=constraints.some(function(entry){return entry.danger;});
+  /* ---------- Analisis titik dan bidang: satu mesin, satu tampilan (mengikuti Bale Ruang NTB) ----------
+   * Titik: layer yang mencakup lokasi beserta kelasnya. Bidang: luas irisan per layer dan per kelas.
+   * Layer yang tidak mencakup/beririsan dikumpulkan dalam satu grup yang bisa dibuka. */
+  var LP2B_NOTE='Hasil Verifikasi Usulan LP2B, belum merupakan penetapan. Sumber: Kementerian ATR/BPN &amp; Pemprov NTB, 6 Okt 2026.';
+  var ANALYSIS_DEFS=[
+    {id:'rtrw',key:'rtrw',layer:'layer_RTRWSUMBAWABARAT20202040_3',field:'NAMOBJ',title:'Pola Ruang RTRW',sub:'Kabupaten Sumbawa Barat 2020–2040',legal:'Perda Kab. Sumbawa Barat No. 11 Tahun 2020'},
+    {id:'rdtr-taliwang',key:'rdtr',layer:'layer_RDTRTALIWANG_2',field:'NAMAOBJ',title:'RDTR dan Peraturan Zonasi Perkotaan Taliwang',sub:'Sumbawa Barat',legal:'Perda Sumbawa Barat No. 12 Tahun 2016'},
+    {id:'rdtr-maluk',key:'rdtr',layer:'layer_RDTRMALUK_1',field:'NAMOBJ',title:'RDTR Sekitar Kawasan Industri Maluk',sub:'Sumbawa Barat',legal:'Perbup Sumbawa Barat No. 4 Tahun 2023'},
+    {id:'lsd',key:'lsd',layer:'layer_LSD_Kabupaten_Sumbawa_Barat_4',field:'LSD',title:'LSD Provinsi NTB',sub:'Lahan Sawah yang Dilindungi',constraint:'LSD'},
+    {id:'lp2b',key:'lp2b',layer:'layer_LP2BSUMBAWABARAT_5',field:'KELAS',title:'LP2B Hasil Verifikasi Usulan tahun 2026',sub:'Belum merupakan penetapan',note:LP2B_NOTE},
+    {id:'lbs',key:'lbs',layer:'layer_LBS_Kabupaten_Sumbawa_Barat_6',field:'JSWH',title:'LBS Provinsi NTB',sub:'Lahan Baku Sawah'},
+    {id:'pippib',key:'pippib',layer:'layer_PIPPIB2025',value:function(p){return typeof window.pippibCategory==='function'?window.pippibCategory(p).label:p.PIPPIB;},title:'PIPPIB Provinsi NTB 2025',sub:'Peta Indikatif Penghentian Pemberian Izin Baru',constraint:'PIPPIB',danger:true},
+    {id:'sigap',key:'sigap',sigap:true,title:'Kawasan Hutan',sub:'Kementerian Kehutanan RI (SIGAP)'},
+    {id:'sempadan-sungai',key:'sempadan',layer:'layer_SempadanSungaiRTRW',field:'NAMOBJ',title:'Sempadan Sungai',sub:'RTRW Kabupaten Sumbawa Barat',constraint:'Sempadan'},
+    {id:'sempadan-pantai',key:'sempadan',layer:'layer_SempadanPantaiRTRW',field:'NAMOBJ',title:'Sempadan Pantai',sub:'RTRW Kabupaten Sumbawa Barat',constraint:'Sempadan'},
+    {id:'jalan',key:'jalan',layer:'layer_JaringanJalanKSB',field:'NAMOBJ',line:true,title:'Jaringan Jalan',sub:'Kabupaten Sumbawa Barat'}
+  ];
+  var HIDDEN_ATTR=/^(objectid(_1)?|fid|shape_.*|orde0\d|metadata|srs_id|fcode|lcode|luas_cyl|tglskpnjk|lskpnjk|kdp.*|kdc.*|kde.*|kdb.*|__.*)$/i;
+  var MIN_AREA=1;
+  function fmtArea(m2){var v=Number(m2)||0;return Math.round(v).toLocaleString('id-ID')+' m²';}
+  function fmtAreaLong(m2){var v=Number(m2)||0;return v>=10000?(v/10000).toLocaleString('id-ID',{maximumFractionDigits:4})+' ha ('+fmtArea(v)+')':fmtArea(v);}
+  function fmtPct(part,base){if(!base||!part)return '';var v=Math.min(100,part/base*100);return (v<0.1?'<0,1':v.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}))+'%';}
+  function areaOf(geometry){try{return (typeof window.utm50Area==='function'&&window.utm50Area(geometry))||turf.area(geometry)||0;}catch(_areaError){return 0;}}
+  function boxesOverlap(a,b){return !(a[0]>b[2]||a[2]<b[0]||a[1]>b[3]||a[3]<b[1]);}
+  function layerBox(layer){try{var b=layer.getBounds();return b&&b.isValid()?[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()]:null;}catch(_boundsError){return null;}}
+  function featureValue(def,feature){
+    var p=feature&&feature.properties||{},v=def.value?def.value(p):p[def.field];
+    v=v==null?'':String(v).replace(/\s+/g,' ').trim();
+    return v&&v!=='-'?v:'';
+  }
+  function eachFeatureLayer(def,fn){var layer=window[def.layer];if(!layer||typeof layer.eachLayer!=='function')return;layer.eachLayer(fn);}
 
-    var summary=constraints.length?
-      '<div class="st-summary '+(severe?'danger':'warn')+'"><i class="fas '+(severe?'fa-exclamation-circle':'fa-exclamation-triangle')+'" aria-hidden="true"></i><div>'+
-        '<b>'+constraints.length+' hal perlu diperhatikan</b>'+
-        '<div class="st-summary-chips">'+constraints.map(function(entry){return '<span class="st-chip '+(entry.danger?'danger':'in')+'">'+esc(entry.name)+'</span>';}).join('')+'</div>'+
-        '<p>Pemanfaatan lahan di titik ini perlu pemeriksaan lebih lanjut ke instansi berwenang.</p></div></div>':
-      '<div class="st-summary ok"><i class="fas fa-check-circle" aria-hidden="true"></i><div><b>Tidak ditemukan pembatas</b>'+
-        '<p>Titik ini tidak masuk kawasan hutan, PIPPIB, LSD, sempadan, maupun kawasan lindung pada data yang tersedia.</p></div></div>';
+  function analysePoint(latlng){
+    var pt=turf.point([latlng.lng,latlng.lat]),results=[];
+    ANALYSIS_DEFS.forEach(function(def){
+      if(def.line)return;
+      var result={def:def,hits:[],values:[],categories:[]};
+      if(def.sigap){
+        var feature=typeof window.sigapFeatureAt==='function'?window.sigapFeatureAt(latlng.lng,latlng.lat):null;
+        var category=feature&&typeof window.sigapCategoryFromFeature==='function'?window.sigapCategoryFromFeature(feature):(typeof window.sigapPixelAt==='function'?window.sigapPixelAt(latlng.lng,latlng.lat):null);
+        if(category){result.hits=feature?[feature]:[{properties:{}}];result.values=[category.label];result.sigapCategory=category;result.forest=category.key!=='apl';}
+      }else{
+        eachFeatureLayer(def,function(layer){
+          var box=layerBox(layer);if(box&&(latlng.lng<box[0]||latlng.lng>box[2]||latlng.lat<box[1]||latlng.lat>box[3]))return;
+          try{var g=layer.feature||layer.toGeoJSON();if(turf.booleanPointInPolygon(pt,g)){result.hits.push(g);var v=featureValue(def,g);if(v&&result.values.indexOf(v)<0)result.values.push(v);}}catch(_pointError){}
+        });
+      }
+      result.inside=result.hits.length>0;
+      results.push(result);
+    });
+    var kecamatan='';
+    if(window.layer_BatasKecamatanKSB)layer_BatasKecamatanKSB.eachLayer(function(layer){try{var g=layer.feature||layer.toGeoJSON();if(!kecamatan&&turf.booleanPointInPolygon(pt,g))kecamatan=String(g.properties.KECAMATAN||'').replace(/^Kec\.\s*/i,'');}catch(_kecError){}});
+    return {mode:'point',latlng:latlng,results:results,kecamatan:kecamatan,places:kecamatan?[{name:kecamatan,kind:'kecamatan'}]:[]};
+  }
 
-    var alerts='';
-    if(sigapForest)alerts+='<div class="st-alert danger"><i class="fas fa-tree" aria-hidden="true"></i><div><b>Lokasi berada di '+esc(sigap.label)+'</b>'+esc(sigap.action||'Konfirmasikan kepada instansi kehutanan yang berwenang.')+'</div></div>';
-    if(pippibIn)alerts+='<div class="st-alert danger"><i class="fas fa-ban" aria-hidden="true"></i><div><b>Lokasi beririsan dengan PIPPIB</b>Pemanfaatan ruang di sini terikat ketentuan penghentian pemberian izin baru. Konfirmasikan kepada instansi berwenang.</div></div>';
-    if(lsdIn)alerts+='<div class="st-alert"><i class="fas fa-seedling" aria-hidden="true"></i><div><b>Lokasi beririsan dengan LSD</b>Pemanfaatan ruang di sini terikat ketentuan khusus perlindungan lahan. Konfirmasikan kepada instansi berwenang.</div></div>';
-    if(lp2bIn)alerts+='<div class="st-alert info"><i class="fas fa-info-circle" aria-hidden="true"></i><div><b>Lokasi berada dalam LP2B Hasil Verifikasi Usulan tahun 2026</b>Belum merupakan penetapan; menunggu Keputusan Bupati. Untuk rencana pemanfaatan, konfirmasikan ke Pemda setempat.</div></div>';
-    if(sempadanIn)alerts+='<div class="st-alert"><i class="fas fa-tint" aria-hidden="true"></i><div><b>Lokasi berada di sempadan</b>'+esc(data.sempadan.join(', '))+' menurut RTRW Kabupaten Sumbawa Barat.</div></div>';
-
-    var sigapDetails='';
-    if(sigap){
-      var props=data.sigapProperties||{};
-      sigapDetails='<details class="st-details"><summary>Rincian SIGAP</summary><p>'+
-        (data.sigapFeature?'<b>Nama objek:</b> '+esc(props.namobj||'-')+'<br><b>No. SK:</b> '+esc(props.noskpnjk||'-')+'<br><b>Keterangan:</b> '+esc(props.keterangan||props.remark||'-')+'<br>':'')+
-        esc(sigap.meaning||'')+'</p></details>';
+  function analysePolygon(geojson){
+    var parts=turf.flatten(geojson).features.filter(function(f){return f.geometry&&/Polygon/.test(f.geometry.type);}).map(function(f){var box=null;try{box=turf.bbox(f);}catch(_bboxError){}return {feature:f,box:box};});
+    var total=0;parts.forEach(function(part){total+=areaOf(part.feature);});
+    var results=[];
+    function intersectArea(layerGeojson,layerBoxValue){
+      var area=0;
+      parts.forEach(function(part){
+        if(part.box&&layerBoxValue&&!boxesOverlap(part.box,layerBoxValue))return;
+        try{if(turf.booleanIntersects(part.feature,layerGeojson)){var inter=turf.intersect(part.feature,layerGeojson);if(inter){var a=areaOf(inter);if(a>=MIN_AREA)area+=a;}}}catch(_intersectError){}
+      });
+      return area;
     }
-    var rtrwChip=rtrwFound?(rtrwProtected?'<span class="st-chip in">Kawasan lindung</span>':'<span class="st-chip ok">Kawasan budi daya</span>'):'<span class="st-chip out">Tidak ada data</span>';
+    ANALYSIS_DEFS.forEach(function(def){
+      var result={def:def,hits:[],values:[],categories:[],area:0};
+      if(def.sigap){
+        var sigap=typeof window.analyzeSigapGeometry==='function'?window.analyzeSigapGeometry(geojson,total):null;
+        if(sigap&&sigap.ready&&sigap.items&&sigap.items.length){
+          sigap.items.forEach(function(item){result.categories.push({name:item.category.label,area:total?Math.min(item.area,total):item.area,hex:item.category.hex});result.area+=item.area;if(item.category.key!=='apl')result.forest=true;});
+          result.sigapMethod=sigap.sourceType==='vector'?'Luas dihitung dari irisan poligon vektor SIGAP skala 1:250.000.':'Estimasi dari klasifikasi piksel raster cadangan SIGAP.';
+          result.hits=[{properties:{}}];
+        }else if(sigap&&!sigap.ready)result.pending=true;
+      }else if(def.line){
+        var names=[];
+        eachFeatureLayer(def,function(layer){
+          var box=layerBox(layer);
+          var hit=parts.some(function(part){if(part.box&&box&&!boxesOverlap(part.box,box))return false;try{return turf.booleanIntersects(part.feature,layer.feature||layer.toGeoJSON());}catch(_lineError){return false;}});
+          if(hit){var g=layer.feature||layer.toGeoJSON();result.hits.push(g);var v=featureValue(def,g)||'Ruas jalan tanpa nama';if(names.indexOf(v)<0)names.push(v);}
+        });
+        result.values=names.sort(function(a,b){return a.localeCompare(b,'id-ID');});
+      }else{
+        var byName=Object.create(null);
+        eachFeatureLayer(def,function(layer){
+          var g=layer.feature||layer.toGeoJSON(),a=intersectArea(g,layerBox(layer));
+          if(a<MIN_AREA)return;
+          result.area+=a;result.hits.push({type:'Feature',properties:g.properties,__area:a});
+          var name=featureValue(def,g)||'Tanpa keterangan';byName[name]=(byName[name]||0)+a;
+        });
+        result.categories=Object.keys(byName).map(function(name){return {name:name,area:byName[name]};}).sort(function(a,b){return b.area-a.area;});
+      }
+      if(total&&result.area>total)result.area=total;
+      result.inside=def.line?result.hits.length>0:result.area>=MIN_AREA;
+      results.push(result);
+    });
+    var places=[];
+    if(window.layer_BatasKecamatanKSB){
+      var kec=Object.create(null);
+      layer_BatasKecamatanKSB.eachLayer(function(layer){var g=layer.feature||layer.toGeoJSON(),a=intersectArea(g,layerBox(layer));if(a>=MIN_AREA){var n=String(g.properties.KECAMATAN||'').replace(/^Kec\.\s*/i,'');kec[n]=(kec[n]||0)+a;}});
+      places=Object.keys(kec).sort(function(a,b){return kec[b]-kec[a];}).map(function(n){return {name:n,kind:'kecamatan',area:kec[n]};});
+    }
+    var center=null;try{var c=turf.pointOnFeature(geojson).geometry.coordinates;center=L.latLng(c[1],c[0]);}catch(_centerError){}
+    return {mode:'polygon',geojson:geojson,parts:parts,total:total,results:results,latlng:center,kecamatan:places.length?places[0].name:'',places:places};
+  }
 
-    var html=
-      '<div class="st-print-head"><b>SOBAT TARU — Hasil Pemeriksaan Tata Ruang</b><span id="stPrintStamp"></span></div>'+
-      summary+
-      '<div class="st-card"><div class="st-card-title">Lokasi yang diperiksa</div><div class="st-coords">'+
+  // Nama desa/kelurahan dari batas desa Bale Ruang (dimuat saat dibutuhkan); kecamatan tetap tampil bila desa belum terbaca.
+  function lookupVillages(model){
+    var contains=function(geometry,x,y){try{return turf.booleanPointInPolygon([x,y],geometry);}catch(_e){return false;}};
+    if(model.mode==='point'){
+      if(typeof window.ntbAdminLookup!=='function')return Promise.resolve(null);
+      return window.ntbAdminLookup(model.latlng.lng,model.latlng.lat,contains).then(function(features){
+        return (features||[]).slice(0,1).map(function(f){var p=f.properties||{};return {name:p.WADMKD,kecamatan:String(p.WADMKC||'').replace(/^Kec(amatan)?\.?\s*/i,'')};});
+      }).catch(function(){return null;});
+    }
+    if(typeof window.ntbAdminFeaturesInBounds!=='function'||!model.parts.length)return Promise.resolve(null);
+    var box=turf.bbox(model.geojson);
+    return window.ntbAdminFeaturesInBounds(box).then(function(features){
+      var found=[];
+      (features||[]).forEach(function(f){
+        var area=0;model.parts.forEach(function(part){try{if(turf.booleanIntersects(part.feature,f)){var inter=turf.intersect(part.feature,f);if(inter)area+=areaOf(inter);}}catch(_e){}});
+        if(area>=MIN_AREA){var p=f.properties||{};found.push({name:p.WADMKD,kecamatan:String(p.WADMKC||'').replace(/^Kec(amatan)?\.?\s*/i,''),area:area});}
+      });
+      return found.sort(function(a,b){return b.area-a.area;});
+    }).catch(function(){return null;});
+  }
+
+  function attrTable(properties){
+    var rows=Object.keys(properties||{}).filter(function(k){var v=properties[k];return !HIDDEN_ATTR.test(k)&&v!==null&&v!==undefined&&String(v).trim()!==''&&String(v).trim()!=='-'&&v!==0;})
+      .map(function(k){return '<tr><th>'+esc(k)+'</th><td>'+esc(properties[k])+'</td></tr>';}).join('');
+    return rows?'<table class="st-attr">'+rows+'</table>':'';
+  }
+  function detailHtml(result,model){
+    var def=result.def,out='';
+    if(def.legal)out+='<div class="st-legal"><span>Dasar hukum</span>'+esc(def.legal)+'</div>';
+    if(def.sigap&&result.sigapCategory)out+='<p class="st-note">'+esc(result.sigapCategory.meaning||'')+(result.sigapCategory.action?' '+esc(result.sigapCategory.action):'')+'</p>';
+    if(def.sigap&&result.sigapMethod)out+='<p class="st-note">'+esc(result.sigapMethod)+' Konfirmasikan dengan dokumen SK kawasan hutan yang berlaku.</p>';
+    if(model.mode==='polygon'&&!def.line&&!def.sigap)out+='<p class="st-note">≈ Luas beririsan '+esc(fmtAreaLong(result.area))+' • '+result.hits.length.toLocaleString('id-ID')+' fitur sumber beririsan</p>';
+    if(def.line&&model.mode==='polygon')out+='<p class="st-note">'+result.values.length+' ruas jalan memotong bidang.</p>';
+    var features=result.hits.filter(function(f){return f&&f.properties&&Object.keys(f.properties).length;});
+    features.slice(0,5).forEach(function(f,i){
+      var table=attrTable(f.properties);if(!table)return;
+      out+=(features.length>1?'<div class="st-feat">Fitur '+(i+1)+(f.__area?' · '+esc(fmtArea(f.__area)):'')+'</div>':'')+table;
+    });
+    if(features.length>5)out+='<p class="st-note">+'+(features.length-5).toLocaleString('id-ID')+' fitur lain.</p>';
+    if(def.note)out+='<p class="st-note">'+def.note+'</p>';
+    return out||'<p class="st-note">Tidak ada atribut tambahan.</p>';
+  }
+  function layerSection(result,model,index){
+    var def=result.def,flagged=!!(def.constraint||(def.sigap&&result.forest)||(def.id==='rtrw'&&result.values.some(function(v){return protectedPattern.test(v);})));
+    var head,rows='';
+    if(model.mode==='polygon'&&!def.line){
+      head='<div class="st-lrow st-lhead"><div class="st-lname">'+esc(def.title)+'<small>'+esc(def.sub)+'</small></div><div class="st-lnum">'+esc(fmtArea(result.area))+'</div><div class="st-lpct">'+esc(fmtPct(result.area,model.total))+'</div></div>';
+      rows=result.categories.map(function(cat){return '<div class="st-lrow"><div class="st-lcat">'+(cat.hex?'<span class="st-swatch" style="background:'+esc(cat.hex)+'"></span>':'')+esc(cat.name)+'</div><div class="st-lnum">'+esc(fmtArea(cat.area))+'</div><div class="st-lpct">'+esc(fmtPct(cat.area,model.total))+'</div></div>';}).join('');
+    }else{
+      head='<div class="st-lname">'+esc(def.title)+'<small>'+esc(def.sub)+'</small></div>';
+      var values=result.values.length?result.values:['Lokasi berada di dalam layer ini'];
+      if(def.line&&values.length>6){rows=values.slice(0,6).map(function(v){return '<div class="st-lcat">'+esc(v)+'</div>';}).join('')+'<div class="st-lcat st-more">+'+(values.length-6)+' ruas lain</div>';}
+      else rows=values.map(function(v){return '<div class="st-lcat">'+(def.sigap&&result.sigapCategory?'<span class="st-swatch" style="background:'+esc(result.sigapCategory.hex)+'"></span>':'')+esc(v)+'</div>';}).join('');
+    }
+    return '<section class="st-layer'+(flagged?' is-flagged':'')+'">'+head+rows+
+      '<div class="st-lacts"><button type="button" class="st-more-btn" data-st-detail="'+index+'" aria-expanded="false"><i class="fas fa-chevron-right" aria-hidden="true"></i><span>Rincian</span></button>'+showSwitch(def.key)+'</div>'+
+      '<div class="st-ldetail" hidden>'+detailHtml(result,model)+'</div></section>';
+  }
+  function placesHtml(model,villages){
+    if(villages&&villages.length)return villages.slice(0,4).map(function(v){return '<b>'+esc(v.name)+'</b><small>Kec. '+esc(v.kecamatan||model.kecamatan)+' · Sumbawa Barat</small>';}).join('')+(villages.length>4?'<small>+'+(villages.length-4)+' desa lain</small>':'');
+    if(model.places.length)return model.places.map(function(p){return '<b>Kec. '+esc(p.name)+'</b>';}).join('')+'<small>Sumbawa Barat</small>';
+    return '<b>—</b>';
+  }
+  function analysisHtml(model,options){
+    var polygon=model.mode==='polygon',subject=polygon?'Bidang':'Lokasi';
+    var inside=model.results.filter(function(r){return r.inside;}),outside=model.results.filter(function(r){return !r.inside&&!r.pending;});
+    var flags=[];
+    inside.forEach(function(r){
+      var name=r.def.constraint||'';
+      if(r.def.id==='rtrw'&&r.values.concat(r.categories.map(function(c){return c.name;})).some(function(v){return protectedPattern.test(v);}))name='Kawasan lindung RTRW';
+      if(name&&flags.indexOf(name)<0)flags.push(name);
+    });
+    var forest=inside.filter(function(r){return r.def.sigap&&r.forest;})[0];
+    var lp2b=inside.some(function(r){return r.def.id==='lp2b';});
+    var lat=model.latlng?model.latlng.lat:0,lng=model.latlng?model.latlng.lng:0;
+    var utm=null;try{if(model.latlng&&typeof window.projectToUtm50S==='function')utm=window.projectToUtm50S([lng,lat]);}catch(_utmError){}
+    var html='<div class="st-print-head"><b>SOBAT TARU — Hasil Analisis Spasial '+(polygon?'Bidang':'Koordinat')+'</b><span id="stPrintStamp"></span></div>';
+    if(polygon){
+      html+='<div class="st-card"><div class="st-card-title">Bidang yang diperiksa</div><div class="st-coords">'+
+        '<div><span>'+esc(options.areaLabel||'Luas bidang')+'</span> <b>'+esc(fmtAreaLong(model.total))+'</b></div>'+
+        (options.cadastral?'<div><span>Luas atribut bidang</span> '+esc(fmtAreaLong(options.cadastral))+'</div>':'')+
+        (model.latlng?'<div><span>Titik tengah</span> <code>'+lat.toFixed(6)+', '+lng.toFixed(6)+'</code></div>':'')+
+      '</div></div>';
+    }else{
+      html+='<div class="st-card"><div class="st-card-title">Lokasi yang diperiksa</div><div class="st-coords">'+
         '<div><span>Lintang, Bujur</span> <code>'+lat.toFixed(6)+', '+lng.toFixed(6)+'</code></div>'+
         (utm?'<div><span>UTM 50S</span> <code>X '+Number(utm[0]).toFixed(2)+' &middot; Y '+Number(utm[1]).toFixed(2)+'</code></div>':'')+
-        '<div><span>Kecamatan</span> <b>'+esc(data.kecamatan)+'</b></div>'+
-      '</div></div>'+
-      '<div class="st-actions">'+
-        '<a class="st-action" href="https://www.google.com/maps/dir/?api=1&destination='+lat.toFixed(7)+','+lng.toFixed(7)+'" target="_blank" rel="noopener noreferrer"><i class="fas fa-location-arrow" aria-hidden="true"></i>Arah</a>'+
-        '<a class="st-action" href="'+esc(data.bhumiUrl)+'" target="_blank" rel="noopener noreferrer" title="Buka BHUMI ATR/BPN untuk melihat bidang tanah di titik ini"><i class="fas fa-external-link-alt" aria-hidden="true"></i>Cek Bidang</a>'+
-        '<button class="st-action primary" type="button" data-st-share><i class="fas fa-share-alt" aria-hidden="true"></i>Bagikan</button>'+
+      '</div></div>';
+    }
+    var bhumi=options.bhumiUrl||'';
+    var actionCount=(model.latlng?1:0)+(bhumi?1:0)+1;
+    html+='<div class="st-actions" style="grid-template-columns:repeat('+actionCount+',minmax(0,1fr))">'+
+      (model.latlng?'<a class="st-action" href="https://www.google.com/maps/dir/?api=1&destination='+lat.toFixed(7)+','+lng.toFixed(7)+'" target="_blank" rel="noopener noreferrer"><i class="fas fa-location-arrow" aria-hidden="true"></i>Arah</a>':'')+
+      (bhumi?'<a class="st-action" href="'+esc(bhumi)+'" target="_blank" rel="noopener noreferrer" title="Buka BHUMI ATR/BPN untuk melihat bidang tanah di sini"><i class="fas fa-external-link-alt" aria-hidden="true"></i>Cek Bidang</a>':'')+
+      (polygon?'<button class="st-action primary" type="button" data-st-print><i class="fas fa-print" aria-hidden="true"></i>Cetak PDF</button>':'<button class="st-action primary" type="button" data-st-share><i class="fas fa-share-alt" aria-hidden="true"></i>Bagikan</button>')+
+    '</div>';
+    html+='<div class="st-actions-sub">'+
+      (model.latlng?'<button type="button" data-st-copy="'+lat.toFixed(6)+', '+lng.toFixed(6)+'"><i class="fas fa-copy" aria-hidden="true"></i>Salin koordinat</button>':'')+
+      (polygon?'':'<button type="button" data-st-print><i class="fas fa-print" aria-hidden="true"></i>Cetak / PDF</button>')+
+      (options.measured?'<button type="button" data-digitized-action="export"><i class="fas fa-download" aria-hidden="true"></i>Export SHP</button><button type="button" data-digitized-action="delete"><i class="fas fa-trash-alt" aria-hidden="true"></i>Hapus bidang</button>':'')+
+    '</div>';
+    if(forest)html+='<div class="st-alert danger"><i class="fas fa-tree" aria-hidden="true"></i><div><b>'+subject+(polygon?' beririsan dengan kawasan hutan':' berada di kawasan hutan')+'</b>'+esc((forest.sigapCategory&&forest.sigapCategory.action)||'Konfirmasikan kepada instansi kehutanan yang berwenang.')+'</div></div>';
+    if(flags.length)html+='<div class="st-alert'+(flags.indexOf('PIPPIB')>=0?' danger':'')+'"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i><div><b>'+subject+' beririsan dengan '+esc(flags.join(', '))+'</b>Pemanfaatan ruang di sini terikat ketentuan khusus perlindungan lahan/izin. Konfirmasikan kepada instansi berwenang.</div></div>';
+    if(lp2b)html+='<div class="st-alert info"><i class="fas fa-info-circle" aria-hidden="true"></i><div><b>'+subject+' berada dalam LP2B Hasil Verifikasi Usulan tahun 2026</b>Belum merupakan penetapan; menunggu Keputusan Bupati. Untuk rencana pemanfaatan, konfirmasikan ke Pemda setempat.</div></div>';
+    var pending=model.results.some(function(r){return r.pending;});
+    html+='<div class="st-card st-res"><div class="st-results-head"><div class="st-card-title">Hasil analisis</div><small>'+inside.length+' masuk • '+outside.length+' tidak</small></div>'+
+      '<div class="st-meta"><div class="st-meta-item"><span class="st-meta-label">Desa/Kelurahan</span><div class="st-places" data-st-places>'+placesHtml(model,null)+'</div></div>'+
+      (polygon?'<div class="st-meta-item"><span class="st-meta-label">Luas bidang</span><b>'+esc(model.total>=10000?(model.total/10000).toLocaleString('id-ID',{maximumFractionDigits:4})+' ha':fmtArea(model.total))+'</b>'+(model.total>=10000?'<small>'+esc(fmtArea(model.total))+'</small>':'')+'</div>':'')+
       '</div>'+
-      '<div class="st-actions-sub">'+
-        '<button type="button" data-st-copy="'+lat.toFixed(6)+', '+lng.toFixed(6)+'"><i class="fas fa-copy" aria-hidden="true"></i>Salin koordinat</button>'+
-        '<button type="button" data-st-print><i class="fas fa-print" aria-hidden="true"></i>Cetak / PDF</button>'+
-      '</div>'+
-      alerts+
-      '<div class="st-card"><div class="st-results-head"><div class="st-card-title">Rincian per data</div><small>'+(constraints.length?constraints.length+' pembatas':'Tanpa pembatas')+'</small></div>'+
-        item({label:'Pola Ruang RTRW',key:'rtrw',flag:rtrwProtected,title:rtrwFound?esc(data.rtrw):'Di luar data RTRW',sub:'Pola Ruang RTRW Kabupaten Sumbawa Barat 2020–2040',chip:rtrwChip})+
-        item({label:'RDTR',key:'rdtr',title:rdtrFound?'Zona '+esc(data.rdtrZona):'Tidak berada pada wilayah RDTR',sub:rdtrFound?esc(data.rdtrWilayah):'RDTR Perkotaan Taliwang dan RDTR Sekitar Kawasan Industri Maluk',chip:rdtrFound?'<span class="st-chip ok">Masuk wilayah RDTR</span>':'<span class="st-chip out">Di luar RDTR</span>'})+
-        item({label:'Kawasan Hutan (SIGAP)',key:'sigap',flag:sigapForest,title:sigap?(sigapForest?'<span class="st-swatch" style="background:'+esc(sigap.hex)+'"></span>':'')+esc(sigap.label):'Tidak ada klasifikasi pada titik ini',sub:'Kementerian Kehutanan RI',details:sigapDetails,chip:sigap?(sigapForest?'<span class="st-chip danger">Kawasan hutan</span>':'<span class="st-chip ok">Bukan kawasan hutan</span>'):'<span class="st-chip out">Tidak ada data</span>'})+
-        item({label:'PIPPIB Provinsi NTB 2025',key:'pippib',flag:pippibIn,title:pippibIn?esc(data.pippib):'Tidak masuk PIPPIB',sub:'Peta Indikatif Penghentian Pemberian Izin Baru',chip:pippibIn?'<span class="st-chip danger">Masuk</span>':chip(false)})+
-        item({label:'LSD Provinsi NTB',key:'lsd',flag:lsdIn,title:'Lahan Sawah yang Dilindungi',chip:chip(lsdIn)})+
-        item({label:'LP2B Hasil Verifikasi Usulan tahun 2026',key:'lp2b',title:lp2bIn?'Masuk usulan LP2B':'Tidak masuk usulan LP2B',sub:'Belum merupakan penetapan. Sumber: Kementerian ATR/BPN &amp; Pemprov NTB, 6 Okt 2026.',chip:lp2bIn?'<span class="st-chip info">Masuk usulan</span>':chip(false)})+
-        item({label:'LBS Provinsi NTB',key:'lbs',title:'Lahan Baku Sawah',chip:lbsIn?'<span class="st-chip info">Masuk</span>':chip(false)})+
-        item({label:'Sempadan (RTRW)',key:'sempadan',flag:sempadanIn,title:sempadanIn?esc(data.sempadan.join(', ')):'Tidak berada di sempadan sungai atau pantai',chip:chip(sempadanIn)})+
-        item({label:'Administrasi',key:'administrasi',title:'Kecamatan '+esc(data.kecamatan),sub:'Kabupaten Sumbawa Barat'})+
-      '</div>'+
-      '<p class="st-foot-note">Hasil SOBAT TARU bersifat indikatif, memakai seluruh dataset yang tersedia meskipun layer disembunyikan, dan bukan produk hukum. Konfirmasikan kepada instansi berwenang.</p>';
+      '<div class="st-lacts st-meta-acts">'+showSwitch('administrasi')+'</div>';
+    html+=inside.length?inside.map(function(r){return layerSection(r,model,model.results.indexOf(r));}).join(''):'<p class="st-empty">Tidak ada layer yang '+(polygon?'beririsan dengan bidang ini.':'mencakup lokasi ini.')+'</p>';
+    if(pending)html+='<p class="st-note">Data kawasan hutan sedang dimuat. Ulangi analisis setelah sinkronisasi selesai.</p>';
+    if(outside.length)html+='<details class="st-out"><summary>'+outside.length+' layer '+(polygon?'tidak beririsan dengan bidang':'tidak mencakup lokasi ini')+'</summary>'+
+      outside.map(function(r){return '<div class="st-outrow">'+esc(r.def.title)+'<small>'+esc(r.def.sub)+'</small></div>';}).join('')+'</details>';
+    html+='</div>';
+    html+='<p class="st-foot-note">Hasil SOBAT TARU bersifat indikatif, memakai seluruh dataset yang tersedia meskipun layer disembunyikan, dan bukan produk hukum.'+(polygon?' Luas irisan dihitung dari geometri (UTM 50S), bukan ukuran kadastral.':'')+' Konfirmasikan kepada instansi berwenang.</p>';
+    return html;
+  }
+  var analysisToken=0;
+  function renderAnalysis(model,options,target){
+    var token=++analysisToken,body=target||$('stResultBody');
+    body.innerHTML=analysisHtml(model,options||{});
+    lookupVillages(model).then(function(villages){
+      if(token!==analysisToken||!villages||!villages.length)return;
+      body.querySelectorAll('[data-st-places]').forEach(function(node){node.innerHTML=placesHtml(model,villages);});
+    });
+  }
+  // Rincian per layer (panel hasil maupun panel eksplorasi bidang lama).
+  document.addEventListener('click',function(event){
+    var button=event.target.closest&&event.target.closest('[data-st-detail]');if(!button)return;
+    var panel=button.closest('.st-layer').querySelector('.st-ldetail'),open=panel.hidden;
+    panel.hidden=!open;button.setAttribute('aria-expanded',String(open));
+    button.querySelector('i').className='fas fa-chevron-'+(open?'down':'right');
+    button.querySelector('span').textContent=open?'Tutup rincian':'Rincian';
+  });
 
-    var body=$('stResultBody');
-    body.innerHTML=html;body.scrollTop=0;
+  function setResultTitle(polygon){
+    var title=resultPanel.querySelector('.st-panel-head h2');
+    if(title)title.innerHTML='<i class="fas '+(polygon?'fa-object-group':'fa-map-marker-alt')+'" aria-hidden="true"></i>'+(polygon?'Analisis Bidang':'Analisis Lokasi');
+  }
+
+  window.sobatRenderIdentification=function(data){
+    var model=analysePoint(data.latlng);
+    lastIdentification={mode:'point',latlng:data.latlng,kecamatan:model.kecamatan||data.kecamatan};
+    hideHint(true);
+    setResultTitle(false);
+    renderAnalysis(model,{bhumiUrl:data.bhumiUrl});
+    var body=$('stResultBody');body.scrollTop=0;
     hideUploadResult();
     showResult();
     setTimeout(function(){keepPointVisible(data.latlng);},isPhone()?260:60);
   };
+
+  // Analisis bidang (unggah SHP/KML, ukur luas, PDF KKPR, bidang eksplorasi) memakai tampilan yang sama dengan analisis titik.
+  if(typeof window.runAnalysis==='function'){
+    window.runAnalysis=function(geojson){
+      window.lastUploadedFeature=geojson;
+      map.closePopup();
+      var features=geojson.type==='FeatureCollection'?geojson.features:[geojson];
+      var props=function(f){return f&&f.properties||{};};
+      var explorer=features.some(function(f){return props(f).__SOBAT_EXPLORER_SELECTED===true;});
+      var measured=features.some(function(f){return props(f).__SOBAT_MEASURED===true||/HASIL PENGUKURAN/i.test(String(props(f).NAMA||props(f).Nama||''));});
+      var cadastral=features.reduce(function(sum,f){var v=Number(props(f).__SOBAT_KADASTRAL_M2);return sum+(v>0?v:0);},0);
+      var hasNib=features.length&&features.every(function(f){var p=props(f);return p.__SOBAT_HAS_NIB===true||Object.keys(p).some(function(k){return /^(NIB|NIBIDANG|NOMORNIB)$/.test(String(k).toUpperCase().replace(/[^A-Z0-9]/g,''))&&String(p[k]||'').trim();});});
+      var model=analysePolygon(geojson);
+      var options={measured:measured,cadastral:cadastral,areaLabel:measured?'Luas hasil pengukuran':'Luas bidang',bhumiUrl:!explorer&&!hasNib&&typeof window.bhumiUrlForGeojson==='function'?window.bhumiUrlForGeojson(geojson):''};
+      lastIdentification={mode:'polygon',latlng:model.latlng,kecamatan:model.kecamatan};
+      hideHint(true);
+      if(explorer){
+        // Bidang dari eksplorasi tetap tampil di panel eksplorasi (kartu bidang ditambahkan di atasnya).
+        var legacyPanel=uploadPanel(),content=$('analysisContent');
+        if(legacyPanel&&content){legacyPanel.style.display='block';renderAnalysis(model,options,content);}
+      }else{
+        setResultTitle(true);
+        renderAnalysis(model,options);
+        $('stResultBody').scrollTop=0;
+        var legacy=uploadPanel();if(legacy)legacy.style.display='none';
+        showResult();
+      }
+      if(typeof window.presentUploadedAnalysis==='function')window.presentUploadedAnalysis(geojson);
+    };
+  }
+  // Hapus bidang hasil digitasi juga menutup panel hasil.
+  document.addEventListener('click',function(event){
+    if(event.target.closest&&event.target.closest('[data-digitized-action="delete"]')){lastIdentification=null;hideResult(true);}
+  });
 
   /* ---------- Petunjuk awal ---------- */
   function hideHint(remember){hint.hidden=true;if(remember)store('sobatTaruHintSeen','1');}
