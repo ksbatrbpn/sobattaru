@@ -1,9 +1,9 @@
 {
   "status": "success",
   "message": "Layer disinkronkan dari Bale Ruang NTB.",
-  "updatedAt": "2026-10-21T12:14:22+08:00",
+  "updatedAt": "2026-10-21T16:50:20+08:00",
   "source": "https://github.com/atrbpnproject/baleruangntb",
-  "ref": "0539f60daf19b40009ba773bd2f043a80fb2385c",
+  "ref": "local",
   "layers": [
     {
       "layer": "RDTR Maluk",
@@ -28,6 +28,14 @@
       "features": 145,
       "previous": 145,
       "source": "SHP POLA RUANG KSB.zip"
+    },
+    {
+      "layer": "RTRW Provinsi NTB",
+      "key": "rtrw",
+      "file": "RTRWPROVINSINTB20242044_7.js",
+      "features": 405,
+      "previous": 422,
+      "source": "NTB_LSD.zip (LSD Provinsi Nusa Tenggara Barat)"
     },
     {
       "layer": "LSD",
@@ -57,8 +65,8 @@
       "layer": "PIPPIB 2025",
       "key": "pippib",
       "file": "pippib_2025_ntb.js",
-      "features": 63,
-      "previous": 63,
+      "features": 65,
+      "previous": 65,
       "source": "PIPPIB_AR_250K_2025_1_NUSA_TENGGARA_BARAT (1).zip"
     }
   ]

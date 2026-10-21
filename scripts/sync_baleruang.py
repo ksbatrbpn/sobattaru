@@ -41,6 +41,8 @@ LAYERS = [
      "label": "RDTR Taliwang", "filter": None},
     {"key": "rtrw-sumbawa-barat", "file": "RTRWSUMBAWABARAT20202040_3.js",
      "var": "json_RTRWSUMBAWABARAT20202040_3", "label": "RTRW Sumbawa Barat", "filter": None},
+    {"key": "rtrw", "file": "RTRWPROVINSINTB20242044_7.js",
+     "var": "json_RTRWPROVINSINTB20242044_7", "label": "RTRW Provinsi NTB", "filter": "spatial"},
     {"key": "lsd", "file": "LSD_Kabupaten_Sumbawa_Barat_4.js",
      "var": "json_LSD_Kabupaten_Sumbawa_Barat_4", "label": "LSD", "filter": "spatial"},
     {"key": "lp2b", "file": "LP2BSUMBAWABARAT_5.js", "var": "json_LP2BSUMBAWABARAT_5",
@@ -65,8 +67,13 @@ def compat_properties(key, props):
 
 
 def keep_feature(key, feature):
+    props = feature.get("properties") or {}
     if key == "lp2b":
-        return (feature.get("properties") or {}).get("KELAS", "LP2B") == "LP2B"
+        return props.get("KELAS", "LP2B") == "LP2B"
+    if key == "rtrw":
+        # Daratan kabupaten lain (mis. Kab. Sumbawa) dibuang; perairan yang menyentuh KSB tetap ikut.
+        region = str(props.get("WADMKK") or "")
+        return not region.startswith("Kabupaten ") or region == "Kabupaten Sumbawa Barat"
     return True
 
 
@@ -158,6 +165,14 @@ def overlaps(a, b):
 
 
 class Boundary:
+    """Batas KSB sebagai raster 0,002 derajat (~220 m) agar uji titik cepat.
+
+    Sel yang dilalui garis batas ikut dihitung "di dalam", jadi fitur yang
+    hanya menyentuh tepi batas tetap ikut (lebih baik lebih dari kurang).
+    """
+
+    CELL = 0.002
+
     def __init__(self, path):
         with open(path, encoding="utf-8") as handle:
             data = json.load(handle)
@@ -165,8 +180,31 @@ class Boundary:
         for feature in data["features"]:
             self.polys.extend(rings_of(feature.get("geometry")))
         self.bbox = bounds_of(self.polys)
-        step = max(1, sum(len(p[0]) for p in self.polys) // 4000)
-        self.samples = [pt for poly in self.polys for pt in poly[0][::step]]
+        west, south, east, north = self.bbox
+        self.cols = int(math.ceil((east - west) / self.CELL)) + 1
+        self.rows = int(math.ceil((north - south) / self.CELL)) + 1
+        self.mask = set()
+        rings = [ring for poly in self.polys for ring in poly]
+        for row in range(self.rows):
+            y = south + (row + 0.5) * self.CELL
+            xs = []
+            for ring in rings:
+                for i in range(len(ring) - 1):
+                    (x1, y1), (x2, y2) = ring[i][:2], ring[i + 1][:2]
+                    if (y1 > y) != (y2 > y):
+                        xs.append(x1 + (y - y1) * (x2 - x1) / (y2 - y1))
+            xs.sort()
+            for a, b in zip(xs[0::2], xs[1::2]):
+                for col in range(int((a - west) / self.CELL), int((b - west) / self.CELL) + 1):
+                    self.mask.add((col, row))
+        for ring in rings:
+            for point in ring:
+                self.mask.add(self.cell(point[0], point[1]))
+        self.samples = [(west + (c + 0.5) * self.CELL, south + (r + 0.5) * self.CELL)
+                        for c, r in sorted(self.mask)[::max(1, len(self.mask) // 3000)]]
+
+    def cell(self, x, y):
+        return (int((x - self.bbox[0]) / self.CELL), int((y - self.bbox[1]) / self.CELL))
 
     def touches(self, feature):
         polys = rings_of(feature.get("geometry"))
@@ -175,11 +213,11 @@ class Boundary:
             return False
         for poly in polys:
             for point in poly[0]:
-                if point_in_polys(point[0], point[1], self.polys):
+                if self.cell(point[0], point[1]) in self.mask:
                     return True
         # Poligon besar (mis. PIPPIB) yang menutupi KSB tanpa titik sudut di dalamnya.
-        return any(point_in_polys(pt[0], pt[1], polys) for pt in self.samples
-                   if bbox[0] <= pt[0] <= bbox[2] and bbox[1] <= pt[1] <= bbox[3])
+        return any(point_in_polys(x, y, polys) for x, y in self.samples
+                   if bbox[0] <= x <= bbox[2] and bbox[1] <= y <= bbox[3])
 
 
 def load_layer(source, catalog, layer, boundary, pool):

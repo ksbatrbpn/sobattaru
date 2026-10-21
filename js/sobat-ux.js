@@ -193,14 +193,14 @@
   });
 
   /* ---------- Ketebalan warna layer ---------- */
-  var opacityPanes=['pane_RTRWSUMBAWABARAT20202040_3','pane_RDTRTALIWANG_2','pane_RDTRMALUK_1','pane_LP2BSUMBAWABARAT_5','pane_LSD_Kabupaten_Sumbawa_Barat_4','pane_LBS_Kabupaten_Sumbawa_Barat_6'];
+  var opacityPanes=['pane_RTRWPROVINSINTB20242044_7','pane_RTRWSUMBAWABARAT20202040_3','pane_RDTRTALIWANG_2','pane_RDTRMALUK_1','pane_LP2BSUMBAWABARAT_5','pane_LSD_Kabupaten_Sumbawa_Barat_4','pane_LBS_Kabupaten_Sumbawa_Barat_6'];
   // Warna isi bawaan qgis2web sudah transparan (rgba ..., 0.5), jadi pada 100% layer tetap tembus.
   // Isi dibuat pekat dan seluruh transparansi diatur oleh penggeser lewat opasitas pane.
   function solidColor(color){
     var match=/^rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)$/.exec(String(color||'').replace(/\s/g,''));
     return match?'rgb('+match[1]+','+match[2]+','+match[3]+')':color;
   }
-  ['layer_RTRWSUMBAWABARAT20202040_3','layer_RDTRTALIWANG_2','layer_RDTRMALUK_1','layer_LP2BSUMBAWABARAT_5','layer_LSD_Kabupaten_Sumbawa_Barat_4','layer_LBS_Kabupaten_Sumbawa_Barat_6'].forEach(function(name){
+  ['layer_RTRWPROVINSINTB20242044_7','layer_RTRWSUMBAWABARAT20202040_3','layer_RDTRTALIWANG_2','layer_RDTRMALUK_1','layer_LP2BSUMBAWABARAT_5','layer_LSD_Kabupaten_Sumbawa_Barat_4','layer_LBS_Kabupaten_Sumbawa_Barat_6'].forEach(function(name){
     var layer=window[name];if(!layer||!layer.options||typeof layer.setStyle!=='function')return;
     var base=layer.options.style;
     var solid=function(feature){
@@ -740,7 +740,7 @@
   });
 
   /* ---------- Panel hasil identifikasi titik ---------- */
-  var themeLayerKeys=['sigap','pippib','rtrw','rdtr','lp2b','lsd','lbs','administrasi','jalan','sempadan'];
+  var themeLayerKeys=['sigap','pippib','rtrw-provinsi','rtrw','rdtr','lp2b','lsd','lbs','administrasi','jalan','sempadan'];
   function layerKeyActive(key){
     var groups=typeof window.analysisLayerGroups==='function'?window.analysisLayerGroups():{};
     return (groups[key]||[]).some(function(layer){return layer&&map.hasLayer(layer);});
@@ -804,6 +804,7 @@
    * Layer yang tidak mencakup/beririsan dikumpulkan dalam satu grup yang bisa dibuka. */
   var LP2B_NOTE='Hasil Verifikasi Usulan LP2B, belum merupakan penetapan. Sumber: Kementerian ATR/BPN &amp; Pemprov NTB, 6 Okt 2026.';
   var ANALYSIS_DEFS=[
+    {id:'rtrw-provinsi',key:'rtrw-provinsi',layer:'layer_RTRWPROVINSINTB20242044_7',field:'NAMOBJ',title:'Pola Ruang RTRW',sub:'Provinsi NTB 2024–2044',legal:'Perda Provinsi NTB No. 5 Tahun 2024',color:function(v){return window.rtrwProvinsiColors?window.rtrwProvinsiColors.color(v):'';}},
     {id:'rtrw',key:'rtrw',layer:'layer_RTRWSUMBAWABARAT20202040_3',field:'NAMOBJ',title:'Pola Ruang RTRW',sub:'Kabupaten Sumbawa Barat 2020–2040',legal:'Perda Kab. Sumbawa Barat No. 11 Tahun 2020'},
     {id:'rdtr-taliwang',key:'rdtr',layer:'layer_RDTRTALIWANG_2',field:'NAMAOBJ',title:'RDTR dan Peraturan Zonasi Perkotaan Taliwang',sub:'Sumbawa Barat',legal:'Perda Sumbawa Barat No. 12 Tahun 2016'},
     {id:'rdtr-maluk',key:'rdtr',layer:'layer_RDTRMALUK_1',field:'NAMOBJ',title:'RDTR Sekitar Kawasan Industri Maluk',sub:'Sumbawa Barat',legal:'Perbup Sumbawa Barat No. 4 Tahun 2023'},
@@ -891,7 +892,7 @@
           result.area+=a;result.hits.push({type:'Feature',properties:g.properties,__area:a});
           var name=featureValue(def,g)||'Tanpa keterangan';byName[name]=(byName[name]||0)+a;
         });
-        result.categories=Object.keys(byName).map(function(name){return {name:name,area:byName[name]};}).sort(function(a,b){return b.area-a.area;});
+        result.categories=Object.keys(byName).map(function(name){return {name:name,area:byName[name],hex:def.color?def.color(name):''};}).sort(function(a,b){return b.area-a.area;});
       }
       if(total&&result.area>total)result.area=total;
       result.inside=def.line?result.hits.length>0:result.area>=MIN_AREA;
@@ -950,7 +951,7 @@
     return out||'<p class="st-note">Tidak ada atribut tambahan.</p>';
   }
   function layerSection(result,model,index){
-    var def=result.def,flagged=!!(def.constraint||(def.sigap&&result.forest)||(def.id==='rtrw'&&result.values.some(function(v){return protectedPattern.test(v);})));
+    var def=result.def,flagged=!!(def.constraint||(def.sigap&&result.forest)||(/^rtrw/.test(def.id)&&result.values.some(function(v){return protectedPattern.test(v);})));
     var head,rows='';
     if(model.mode==='polygon'&&!def.line){
       head='<div class="st-lrow st-lhead"><div class="st-lname">'+esc(def.title)+'<small>'+esc(def.sub)+'</small></div><div class="st-lnum">'+esc(fmtArea(result.area))+'</div><div class="st-lpct">'+esc(fmtPct(result.area,model.total))+'</div></div>';
@@ -959,7 +960,7 @@
       head='<div class="st-lname">'+esc(def.title)+'<small>'+esc(def.sub)+'</small></div>';
       var values=result.values.length?result.values:['Lokasi berada di dalam layer ini'];
       if(def.line&&values.length>6){rows=values.slice(0,6).map(function(v){return '<div class="st-lcat">'+esc(v)+'</div>';}).join('')+'<div class="st-lcat st-more">+'+(values.length-6)+' ruas lain</div>';}
-      else rows=values.map(function(v){return '<div class="st-lcat">'+(def.sigap&&result.sigapCategory?'<span class="st-swatch" style="background:'+esc(result.sigapCategory.hex)+'"></span>':'')+esc(v)+'</div>';}).join('');
+      else rows=values.map(function(v){var hex=def.sigap&&result.sigapCategory?result.sigapCategory.hex:(def.color&&result.values.length?def.color(v):'');return '<div class="st-lcat">'+(hex?'<span class="st-swatch" style="background:'+esc(hex)+'"></span>':'')+esc(v)+'</div>';}).join('');
     }
     return '<section class="st-layer'+(flagged?' is-flagged':'')+'">'+head+rows+
       '<div class="st-lacts"><button type="button" class="st-more-btn" data-st-detail="'+index+'" aria-expanded="false"><i class="fas fa-chevron-right" aria-hidden="true"></i><span>Rincian</span></button>'+showSwitch(def.key)+'</div>'+
@@ -976,7 +977,7 @@
     var flags=[];
     inside.forEach(function(r){
       var name=r.def.constraint||'';
-      if(r.def.id==='rtrw'&&r.values.concat(r.categories.map(function(c){return c.name;})).some(function(v){return protectedPattern.test(v);}))name='Kawasan lindung RTRW';
+      if(/^rtrw/.test(r.def.id)&&r.values.concat(r.categories.map(function(c){return c.name;})).some(function(v){return protectedPattern.test(v);}))name='Kawasan lindung RTRW';
       if(name&&flags.indexOf(name)<0)flags.push(name);
     });
     var forest=inside.filter(function(r){return r.def.sigap&&r.forest;})[0];

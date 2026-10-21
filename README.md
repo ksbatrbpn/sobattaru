@@ -51,8 +51,8 @@ Saat seluruh isi folder ini diunggah sebagai repositori GitHub:
 
 ## Sinkronisasi layer dari Bale Ruang NTB
 
-Layer RDTR Maluk, RDTR Taliwang, RTRW Sumbawa Barat, LSD, LP2B, LBS dan
-PIPPIB 2025 diambil langsung dari repositori Bale Ruang NTB
+Layer RDTR Maluk, RDTR Taliwang, RTRW Sumbawa Barat, RTRW Provinsi NTB, LSD,
+LP2B, LBS dan PIPPIB 2025 diambil langsung dari repositori Bale Ruang NTB
 (https://github.com/atrbpnproject/baleruangntb) dan disaring ke wilayah
 Kabupaten Sumbawa Barat. Geometri dipakai apa adanya, tanpa penyederhanaan.
 

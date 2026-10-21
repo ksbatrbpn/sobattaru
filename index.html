@@ -342,6 +342,7 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
     <section class="data-warning"><h3>Batas penggunaan</h3><p>Hasil SOBAT TARU bersifat <b>indikatif</b> untuk identifikasi awal. Ini bukan bukti hak atas tanah, bukan izin pemanfaatan ruang, dan tidak menggantikan dokumen resmi. Konfirmasikan kepada instansi berwenang.</p><details class="data-warning-more"><summary>Baca selengkapnya</summary><p>SOBAT TARU v1.5 merupakan media informasi dan identifikasi spasial awal Kabupaten Sumbawa Barat. Seluruh hasil bersifat indikatif, termasuk klasifikasi lokasi, persinggungan, jarak, persentase, dan estimasi luas. Hasil dapat dipengaruhi oleh skala dan tanggal sumber data, ketelitian geometri, sistem koordinat, generalisasi peta, serta perbedaan antara luas atribut dan luas geometri. Layer yang ditampilkan atau disembunyikan hanya mengatur visual peta; analisis tetap memeriksa seluruh dataset yang tersedia. Data daring dapat gagal diperbarui ketika server sumber atau koneksi bermasalah, dan dalam kondisi tersebut aplikasi mempertahankan data terakhir yang berhasil dimuat serta menampilkan status kegagalan. Informasi ini bukan survei kadastral, bukan bukti hak atas tanah, bukan persetujuan pemanfaatan ruang, dan tidak menggantikan peta, keputusan, perizinan, maupun produk hukum resmi. Konfirmasikan kebutuhan resmi kepada instansi berwenang dan dokumen sumber yang berlaku.</p></details><p><b>Versi aplikasi:</b> 1.5<br><b>Terakhir diperbarui:</b> 29 Juli 2026</p></section>
     <section class="data-source-section"><h3 class="data-section-title">Sumber Informasi Data Spasial</h3><p class="data-section-copy">Data tata ruang yang tersedia pada aplikasi ini meliputi:</p>
     <div id="dataInfoDetails" class="data-info-details"><div class="data-list">
+      <div class="data-row"><b>RTRW Provinsi NTB 2024–2044</b><span>Peraturan Daerah Provinsi Nusa Tenggara Barat Nomor 5 Tahun 2024. Data diambil otomatis dari Bale Ruang NTB.</span></div>
       <div class="data-row"><b>RTRW Kabupaten Sumbawa Barat 2020–2040</b><span>Peraturan Daerah Kabupaten Sumbawa Barat Nomor 11 Tahun 2020.</span></div>
       <div class="data-row"><b>RDTR Kawasan Perkotaan Taliwang 2015–2035</b><span>Peraturan Daerah Kabupaten Sumbawa Barat Nomor 12 Tahun 2016. Dokumen sedang dalam proses revisi.</span></div>
       <div class="data-row"><b>RDTR Sekitar Kawasan Industri Maluk 2023–2043</b><span>Peraturan Bupati Sumbawa Barat Nomor 4 Tahun 2023.</span></div>
@@ -438,6 +439,8 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
         <script src="data/RDTRMALUK_1.js" onload="stDataLoaded('RDTR Maluk')" onerror="stDataLoaded()"></script>
         <script src="data/RDTRTALIWANG_2.js" onload="stDataLoaded('RDTR Taliwang')" onerror="stDataLoaded()"></script>
         <script src="data/RTRWSUMBAWABARAT20202040_3.js" onload="stDataLoaded('RTRW')" onerror="stDataLoaded()"></script>
+        <script src="data/RTRWPROVINSINTB20242044_7.js" onload="stDataLoaded('RTRW Provinsi')" onerror="stDataLoaded()"></script>
+        <script src="js/baleruang-colors.js"></script>
         <script src="data/LSD_Kabupaten_Sumbawa_Barat_4.js" onload="stDataLoaded('LSD')" onerror="stDataLoaded()"></script>
         <script src="data/LP2BSUMBAWABARAT_5.js" onload="stDataLoaded('LP2B')" onerror="stDataLoaded()"></script>
         <script src="data/LBS_Kabupaten_Sumbawa_Barat_6.js" onload="stDataLoaded('LBS')" onerror="stDataLoaded()"></script>
@@ -2160,6 +2163,22 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
             style: style_RTRWSUMBAWABARAT20202040_3_0,
         });
         bounds_group.addLayer(layer_RTRWSUMBAWABARAT20202040_3);
+        // Pola Ruang RTRW Provinsi NTB dari Bale Ruang NTB (disaring ke KSB); warna sama dengan Bale Ruang.
+        var rtrwProvinsiColors=window.baleRuangPolaRuang(window.json_RTRWPROVINSINTB20242044_7,'NAMOBJ');
+        function style_RTRWPROVINSINTB20242044_7_0(feature) {
+            return {pane:'pane_RTRWPROVINSINTB20242044_7',opacity:1,color:'rgba(35,35,35,0.5)',weight:1,fill:true,fillOpacity:1,fillColor:rtrwProvinsiColors.color(feature&&feature.properties&&feature.properties.NAMOBJ),interactive:true};
+        }
+        map.createPane('pane_RTRWPROVINSINTB20242044_7');
+        map.getPane('pane_RTRWPROVINSINTB20242044_7').style.zIndex = 400;
+        map.getPane('pane_RTRWPROVINSINTB20242044_7').style['mix-blend-mode'] = 'normal';
+        var layer_RTRWPROVINSINTB20242044_7 = new L.geoJson(window.json_RTRWPROVINSINTB20242044_7 || null, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RTRWPROVINSINTB20242044_7',
+            layerName: 'layer_RTRWPROVINSINTB20242044_7',
+            pane: 'pane_RTRWPROVINSINTB20242044_7',
+            style: style_RTRWPROVINSINTB20242044_7_0,
+        });
         function pop_LSD_Kabupaten_Sumbawa_Barat_4(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
@@ -2711,9 +2730,12 @@ window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}
             var legend=entry.label.slice(splitAt+marker.length);
             entry.label='<span class="layer-legend-title"><span>'+title+'</span><button class="legend-toggle" type="button" aria-expanded="false" aria-label="Buka legenda '+plainTitle+'"><i class="fas fa-list" aria-hidden="true"></i><span>Legenda</span><i class="fas fa-chevron-right legend-chevron" aria-hidden="true"></i></button></span><div class="layer-legend-content">'+legend+'</div>';
         }
-        [overlaysTreeRaw[3],overlaysTreeRaw[4],overlaysTreeRaw[5]].forEach(makeLegendCollapsible);
+        var rtrwProvinsiEntry={label:'<span class="st-lyr-ico" style="--c:#3fae77"><i class="fas fa-globe" aria-hidden="true"></i></span>Pola Ruang RTRW Provinsi NTB 2024–2044<small class="st-layer-sub">Perda Provinsi NTB No. 5 Tahun 2024</small><br /><table>'+rtrwProvinsiColors.names.map(function(name){
+            return '<tr><td style="text-align: center;"><span style="display:inline-block;width:14px;height:14px;vertical-align:middle;background:'+rtrwProvinsiColors.colors[name]+';border:1px solid rgba(35,35,35,.5)"></span></td><td>'+escapeHtml(name)+'</td></tr>';
+        }).join('')+'</table>',layer:layer_RTRWPROVINSINTB20242044_7};
+        [rtrwProvinsiEntry,overlaysTreeRaw[3],overlaysTreeRaw[4],overlaysTreeRaw[5]].forEach(makeLegendCollapsible);
         var overlaysTree=[
-            {label:'<b>Rencana Tata Ruang</b>',selectAllCheckbox:true,children:[overlaysTreeRaw[3],overlaysTreeRaw[4],overlaysTreeRaw[5]]},
+            {label:'<b>Rencana Tata Ruang</b>',selectAllCheckbox:true,children:[rtrwProvinsiEntry,overlaysTreeRaw[3],overlaysTreeRaw[4],overlaysTreeRaw[5]]},
             {label:'<b>Peta Tematik</b>',selectAllCheckbox:true,children:[kawasanHutanKemenhutEntry,pippib2025Entry,overlaysTreeRaw[2],overlaysTreeRaw[1],overlaysTreeRaw[0]]},
             {label:'<b>Data Administrasi</b>',selectAllCheckbox:true,children:administrationEntries},
             {label:'<b>Infrastruktur</b>',selectAllCheckbox:true,children:infrastructureEntries},
@@ -3078,8 +3100,8 @@ function bhumiUrlForGeojson(geojson){try{const point=turf.pointOnFeature(geojson
 function projectToUtm50S(coordinate){const lon=Number(coordinate[0]);const lat=Number(coordinate[1]);const a=6378137;const eccSquared=0.00669438;const k0=0.9996;const lonOrigin=117;const latRad=lat*Math.PI/180;const lonRad=lon*Math.PI/180;const lonOriginRad=lonOrigin*Math.PI/180;const eccPrimeSquared=eccSquared/(1-eccSquared);const N=a/Math.sqrt(1-eccSquared*Math.sin(latRad)*Math.sin(latRad));const T=Math.tan(latRad)*Math.tan(latRad);const C=eccPrimeSquared*Math.cos(latRad)*Math.cos(latRad);const A=Math.cos(latRad)*(lonRad-lonOriginRad);const M=a*((1-eccSquared/4-3*eccSquared*eccSquared/64-5*eccSquared*eccSquared*eccSquared/256)*latRad-(3*eccSquared/8+3*eccSquared*eccSquared/32+45*eccSquared*eccSquared*eccSquared/1024)*Math.sin(2*latRad)+(15*eccSquared*eccSquared/256+45*eccSquared*eccSquared*eccSquared/1024)*Math.sin(4*latRad)-(35*eccSquared*eccSquared*eccSquared/3072)*Math.sin(6*latRad));const easting=k0*N*(A+(1-T+C)*Math.pow(A,3)/6+(5-18*T+T*T+72*C-58*eccPrimeSquared)*Math.pow(A,5)/120)+500000;let northing=k0*(M+N*Math.tan(latRad)*(A*A/2+(5-T+9*C+4*C*C)*Math.pow(A,4)/24+(61-58*T+T*T+600*C-330*eccPrimeSquared)*Math.pow(A,6)/720));if(lat<0)northing+=10000000;return[easting,northing];}
 function utmRingArea(ring){let sum=0;if(!Array.isArray(ring)||ring.length<3)return 0;for(let i=0;i<ring.length;i++){const a=projectToUtm50S(ring[i]);const b=projectToUtm50S(ring[(i+1)%ring.length]);sum+=a[0]*b[1]-b[0]*a[1];}return Math.abs(sum)/2;}
 function utm50Area(input){const geometry=input&&input.type==='Feature'?input.geometry:input;if(!geometry)return 0;const polygonArea=function(rings){if(!rings||!rings.length)return 0;let area=utmRingArea(rings[0]);for(let i=1;i<rings.length;i++)area-=utmRingArea(rings[i]);return Math.max(0,area);};if(geometry.type==='Polygon')return polygonArea(geometry.coordinates);if(geometry.type==='MultiPolygon')return geometry.coordinates.reduce(function(sum,polygon){return sum+polygonArea(polygon);},0);if(geometry.type==='FeatureCollection')return geometry.features.reduce(function(sum,feature){return sum+utm50Area(feature);},0);return 0;}
-function analysisLayerGroups(){return{sigap:[layer_KawasanHutanKemenhut],pippib:[layer_PIPPIB2025],rtrw:[layer_RTRWSUMBAWABARAT20202040_3],rdtr:[layer_RDTRTALIWANG_2,layer_RDTRMALUK_1],lp2b:[layer_LP2BSUMBAWABARAT_5],lsd:[layer_LSD_Kabupaten_Sumbawa_Barat_4],lbs:[layer_LBS_Kabupaten_Sumbawa_Barat_6],administrasi:[layer_BatasKecamatanKSB],jalan:[layer_JaringanJalanKSB],sempadan:[layer_SempadanSungaiRTRW,layer_SempadanPantaiRTRW]};}
-function buildLayerActivationPanel(){const item=function(key,label){const layers=analysisLayerGroups()[key]||[];const active=layers.some(function(layer){return map.hasLayer(layer);});return '<label class="layer-switch"><span class="layer-switch-name">'+label+'</span><input type="checkbox" data-layer-switch="'+key+'"'+(active?' checked':'')+'><span class="layer-switch-control"><i class="layer-switch-track" aria-hidden="true"></i><b class="layer-switch-status">'+(active?'ON':'OFF')+'</b></span></label>';};return '<details class="layer-activation-panel"><summary><span><i class="fas fa-list-alt" aria-hidden="true"></i> Aktifkan Layer Tata Ruang &amp; Tematik</span></summary><div class="layer-switch-scroll"><div class="layer-switch-row">'+item('sigap','SIGAP')+item('pippib','PIPPIB')+item('rtrw','RTRW')+item('rdtr','RDTR')+item('lp2b','LP2B')+item('lsd','LSD')+item('lbs','LBS')+item('administrasi','Batas Kecamatan')+item('jalan','Jaringan Jalan')+item('sempadan','Sempadan')+'</div></div></details>';}
+function analysisLayerGroups(){return{sigap:[layer_KawasanHutanKemenhut],pippib:[layer_PIPPIB2025],'rtrw-provinsi':[layer_RTRWPROVINSINTB20242044_7],rtrw:[layer_RTRWSUMBAWABARAT20202040_3],rdtr:[layer_RDTRTALIWANG_2,layer_RDTRMALUK_1],lp2b:[layer_LP2BSUMBAWABARAT_5],lsd:[layer_LSD_Kabupaten_Sumbawa_Barat_4],lbs:[layer_LBS_Kabupaten_Sumbawa_Barat_6],administrasi:[layer_BatasKecamatanKSB],jalan:[layer_JaringanJalanKSB],sempadan:[layer_SempadanSungaiRTRW,layer_SempadanPantaiRTRW]};}
+function buildLayerActivationPanel(){const item=function(key,label){const layers=analysisLayerGroups()[key]||[];const active=layers.some(function(layer){return map.hasLayer(layer);});return '<label class="layer-switch"><span class="layer-switch-name">'+label+'</span><input type="checkbox" data-layer-switch="'+key+'"'+(active?' checked':'')+'><span class="layer-switch-control"><i class="layer-switch-track" aria-hidden="true"></i><b class="layer-switch-status">'+(active?'ON':'OFF')+'</b></span></label>';};return '<details class="layer-activation-panel"><summary><span><i class="fas fa-list-alt" aria-hidden="true"></i> Aktifkan Layer Tata Ruang &amp; Tematik</span></summary><div class="layer-switch-scroll"><div class="layer-switch-row">'+item('sigap','SIGAP')+item('pippib','PIPPIB')+item('rtrw-provinsi','RTRW Provinsi')+item('rtrw','RTRW Kabupaten')+item('rdtr','RDTR')+item('lp2b','LP2B')+item('lsd','LSD')+item('lbs','LBS')+item('administrasi','Batas Kecamatan')+item('jalan','Jaringan Jalan')+item('sempadan','Sempadan')+'</div></div></details>';}
 document.addEventListener('change',function(event){const input=event.target.closest&&event.target.closest('[data-layer-switch]');if(!input)return;event.stopPropagation();const layers=analysisLayerGroups()[input.getAttribute('data-layer-switch')]||[];layers.forEach(function(layer){if(input.checked&&!map.hasLayer(layer))map.addLayer(layer);if(!input.checked&&map.hasLayer(layer))map.removeLayer(layer);});document.querySelectorAll('[data-layer-switch="'+input.getAttribute('data-layer-switch')+'"]').forEach(function(other){other.checked=input.checked;const status=other.closest('.layer-switch').querySelector('.layer-switch-status');if(status)status.textContent=input.checked?'ON':'OFF';});});
 function runAnalysis(geojson){
 
@@ -3710,6 +3732,7 @@ map.on('moveend zoomend resize',refreshAnalysisConnector);
   }
   function thematicSources(){return{
     rtrw:{label:'RTRW Kabupaten',property:'NAMOBJ',layers:[layer_RTRWSUMBAWABARAT20202040_3]},
+    rtrwProvinsi:{label:'RTRW Provinsi NTB',property:'NAMOBJ',layers:[layer_RTRWPROVINSINTB20242044_7]},
     rdtr:{label:'RDTR Taliwang & Maluk',property:null,layers:[layer_RDTRTALIWANG_2,layer_RDTRMALUK_1]},
     lp2b:{label:'LP2B Usulan 2026',property:'Keterangan',layers:[layer_LP2BSUMBAWABARAT_5]},
     lsd:{label:'LSD',property:'LSD',layers:[layer_LSD_Kabupaten_Sumbawa_Barat_4]},
@@ -3811,7 +3834,7 @@ map.on('moveend zoomend resize',refreshAnalysisConnector);
 <script src="data/admin-index/index.js?v=1"></script>
 <script src="js/admin-lookup.js?v=1"></script>
 <script src="js/geotag.js?v=1"></script>
-<script src="js/sobat-ux.js?v=8"></script>
+<script src="js/sobat-ux.js?v=9"></script>
 </body>
 
 
