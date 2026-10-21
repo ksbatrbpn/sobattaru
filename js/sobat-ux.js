@@ -25,9 +25,9 @@
       '<div class="st-panel-body">'+
         '<div class="st-section-label">Peta dasar</div>'+
         '<div id="stBasemapSegment" class="st-segment" role="radiogroup" aria-label="Peta dasar"></div>'+
-        '<div class="st-section-label"><label for="stOpacity">Ketebalan warna layer</label><output id="stOpacityValue" for="stOpacity">75%</output></div>'+
-        '<div class="st-range-row"><i class="fas fa-adjust" aria-hidden="true"></i><input id="stOpacity" class="st-range" type="range" min="20" max="100" step="5" value="75" title="Turunkan agar citra satelit di bawah RTRW, RDTR, LP2B, LSD, dan LBS tetap terlihat"></div>'+
-        '<div class="st-section-label">Data Kabupaten Sumbawa Barat</div>'+
+        '<div class="st-section-label"><label for="stOpacity">Ketebalan warna layer</label><output id="stOpacityValue" for="stOpacity">60%</output></div>'+
+        '<div class="st-range-row"><i class="fas fa-adjust" aria-hidden="true"></i><input id="stOpacity" class="st-range" type="range" min="10" max="100" step="5" value="60" title="Turunkan agar citra satelit di bawah layer tetap terlihat"></div>'+
+        '<div class="st-section-label"><span>Data Kabupaten Sumbawa Barat</span><button id="stLayersOff" class="st-text-btn" type="button" disabled>Matikan semua</button></div>'+
         '<div id="stLayerTreeSlot"></div>'+
       '</div>'+
     '</aside>');
@@ -145,16 +145,33 @@
 
   /* ---------- Ketebalan warna layer ---------- */
   var opacityPanes=['pane_RTRWSUMBAWABARAT20202040_3','pane_RDTRTALIWANG_2','pane_RDTRMALUK_1','pane_LP2BSUMBAWABARAT_5','pane_LSD_Kabupaten_Sumbawa_Barat_4','pane_LBS_Kabupaten_Sumbawa_Barat_6'];
+  // Warna isi bawaan qgis2web sudah transparan (rgba ..., 0.5), jadi pada 100% layer tetap tembus.
+  // Isi dibuat pekat dan seluruh transparansi diatur oleh penggeser lewat opasitas pane.
+  function solidColor(color){
+    var match=/^rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)$/.exec(String(color||'').replace(/\s/g,''));
+    return match?'rgb('+match[1]+','+match[2]+','+match[3]+')':color;
+  }
+  ['layer_RTRWSUMBAWABARAT20202040_3','layer_RDTRTALIWANG_2','layer_RDTRMALUK_1','layer_LP2BSUMBAWABARAT_5','layer_LSD_Kabupaten_Sumbawa_Barat_4','layer_LBS_Kabupaten_Sumbawa_Barat_6'].forEach(function(name){
+    var layer=window[name];if(!layer||!layer.options||typeof layer.setStyle!=='function')return;
+    var base=layer.options.style;
+    var solid=function(feature){
+      var style=L.extend({},typeof base==='function'?base(feature):base);
+      if(style.fillColor)style.fillColor=solidColor(style.fillColor);
+      style.fillOpacity=1;
+      return style;
+    };
+    layer.options.style=solid;layer.setStyle(solid);
+  });
   var opacityInput=$('stOpacity');
   function applyOpacity(value){
     opacityPanes.forEach(function(name){var pane=map.getPane(name);if(pane)pane.style.opacity=String(value/100);});
     $('stOpacityValue').textContent=value+'%';
   }
-  var savedOpacity=parseInt(store('sobatTaruLayerOpacity'),10);
-  if(savedOpacity>=20&&savedOpacity<=100)opacityInput.value=savedOpacity;
+  var savedOpacity=parseInt(store('sobatTaruLayerOpacity2'),10);
+  if(savedOpacity>=10&&savedOpacity<=100)opacityInput.value=savedOpacity;
   applyOpacity(Number(opacityInput.value));
   opacityInput.addEventListener('input',function(){applyOpacity(Number(opacityInput.value));});
-  opacityInput.addEventListener('change',function(){store('sobatTaruLayerOpacity',opacityInput.value);});
+  opacityInput.addEventListener('change',function(){store('sobatTaruLayerOpacity2',opacityInput.value);});
 
   /* ---------- Status peta (kiri bawah, desktop) ---------- */
   var pointerLatLng=null,statusFrame=0;
@@ -197,10 +214,32 @@
   }
   legendButton.addEventListener('click',function(){setLegendOpen(legendPanel.hidden);});
   var legendFrame=0;
-  map.on('layeradd layerremove',function(){if(legendFrame)return;legendFrame=requestAnimationFrame(function(){legendFrame=0;renderLegend();});});
+  map.on('layeradd layerremove',function(){if(legendFrame)return;legendFrame=requestAnimationFrame(function(){legendFrame=0;renderLegend();refreshLayersOff();});});
+
+  /* ---------- Matikan semua layer ---------- */
+  var layersOff=$('stLayersOff');
+  function activeLayerInputs(){
+    return Array.prototype.filter.call(document.querySelectorAll('#stLayerTreeSlot input.leaflet-control-layers-selector[type="checkbox"]:not(.leaflet-layerstree-sel-all-checkbox)'),function(input){return input.checked;});
+  }
+  function refreshLayersOff(){
+    var count=activeLayerInputs().length;
+    layersOff.disabled=count===0;
+  }
+  layersOff.addEventListener('click',function(){
+    var inputs=activeLayerInputs();
+    inputs.forEach(function(input){input.click();});
+    refreshLayersOff();showToast(inputs.length+' layer dimatikan');
+  });
+
 
   /* ---------- Buka/tutup panel ---------- */
   var navLayers=$('stNavLayers'),navTools=$('stNavTools'),navAbout=$('stNavAbout');
+  // Tombol "Hasil" di header: membuka lagi hasil analisis terakhir setelah panelnya ditutup.
+  var navResult=document.createElement('button');
+  navResult.id='stNavResult';navResult.className='st-nav-btn';navResult.type='button';navResult.hidden=true;
+  navResult.title='Buka lagi hasil analisis terakhir';navResult.setAttribute('aria-controls','stResultPanel');
+  navResult.innerHTML='<i class="fas fa-clipboard-list" aria-hidden="true"></i><span>Hasil</span>';
+  if(navLayers)navLayers.insertAdjacentElement('afterend',navResult);
   var lastIdentification=null;
 
   function setLayersOpen(open,remember){
@@ -258,7 +297,7 @@
     if(closer){
       var what=closer.dataset.stClose;
       if(what==='layers')setLayersOpen(false,true);
-      else if(what==='result')hideResult(false);
+      else if(what==='result')hideResult(true);
       else if(what==='legend')setLegendOpen(false);
       else if(what==='hint')hideHint(true);
       else closeMenus();
@@ -272,7 +311,7 @@
     if(uploadBoxOpen()&&!$('uploadBox').classList.contains('is-processing')){closeUploadBox();return;}
     if(!legendPanel.hidden){setLegendOpen(false);return;}
     if(isPhone()&&!layerPanel.hidden){setLayersOpen(false);return;}
-    if(!resultPanel.hidden&&!document.querySelector('.data-info-backdrop.open,.tutorial-backdrop.open,.tool-modal-backdrop.open,.smart-search-backdrop.open'))hideResult(false);
+    if(!resultPanel.hidden&&!document.querySelector('.data-info-backdrop.open,.tutorial-backdrop.open,.tool-modal-backdrop.open,.smart-search-backdrop.open'))hideResult(true);
   });
 
   /* ---------- Header ---------- */
@@ -353,7 +392,14 @@
     });
     var resultButton=bottomNav.querySelector('[data-st-nav="result"]');
     resultButton.disabled=!(lastIdentification||uploadResultVisible());
+    navResult.hidden=!lastIdentification;
+    navResult.classList.toggle('is-active',!resultPanel.hidden);
+    navResult.setAttribute('aria-expanded',resultPanel.hidden?'false':'true');
   }
+  navResult.addEventListener('click',function(){
+    if(!resultPanel.hidden){hideResult(true);return;}
+    if(lastIdentification){showResult();keepPointVisible(lastIdentification.latlng);}
+  });
   bottomNav.addEventListener('click',function(event){
     var button=event.target.closest('[data-st-nav]');if(!button||button.disabled)return;
     var kind=button.dataset.stNav;
@@ -774,7 +820,7 @@
   syncBasemapSegment();
   applyLayout();
   map.closePopup();
-  renderLegend();
+  renderLegend();refreshLayersOff();
 
   var params=new URLSearchParams(location.search);
   var sharedPoint=(params.get('titik')||'').split(',').map(Number);
