@@ -374,6 +374,7 @@
     closeMenus();
     if(item.dataset.stTool==='geotag'){if(typeof window.brGeotagOpen==='function')window.brGeotagOpen();return;}
     if(item.dataset.stTool==='install'){installApp();return;}
+    if(item.dataset.stTool==='area'||item.dataset.stTool==='distance')drawMode=item.dataset.stTool;
     var original=document.querySelector('.sobat-toolbox-item[data-tool="'+item.dataset.stTool+'"]');
     if(original)original.click();
   });
@@ -587,6 +588,78 @@
   var layerOpenControl=new LayerOpenControl().addTo(map);
   var corner=layerOpenControl.getContainer().parentNode;if(corner)corner.insertBefore(layerOpenControl.getContainer(),corner.firstChild);
 
+  /* ---------- Gambar poligon / ukur jarak: tombol Selesaikan, Hapus titik terakhir, Batalkan (seperti Bale Ruang NTB) ---------- */
+  var drawMode='area',drawControl=null,drawing=false,dragWasEnabled=false;
+  var drawBar=append(
+    '<div id="stDrawBar" class="st-draw-bar" role="toolbar" aria-label="Alat gambar" hidden>'+
+      '<div class="st-draw-info"><b id="stDrawTitle">Gambar poligon</b><span id="stDrawStatus">Ketuk/klik peta untuk menambah titik.</span></div>'+
+      '<div class="st-draw-actions">'+
+        '<button type="button" class="st-draw-btn" data-st-draw="undo" aria-label="Hapus titik terakhir" title="Hapus titik terakhir (Ctrl+Z)" disabled><i class="fas fa-undo" aria-hidden="true"></i><span>Hapus titik terakhir</span></button>'+
+        '<button type="button" class="st-draw-btn danger" data-st-draw="cancel" title="Batalkan gambar (Esc)"><i class="fas fa-times" aria-hidden="true"></i><span>Batalkan<span class="st-draw-long"> Gambar</span></span></button>'+
+        '<button type="button" class="st-draw-btn primary" data-st-draw="finish" disabled><i class="fas fa-check" aria-hidden="true"></i><span id="stDrawFinishLabel">Selesaikan Poligon</span></button>'+
+      '</div>'+
+    '</div>');
+  L.DomEvent.disableClickPropagation(drawBar);
+  function drawPoints(){return drawControl&&drawControl._latlngs?drawControl._latlngs.length:0;}
+  function refreshDrawBar(){
+    var n=drawPoints(),min=drawMode==='area'?3:2,pts=n?drawControl._latlngs:[];
+    $('stDrawTitle').textContent=drawMode==='area'?'Gambar poligon':'Ukur jarak';
+    $('stDrawFinishLabel').innerHTML=drawMode==='area'?'Selesaikan<span class="st-draw-long"> Poligon</span>':'Selesai Ukur';
+    var info=n?n+' titik':'Ketuk/klik peta untuk menambah titik.';
+    if(n>1&&drawMode!=='area'){var length=0;for(var i=1;i<n;i++)length+=map.distance(pts[i-1],pts[i]);info+=' • Jarak '+(length>=1000?(length/1000).toLocaleString('id-ID',{maximumFractionDigits:3})+' km':Math.round(length).toLocaleString('id-ID')+' m');}
+    if(n>2&&drawMode==='area'){var ring=pts.map(function(p){return [p.lng,p.lat];});ring.push(ring[0]);info+=' • Luas '+fmtAreaLong(areaOf({type:'Polygon',coordinates:[ring]}));}
+    if(n&&n<min)info+=' • minimal '+min+' titik';
+    $('stDrawStatus').textContent=info;
+    drawBar.querySelector('[data-st-draw="undo"]').disabled=!n;
+    drawBar.querySelector('[data-st-draw="finish"]').disabled=n<min;
+  }
+  if(L.Control.Measure){
+    var originalMeasureClick=L.Control.Measure.prototype._handleMeasureClick;
+    L.Control.Measure.prototype._handleMeasureClick=function(){var result=originalMeasureClick.apply(this,arguments);drawControl=this;refreshDrawBar();return result;};
+    var originalStart=L.Control.Measure.prototype._startMeasure;
+    L.Control.Measure.prototype._startMeasure=function(){drawControl=this;return originalStart.apply(this,arguments);};
+  }
+  map.on('measurestart',function(){
+    drawing=true;drawBar.hidden=false;document.body.classList.add('st-drawing');
+    // Seperti Bale Ruang: peta tidak ikut tergeser saat menambah titik.
+    dragWasEnabled=!!(map.dragging&&map.dragging.enabled());if(dragWasEnabled&&isPhone())map.dragging.disable();
+    if(isPhone()){setLayersOpen(false);hideResult(true);hideUploadResult();}
+    hideHint(true);refreshDrawBar();
+  });
+  map.on('measurefinish',function(){
+    drawing=false;drawBar.hidden=true;document.body.classList.remove('st-drawing');
+    if(dragWasEnabled&&map.dragging)map.dragging.enable();dragWasEnabled=false;
+  });
+  function undoDrawPoint(){
+    var c=drawControl;if(!c||!c._latlngs||!c._latlngs.length)return;
+    c._latlngs.pop();
+    var vertexes=c._measureVertexes&&c._measureVertexes.getLayers();
+    if(vertexes&&vertexes.length){c._measureVertexes.removeLayer(vertexes[vertexes.length-1]);var last=vertexes[vertexes.length-2];if(last){last.setStyle(c._symbols.getSymbol('measureVertexActive'));if(last._path)last._path.setAttribute('class',c._symbols.getSymbol('measureVertexActive').className);}}
+    c._addMeasureArea(c._latlngs);c._addMeasureBoundary(c._latlngs);
+    if(c._latlngs.length){c._updateResults();c._updateMeasureStartedWithPoints();}else{c._resultsModel=null;c._updateMeasureStartedNoPoints();}
+    refreshDrawBar();
+  }
+  function cancelDraw(){
+    var c=drawControl;if(!c||!drawing)return;
+    // Kosongkan titik dulu agar pembatalan tidak dianggap sebagai bidang yang selesai digambar.
+    c._latlngs=[];c._finishMeasure();showToast('Gambar dibatalkan.');
+  }
+  function finishDraw(){
+    var finish=document.querySelector('.leaflet-control-measure .js-finish');
+    if(finish)finish.click();else showToast('Alat gambar belum siap menyelesaikan poligon.');
+  }
+  drawBar.addEventListener('click',function(event){
+    var button=event.target.closest('[data-st-draw]');if(!button||button.disabled)return;
+    var action=button.dataset.stDraw;
+    if(action==='undo')undoDrawPoint();else if(action==='cancel')cancelDraw();else finishDraw();
+  });
+  document.addEventListener('keydown',function(event){
+    if(!drawing)return;
+    if(event.key==='Escape'){event.preventDefault();cancelDraw();}
+    else if((event.key==='z'||event.key==='Z')&&(event.ctrlKey||event.metaKey)){event.preventDefault();undoDrawPoint();}
+    else if(event.key==='Enter'&&drawPoints()>=(drawMode==='area'?3:2)){event.preventDefault();finishDraw();}
+  });
+
   /* ---------- Pencarian di header ---------- */
   var searchForm=$('stSearch'),searchInput=$('stSearchInput');
   var fullPlaceholder='Cari desa, kecamatan, tempat, koordinat, atau tautan Maps';
@@ -777,6 +850,7 @@
       else copyText(url,'Salin tautan:',function(){showToast('Tautan hasil disalin. Tempel di WhatsApp atau surel.');});
       return;
     }
+    if(event.target.closest('[data-st-print]')&&typeof window.sobatOpenPrintSetup==='function'&&lastAnalysis){window.sobatOpenPrintSetup();return;}
     if(event.target.closest('[data-st-print]')){
       var stamp=$('stPrintStamp');if(stamp)stamp.textContent='Dicetak '+new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
       document.body.classList.add('st-printing');
@@ -914,7 +988,7 @@
     if(model.mode==='point'){
       if(typeof window.ntbAdminLookup!=='function')return Promise.resolve(null);
       return window.ntbAdminLookup(model.latlng.lng,model.latlng.lat,contains).then(function(features){
-        return (features||[]).slice(0,1).map(function(f){var p=f.properties||{};return {name:p.WADMKD,kecamatan:String(p.WADMKC||'').replace(/^Kec(amatan)?\.?\s*/i,'')};});
+        return (features||[]).slice(0,1).map(function(f){var p=f.properties||{};return {name:p.WADMKD,kecamatan:String(p.WADMKC||'').replace(/^Kec(amatan)?\.?\s*/i,''),kelurahan:Number(p.TIPADM)===2};});
       }).catch(function(){return null;});
     }
     if(typeof window.ntbAdminFeaturesInBounds!=='function'||!model.parts.length)return Promise.resolve(null);
@@ -923,7 +997,7 @@
       var found=[];
       (features||[]).forEach(function(f){
         var area=0;model.parts.forEach(function(part){try{if(turf.booleanIntersects(part.feature,f)){var inter=turf.intersect(part.feature,f);if(inter)area+=areaOf(inter);}}catch(_e){}});
-        if(area>=MIN_AREA){var p=f.properties||{};found.push({name:p.WADMKD,kecamatan:String(p.WADMKC||'').replace(/^Kec(amatan)?\.?\s*/i,''),area:area});}
+        if(area>=MIN_AREA){var p=f.properties||{};found.push({name:p.WADMKD,kecamatan:String(p.WADMKC||'').replace(/^Kec(amatan)?\.?\s*/i,''),kelurahan:Number(p.TIPADM)===2,area:area});}
       });
       return found.sort(function(a,b){return b.area-a.area;});
     }).catch(function(){return null;});
@@ -1006,7 +1080,7 @@
     '</div>';
     html+='<div class="st-actions-sub">'+
       (model.latlng?'<button type="button" data-st-copy="'+lat.toFixed(6)+', '+lng.toFixed(6)+'"><i class="fas fa-copy" aria-hidden="true"></i>Salin koordinat</button>':'')+
-      (polygon?'':'<button type="button" data-st-print><i class="fas fa-print" aria-hidden="true"></i>Cetak / PDF</button>')+
+      (polygon?'':'<button type="button" data-st-print><i class="fas fa-print" aria-hidden="true"></i>Cetak PDF</button>')+
       (options.measured?'<button type="button" data-digitized-action="export"><i class="fas fa-download" aria-hidden="true"></i>Export SHP</button><button type="button" data-digitized-action="delete"><i class="fas fa-trash-alt" aria-hidden="true"></i>Hapus bidang</button>':'')+
     '</div>';
     if(forest)html+='<div class="st-alert danger"><i class="fas fa-tree" aria-hidden="true"></i><div><b>'+subject+(polygon?' beririsan dengan kawasan hutan':' berada di kawasan hutan')+'</b>'+esc((forest.sigapCategory&&forest.sigapCategory.action)||'Konfirmasikan kepada instansi kehutanan yang berwenang.')+'</div></div>';
@@ -1027,10 +1101,17 @@
     return html;
   }
   var analysisToken=0;
+  // Hasil terakhir disimpan untuk Cetak PDF (js/print-report.js).
+  var lastAnalysis=null;
+  window.sobatPrintState=function(){
+    return lastAnalysis&&{model:lastAnalysis.model,options:lastAnalysis.options,villages:lastAnalysis.villages,defs:ANALYSIS_DEFS,protectedPattern:protectedPattern,featureValue:featureValue,areaOf:areaOf,fmtArea:fmtArea,fmtAreaLong:fmtAreaLong,fmtPct:fmtPct,showToast:showToast};
+  };
   function renderAnalysis(model,options,target){
     var token=++analysisToken,body=target||$('stResultBody');
     body.innerHTML=analysisHtml(model,options||{});
-    lookupVillages(model).then(function(villages){
+    var current=lastAnalysis={model:model,options:options||{},villages:null};
+    current.villagesReady=lookupVillages(model).then(function(villages){
+      current.villages=villages||[];
       if(token!==analysisToken||!villages||!villages.length)return;
       body.querySelectorAll('[data-st-places]').forEach(function(node){node.innerHTML=placesHtml(model,villages);});
     });
@@ -1092,7 +1173,7 @@
   }
   // Hapus bidang hasil digitasi juga menutup panel hasil.
   document.addEventListener('click',function(event){
-    if(event.target.closest&&event.target.closest('[data-digitized-action="delete"]')){lastIdentification=null;hideResult(true);}
+    if(event.target.closest&&event.target.closest('[data-digitized-action="delete"]')){lastIdentification=null;lastAnalysis=null;hideResult(true);}
   });
 
   /* ---------- Petunjuk awal ---------- */
