@@ -1,9 +1,9 @@
 {
   "status": "success",
   "message": "Layer disinkronkan dari Bale Ruang NTB.",
-  "updatedAt": "2026-10-21T16:50:20+08:00",
+  "updatedAt": "2026-10-21T20:26:54+08:00",
   "source": "https://github.com/atrbpnproject/baleruangntb",
-  "ref": "local",
+  "ref": "0539f60daf19b40009ba773bd2f043a80fb2385c",
   "layers": [
     {
       "layer": "RDTR Maluk",
@@ -34,7 +34,7 @@
       "key": "rtrw",
       "file": "RTRWPROVINSINTB20242044_7.js",
       "features": 405,
-      "previous": 422,
+      "previous": 405,
       "source": "NTB_LSD.zip (LSD Provinsi Nusa Tenggara Barat)"
     },
     {
