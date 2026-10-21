@@ -42,19 +42,20 @@
   var toolsMenu=append(
     '<div id="stToolsMenu" class="st-menu" role="menu" aria-label="Alat" hidden>'+
       '<div class="st-menu-head"><span>Alat</span><button class="st-close" type="button" data-st-close="menus" aria-label="Tutup">&times;</button></div>'+
-      '<div class="st-menu-title">Pengukuran</div>'+
+      // Isi dan urutan sama dengan menu Alat Bale Ruang NTB.
       '<button type="button" role="menuitem" data-st-tool="distance"><i class="fas fa-ruler-horizontal" aria-hidden="true"></i>Ukur Jarak</button>'+
-      '<button type="button" role="menuitem" data-st-tool="area"><i class="fas fa-object-group" aria-hidden="true"></i>Ukur Luas &amp; Analisis</button>'+
-      '<hr><div class="st-menu-title">Konversi Data</div>'+
-      '<button type="button" role="menuitem" data-st-tool="shp-kml"><i class="fas fa-exchange-alt" aria-hidden="true"></i>SHP ke KML<span class="st-badge">ZIP</span></button>'+
-      '<button type="button" role="menuitem" data-st-tool="kml-shp"><i class="fas fa-file-archive" aria-hidden="true"></i>KML ke SHP<span class="st-badge">KML</span></button>'+
-      '<button type="button" role="menuitem" data-st-tool="pdf-kkpr"><i class="fas fa-file-pdf" aria-hidden="true"></i>PDF KKPR ke Poligon<span class="st-badge">PDF</span></button>'+
+      '<button type="button" role="menuitem" data-st-tool="area"><i class="fas fa-object-group" aria-hidden="true"></i>Ukur Luas</button>'+
+      '<button type="button" role="menuitem" data-st-tool="shp-kml"><i class="fas fa-exchange-alt" aria-hidden="true"></i>SHP ke KML</button>'+
+      '<button type="button" role="menuitem" data-st-tool="kml-shp"><i class="fas fa-exchange-alt" aria-hidden="true"></i>KML ke SHP</button>'+
+      '<button type="button" role="menuitem" data-st-tool="pdf-kkpr"><i class="fas fa-file-pdf" aria-hidden="true"></i>PDF KKPR ke Poligon</button>'+
+      '<button type="button" role="menuitem" data-st-tool="geotag"><i class="fas fa-camera" aria-hidden="true"></i>Foto &amp; PDF Geotag</button>'+
+      '<button type="button" role="menuitem" data-st-tool="install" hidden><i class="fas fa-mobile-alt" aria-hidden="true"></i>Pasang Aplikasi</button>'+
     '</div>');
 
   var infoMenu=append(
     '<div id="stInfoMenu" class="st-menu" role="menu" aria-label="Informasi" hidden>'+
       '<div class="st-menu-head"><span>Informasi</span><button class="st-close" type="button" data-st-close="menus" aria-label="Tutup">&times;</button></div>'+
-      '<button type="button" role="menuitem" data-st-info="guide"><i class="fas fa-book-open" aria-hidden="true"></i>Panduan Penggunaan</button>'+
+      '<button type="button" role="menuitem" data-st-info="guide" class="st-phone-only"><i class="fas fa-book-open" aria-hidden="true"></i>Panduan Penggunaan</button>'+
       '<button type="button" role="menuitem" data-st-info="data"><i class="fas fa-database" aria-hidden="true"></i>Informasi Data &amp; Batas Penggunaan</button>'+
       '<button type="button" role="menuitem" data-st-info="about"><i class="fas fa-info-circle" aria-hidden="true"></i>Tentang SOBAT TARU</button>'+
     '</div>');
@@ -85,11 +86,28 @@
     L.DomEvent.disableScrollPropagation(node);
   });
 
-  function showToast(text){
+  function showToast(text,duration){
     toast.textContent=text;toast.hidden=false;toast.classList.add('show');
     clearTimeout(showToast.timer);
-    showToast.timer=setTimeout(function(){toast.classList.remove('show');setTimeout(function(){toast.hidden=true;},250);},2600);
+    showToast.timer=setTimeout(function(){toast.classList.remove('show');setTimeout(function(){toast.hidden=true;},250);},duration||2600);
   }
+
+  // Fitur yang diambil dari Bale Ruang NTB (Geotag) memakai window.brToast.
+  window.brToast=function(text,duration){showToast(text,duration);};
+
+  /* ---------- Pasang Aplikasi (PWA), sama seperti Bale Ruang NTB ---------- */
+  var installPrompt=null,installItem=toolsMenu.querySelector('[data-st-tool="install"]');
+  function standalone(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}
+  function refreshInstallItem(){installItem.hidden=standalone()||!(installPrompt||/iphone|ipad|ipod/i.test(navigator.userAgent));}
+  function installApp(){
+    if(installPrompt){installPrompt.prompt();installPrompt.userChoice.then(function(){installPrompt=null;refreshInstallItem();});return;}
+    showToast(/iphone|ipad|ipod/i.test(navigator.userAgent)?'Di iPhone/iPad: ketuk tombol Bagikan, lalu “Tambahkan ke Layar Utama”.':'Buka menu browser (⋮), lalu pilih “Instal aplikasi” atau “Tambahkan ke layar utama”.',6000);
+  }
+  window.addEventListener('beforeinstallprompt',function(event){event.preventDefault();installPrompt=event;refreshInstallItem();});
+  window.addEventListener('appinstalled',function(){installPrompt=null;refreshInstallItem();showToast('SOBAT TARU terpasang di perangkat Anda.');});
+  refreshInstallItem();
+  function registerWorker(){navigator.serviceWorker.register('sw.js').catch(function(){});}
+  if('serviceWorker' in navigator&&location.protocol!=='file:'){if(document.readyState==='complete')registerWorker();else window.addEventListener('load',registerWorker);}
 
   /* ---------- Panel layer: pindahkan kontrol layer lama ---------- */
   if(window.lay&&typeof lay.getContainer==='function'){
@@ -323,6 +341,8 @@
   toolsMenu.addEventListener('click',function(event){
     var item=event.target.closest('[data-st-tool]');if(!item)return;
     closeMenus();
+    if(item.dataset.stTool==='geotag'){if(typeof window.brGeotagOpen==='function')window.brGeotagOpen();return;}
+    if(item.dataset.stTool==='install'){installApp();return;}
     var original=document.querySelector('.sobat-toolbox-item[data-tool="'+item.dataset.stTool+'"]');
     if(original)original.click();
   });
@@ -704,13 +724,13 @@
     var pippibIn=data.pippib&&data.pippib!=='Tidak masuk';
     var lp2bIn=data.lp2b==='YA',lsdIn=data.lsd==='YA',lbsIn=data.lbs==='YA';
     var sempadanIn=data.sempadan&&data.sempadan.length>0;
+    // Pembatas mengikuti Bale Ruang NTB: LSD dan PIPPIB adalah ketentuan khusus. LP2B 2026 masih hasil verifikasi
+    // usulan (belum penetapan) dan LBS adalah data baku sawah, jadi keduanya ditampilkan sebagai informasi, bukan pembatas.
     var constraints=[
       sigapForest&&{name:'Kawasan hutan',danger:true},
       pippibIn&&{name:'PIPPIB',danger:true},
       rtrwProtected&&{name:'Kawasan lindung RTRW',danger:false},
-      lp2bIn&&{name:'LP2B',danger:false},
       lsdIn&&{name:'LSD',danger:false},
-      lbsIn&&{name:'LBS',danger:false},
       sempadanIn&&{name:'Sempadan',danger:false}
     ].filter(Boolean);
     var severe=constraints.some(function(entry){return entry.danger;});
@@ -721,13 +741,13 @@
         '<div class="st-summary-chips">'+constraints.map(function(entry){return '<span class="st-chip '+(entry.danger?'danger':'in')+'">'+esc(entry.name)+'</span>';}).join('')+'</div>'+
         '<p>Pemanfaatan lahan di titik ini perlu pemeriksaan lebih lanjut ke instansi berwenang.</p></div></div>':
       '<div class="st-summary ok"><i class="fas fa-check-circle" aria-hidden="true"></i><div><b>Tidak ditemukan pembatas</b>'+
-        '<p>Titik ini tidak masuk kawasan hutan, PIPPIB, LP2B, LSD, LBS, sempadan, maupun kawasan lindung pada data yang tersedia.</p></div></div>';
+        '<p>Titik ini tidak masuk kawasan hutan, PIPPIB, LSD, sempadan, maupun kawasan lindung pada data yang tersedia.</p></div></div>';
 
     var alerts='';
     if(sigapForest)alerts+='<div class="st-alert danger"><i class="fas fa-tree" aria-hidden="true"></i><div><b>Lokasi berada di '+esc(sigap.label)+'</b>'+esc(sigap.action||'Konfirmasikan kepada instansi kehutanan yang berwenang.')+'</div></div>';
     if(pippibIn)alerts+='<div class="st-alert danger"><i class="fas fa-ban" aria-hidden="true"></i><div><b>Lokasi beririsan dengan PIPPIB</b>Pemanfaatan ruang di sini terikat ketentuan penghentian pemberian izin baru. Konfirmasikan kepada instansi berwenang.</div></div>';
-    var farm=[lp2bIn?'LP2B':'',lsdIn?'LSD':'',lbsIn?'LBS':''].filter(Boolean);
-    if(farm.length)alerts+='<div class="st-alert"><i class="fas fa-seedling" aria-hidden="true"></i><div><b>Lahan pertanian: '+farm.join(', ')+'</b>Alih fungsi lahan pertanian memerlukan pemeriksaan dan persetujuan sesuai ketentuan.</div></div>';
+    if(lsdIn)alerts+='<div class="st-alert"><i class="fas fa-seedling" aria-hidden="true"></i><div><b>Lokasi beririsan dengan LSD</b>Pemanfaatan ruang di sini terikat ketentuan khusus perlindungan lahan. Konfirmasikan kepada instansi berwenang.</div></div>';
+    if(lp2bIn)alerts+='<div class="st-alert info"><i class="fas fa-info-circle" aria-hidden="true"></i><div><b>Lokasi berada dalam LP2B Hasil Verifikasi Usulan tahun 2026</b>Belum merupakan penetapan; menunggu Keputusan Bupati. Untuk rencana pemanfaatan, konfirmasikan ke Pemda setempat.</div></div>';
     if(sempadanIn)alerts+='<div class="st-alert"><i class="fas fa-tint" aria-hidden="true"></i><div><b>Lokasi berada di sempadan</b>'+esc(data.sempadan.join(', '))+' menurut RTRW Kabupaten Sumbawa Barat.</div></div>';
 
     var sigapDetails='';
@@ -758,13 +778,13 @@
       '</div>'+
       alerts+
       '<div class="st-card"><div class="st-results-head"><div class="st-card-title">Rincian per data</div><small>'+(constraints.length?constraints.length+' pembatas':'Tanpa pembatas')+'</small></div>'+
-        item({label:'Pola Ruang RTRW',key:'rtrw',flag:rtrwProtected,title:rtrwFound?esc(data.rtrw):'Di luar data RTRW',sub:'RTRW Kabupaten Sumbawa Barat 2020–2040',chip:rtrwChip})+
-        item({label:'RDTR',key:'rdtr',title:rdtrFound?'Zona '+esc(data.rdtrZona):'Tidak berada pada wilayah RDTR',sub:rdtrFound?esc(data.rdtrWilayah):'RDTR Taliwang dan RDTR Maluk',chip:rdtrFound?'<span class="st-chip ok">Masuk wilayah RDTR</span>':'<span class="st-chip out">Di luar RDTR</span>'})+
+        item({label:'Pola Ruang RTRW',key:'rtrw',flag:rtrwProtected,title:rtrwFound?esc(data.rtrw):'Di luar data RTRW',sub:'Pola Ruang RTRW Kabupaten Sumbawa Barat 2020–2040',chip:rtrwChip})+
+        item({label:'RDTR',key:'rdtr',title:rdtrFound?'Zona '+esc(data.rdtrZona):'Tidak berada pada wilayah RDTR',sub:rdtrFound?esc(data.rdtrWilayah):'RDTR Perkotaan Taliwang dan RDTR Sekitar Kawasan Industri Maluk',chip:rdtrFound?'<span class="st-chip ok">Masuk wilayah RDTR</span>':'<span class="st-chip out">Di luar RDTR</span>'})+
         item({label:'Kawasan Hutan (SIGAP)',key:'sigap',flag:sigapForest,title:sigap?(sigapForest?'<span class="st-swatch" style="background:'+esc(sigap.hex)+'"></span>':'')+esc(sigap.label):'Tidak ada klasifikasi pada titik ini',sub:'Kementerian Kehutanan RI',details:sigapDetails,chip:sigap?(sigapForest?'<span class="st-chip danger">Kawasan hutan</span>':'<span class="st-chip ok">Bukan kawasan hutan</span>'):'<span class="st-chip out">Tidak ada data</span>'})+
-        item({label:'PIPPIB 2025 Periode I',key:'pippib',flag:pippibIn,title:pippibIn?esc(data.pippib):'Tidak masuk PIPPIB',sub:'Peta Indikatif Penghentian Pemberian Izin Baru',chip:pippibIn?'<span class="st-chip danger">Masuk</span>':chip(false)})+
-        item({label:'LP2B',key:'lp2b',flag:lp2bIn,title:'Lahan Pertanian Pangan Berkelanjutan',chip:chip(lp2bIn)})+
-        item({label:'LSD',key:'lsd',flag:lsdIn,title:'Lahan Sawah yang Dilindungi',chip:chip(lsdIn)})+
-        item({label:'LBS',key:'lbs',flag:lbsIn,title:'Lahan Baku Sawah',chip:chip(lbsIn)})+
+        item({label:'PIPPIB Provinsi NTB 2025',key:'pippib',flag:pippibIn,title:pippibIn?esc(data.pippib):'Tidak masuk PIPPIB',sub:'Peta Indikatif Penghentian Pemberian Izin Baru',chip:pippibIn?'<span class="st-chip danger">Masuk</span>':chip(false)})+
+        item({label:'LSD Provinsi NTB',key:'lsd',flag:lsdIn,title:'Lahan Sawah yang Dilindungi',chip:chip(lsdIn)})+
+        item({label:'LP2B Hasil Verifikasi Usulan tahun 2026',key:'lp2b',title:lp2bIn?'Masuk usulan LP2B':'Tidak masuk usulan LP2B',sub:'Belum merupakan penetapan. Sumber: Kementerian ATR/BPN &amp; Pemprov NTB, 6 Okt 2026.',chip:lp2bIn?'<span class="st-chip info">Masuk usulan</span>':chip(false)})+
+        item({label:'LBS Provinsi NTB',key:'lbs',title:'Lahan Baku Sawah',chip:lbsIn?'<span class="st-chip info">Masuk</span>':chip(false)})+
         item({label:'Sempadan (RTRW)',key:'sempadan',flag:sempadanIn,title:sempadanIn?esc(data.sempadan.join(', ')):'Tidak berada di sempadan sungai atau pantai',chip:chip(sempadanIn)})+
         item({label:'Administrasi',key:'administrasi',title:'Kecamatan '+esc(data.kecamatan),sub:'Kabupaten Sumbawa Barat'})+
       '</div>'+

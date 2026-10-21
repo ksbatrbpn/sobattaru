@@ -354,7 +354,7 @@ body.st-layers-open .st-legend-wrap{left:calc(var(--st-gap) + 352px)}
 .st-hint button{position:relative;flex:0 0 24px;width:24px;height:24px;border:0;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:15px;line-height:1;cursor:pointer}
 .st-hint button:after{content:"";position:absolute;inset:-10px}
 body.st-result-open .st-hint{display:none}
-.st-toast{position:fixed;left:50%;top:calc(var(--st-header-h) + 16px);z-index:15000;max-width:min(420px,calc(100vw - 24px));padding:9px 14px;transform:translate(-50%,-8px);opacity:0;
+.st-toast{position:fixed;left:50%;top:calc(var(--st-header-h) + 16px);z-index:16000;max-width:min(420px,calc(100vw - 24px));padding:9px 14px;transform:translate(-50%,-8px);opacity:0;
   border-radius:999px;background:rgba(29,29,31,.82);-webkit-backdrop-filter:var(--st-blur);backdrop-filter:var(--st-blur);color:#fff;font-size:13px;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.22);transition:opacity .2s,transform .2s;pointer-events:none}
 .st-toast.show{opacity:1;transform:translate(-50%,0)}
 .st-toast[hidden]{display:none}
@@ -399,6 +399,9 @@ body.st-result-open .st-hint{display:none}
 .st-alert.danger{background:var(--st-red-50);color:#6b1d14}
 .st-alert.danger i{color:var(--st-red)}
 .st-alert.danger b{color:#4d130c}
+.st-alert.info{background:#e8f1fb;color:#1c3d5a}
+.st-alert.info i{color:#1f6fb2}
+.st-alert.info b{color:#122c44}
 .st-results-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:2px}
 .st-results-head .st-card-title{margin:0}
 .st-results-head small{color:var(--st-muted);font-size:12px}
@@ -411,6 +414,7 @@ body.st-result-open .st-hint{display:none}
 .st-item-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:7px}
 .st-chip{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:500;line-height:1.5}
 .st-chip.in{background:rgba(255,149,0,.16);color:#8a4b00}
+.st-chip.info{background:rgba(31,111,178,.13);color:#1c4f7f}
 .st-chip.danger{background:rgba(255,59,48,.14);color:#a1170c}
 .st-chip.out{background:var(--st-fill);color:var(--st-muted)}
 .st-chip.ok{background:rgba(52,199,89,.15);color:#1d6e31}
@@ -701,3 +705,11 @@ body.st-result-open .tutorial-coach,body.st-layers-open .tutorial-coach{display:
 
 .st-legend-item .st-lyr-ico{width:20px;height:20px;margin-right:6px;border-radius:6px;vertical-align:middle}
 .st-legend-item .st-lyr-ico i{font-size:10px}
+
+/* ---------- Menu Alat dan Info ---------- */
+.st-menu button[hidden]{display:none}
+/* Panduan sudah ada sebagai tombol di header desktop; di menu Info hanya untuk HP. */
+@media (min-width:761px){.st-menu .st-phone-only{display:none}}
+/* Pilihan tabel koordinat PDF KKPR */
+.kkpr-table-pick{display:block;margin:0 0 5px;color:var(--st-muted);font-size:12px;font-weight:600}
+.kkpr-table-select{width:100%;height:36px;margin:0 0 10px;padding:0 10px;border:1px solid var(--st-line-strong);border-radius:8px;background:#fff;color:var(--st-ink);font:13px var(--st-font)}

@@ -1,0 +1,21 @@
+{
+  "name": "SOBAT TARU",
+  "short_name": "SOBAT TARU",
+  "description": "Sumbawa Barat dalam Tata Ruang — WebGIS informasi tata ruang Kabupaten Sumbawa Barat.",
+  "id": "./",
+  "start_url": "./?source=app",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "id",
+  "dir": "ltr",
+  "background_color": "#0b3b35",
+  "theme_color": "#0b3b35",
+  "categories": ["navigation", "utilities", "government"],
+  "icons": [
+    {"src": "assets/app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "assets/app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "assets/app/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+    {"src": "assets/app/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
