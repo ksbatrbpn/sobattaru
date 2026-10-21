@@ -1,9 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+        <meta name="theme-color" content="#0b3b35">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="icon" href="data:,">
@@ -256,6 +260,29 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
 </style>
 </head>
     <body>
+        <div id="stLoader" class="st-loader" role="status" aria-live="polite">
+          <div class="st-loader-card">
+            <img src="assets/sobat-taru-logo.png" alt="" width="56" height="56">
+            <div class="st-loader-title">SOBAT TARU</div>
+            <div id="stLoaderText" class="st-loader-text">Memuat data tata ruang…</div>
+            <div class="st-loader-track"><div id="stLoaderBar" class="st-loader-bar"></div></div>
+            <div class="st-loader-note">Pemuatan pertama bisa memakan waktu di jaringan seluler.</div>
+          </div>
+        </div>
+        <script>
+        window.__stInitialHash=location.hash;
+        (function(){
+          var total=12,done=0;
+          window.stDataLoaded=function(name){
+            done++;
+            var bar=document.getElementById('stLoaderBar'),text=document.getElementById('stLoaderText');
+            if(bar)bar.style.width=Math.min(100,Math.round(done/total*100))+'%';
+            if(text)text.textContent='Memuat data tata ruang… '+Math.min(done,total)+' dari '+total+(name?' ('+name+')':'');
+          };
+          // Cadangan bila skrip antarmuka gagal dimuat: jangan biarkan layar muat menutup peta.
+          window.addEventListener('load',function(){setTimeout(function(){var loader=document.getElementById('stLoader');if(loader&&!loader.classList.contains('done')){loader.classList.add('done');setTimeout(function(){loader.hidden=true;},350);}},2500);});
+        })();
+        </script>
         <div id="map">
         </div>
         <button id="showMapTools" class="show-map-tools" type="button" aria-label="Tampilkan kembali alat peta" title="Tampilkan kembali alat peta">
@@ -267,12 +294,12 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
     <div class="sobat-logo"><img src="assets/sobat-taru-logo.png" alt="Logo SOBAT TARU"></div>
     <div class="sobat-copy"><div class="sobat-name">SOBAT TARU</div><div class="sobat-tagline">Sumbawa Barat dalam Tata Ruang</div></div>
   </div>
-  <form id="stSearch" class="st-search" role="search" autocomplete="off"><i class="fas fa-search st-search-icon" aria-hidden="true"></i><input id="stSearchInput" type="search" inputmode="text" placeholder="Cari koordinat, UTM 50S, atau tempel tautan Maps" aria-label="Cari koordinat, UTM 50S, atau tautan Google Maps"><button id="stSearchLocate" class="st-search-btn" type="button" title="Lokasi saya" aria-label="Tampilkan lokasi saya"><i class="fas fa-crosshairs" aria-hidden="true"></i></button><button id="stSearchAdvanced" class="st-search-btn" type="button" title="Pilih format koordinat" aria-label="Pilih format koordinat"><i class="fas fa-sliders-h" aria-hidden="true"></i></button></form><nav class="header-actions st-nav" aria-label="Menu utama"><button id="stNavLayers" class="st-nav-btn" type="button" aria-controls="stLayerPanel"><svg class="st-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 1 7.5l11 5.5 11-5.5L12 2zm0 13.2L3.4 10.9 1 12.1l11 5.5 11-5.5-2.4-1.2L12 15.2zm0 4.5-8.6-4.3L1 16.6 12 22l11-5.4-2.4-1.2L12 19.7z"/></svg><span>Layer</span></button><button id="stNavTools" class="st-nav-btn" type="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-wrench" aria-hidden="true"></i><span>Alat</span></button><button id="stNavUpload" class="st-nav-btn st-nav-primary" type="button"><i class="fas fa-upload" aria-hidden="true"></i><span>Upload SHP/KML</span></button><button id="openTutorial" class="st-nav-btn" type="button" aria-label="Panduan penggunaan"><i class="fas fa-book-open" aria-hidden="true"></i><span>Panduan</span></button><button id="stNavAbout" class="st-nav-btn" type="button"><i class="fas fa-info-circle" aria-hidden="true"></i><span>Tentang</span></button><div id="basemapPicker" class="basemap-picker"><button id="basemapTrigger" class="basemap-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="basemapMenu"><i class="fas fa-map" aria-hidden="true"></i><span id="basemapCurrent" class="basemap-current">Google Hybrid</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button><div id="basemapMenu" class="basemap-menu" role="menu"><button class="basemap-option active" type="button" role="menuitemradio" aria-checked="true" data-basemap-option="hybrid"><i class="fas fa-map" aria-hidden="true"></i><span>Google Hybrid</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button><button class="basemap-option" type="button" role="menuitemradio" aria-checked="false" data-basemap-option="satellite"><i class="fas fa-image" aria-hidden="true"></i><span>Google Satelit</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button><button class="basemap-option" type="button" role="menuitemradio" aria-checked="false" data-basemap-option="road"><i class="fas fa-road" aria-hidden="true"></i><span>Google Road</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button><button class="basemap-option" type="button" role="menuitemradio" aria-checked="false" data-basemap-option="osm"><i class="fas fa-globe" aria-hidden="true"></i><span>OpenStreetMap</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button></div></div></nav>
+  <form id="stSearch" class="st-search" role="search" autocomplete="off"><i class="fas fa-search st-search-icon" aria-hidden="true"></i><input id="stSearchInput" type="search" inputmode="text" placeholder="Cari koordinat, UTM 50S, atau tempel tautan Maps" aria-label="Cari koordinat, UTM 50S, atau tautan Google Maps"><button id="stSearchLocate" class="st-search-btn" type="button" title="Lokasi saya" aria-label="Tampilkan lokasi saya"><i class="fas fa-crosshairs" aria-hidden="true"></i></button><button id="stSearchAdvanced" class="st-search-btn" type="button" title="Pilih format koordinat" aria-label="Pilih format koordinat"><i class="fas fa-sliders-h" aria-hidden="true"></i></button></form><nav class="header-actions st-nav" aria-label="Menu utama"><button id="stNavLayers" class="st-nav-btn" type="button" title="Layer tata ruang" aria-controls="stLayerPanel"><svg class="st-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 1 7.5l11 5.5 11-5.5L12 2zm0 13.2L3.4 10.9 1 12.1l11 5.5 11-5.5-2.4-1.2L12 15.2zm0 4.5-8.6-4.3L1 16.6 12 22l11-5.4-2.4-1.2L12 19.7z"/></svg><span>Layer</span></button><button id="stNavTools" class="st-nav-btn" type="button" title="Alat ukur dan konversi" aria-haspopup="true" aria-expanded="false"><i class="fas fa-wrench" aria-hidden="true"></i><span>Alat</span></button><button id="stNavUpload" class="st-nav-btn st-nav-primary" type="button" title="Unggah SHP/KML untuk dianalisis"><i class="fas fa-upload" aria-hidden="true"></i><span>Unggah SHP/KML</span></button><button id="openTutorial" class="st-nav-btn" type="button" title="Panduan penggunaan" aria-label="Panduan penggunaan"><i class="fas fa-book-open" aria-hidden="true"></i><span>Panduan</span></button><button id="stNavAbout" class="st-nav-btn" type="button" title="Informasi dan tentang aplikasi"><i class="fas fa-info-circle" aria-hidden="true"></i><span>Tentang</span></button><div id="basemapPicker" class="basemap-picker"><button id="basemapTrigger" class="basemap-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="basemapMenu"><i class="fas fa-map" aria-hidden="true"></i><span id="basemapCurrent" class="basemap-current">Google Hybrid</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button><div id="basemapMenu" class="basemap-menu" role="menu"><button class="basemap-option active" type="button" role="menuitemradio" aria-checked="true" data-basemap-option="hybrid"><i class="fas fa-map" aria-hidden="true"></i><span>Google Hybrid</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button><button class="basemap-option" type="button" role="menuitemradio" aria-checked="false" data-basemap-option="satellite"><i class="fas fa-image" aria-hidden="true"></i><span>Google Satelit</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button><button class="basemap-option" type="button" role="menuitemradio" aria-checked="false" data-basemap-option="road"><i class="fas fa-road" aria-hidden="true"></i><span>Google Road</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button><button class="basemap-option" type="button" role="menuitemradio" aria-checked="false" data-basemap-option="osm"><i class="fas fa-globe" aria-hidden="true"></i><span>OpenStreetMap</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button></div></div></nav>
 </header>
 
 <div id="dataInfoModal" class="data-info-backdrop open" role="dialog" aria-modal="true" aria-labelledby="dataInfoTitle">
   <div class="data-info-dialog"><div class="data-info-head"><h2 id="dataInfoTitle">Informasi Data SOBAT TARU</h2><p>Batas penggunaan dan sumber informasi data</p><button id="closeDataInfo" class="data-info-close" type="button" aria-label="Tutup">×</button></div><div class="data-info-body">
-    <section class="data-warning"><h3>⚠ BATAS PENGGUNAAN INFORMASI TATA RUANG</h3><p>SOBAT TARU v1.5 merupakan media informasi dan identifikasi spasial awal Kabupaten Sumbawa Barat. Seluruh hasil bersifat indikatif, termasuk klasifikasi lokasi, persinggungan, jarak, persentase, dan estimasi luas. Hasil dapat dipengaruhi oleh skala dan tanggal sumber data, ketelitian geometri, sistem koordinat, generalisasi peta, serta perbedaan antara luas atribut dan luas geometri. Layer yang ditampilkan atau disembunyikan hanya mengatur visual peta; analisis tetap memeriksa seluruh dataset yang tersedia. Data daring dapat gagal diperbarui ketika server sumber atau koneksi bermasalah, dan dalam kondisi tersebut aplikasi mempertahankan data terakhir yang berhasil dimuat serta menampilkan status kegagalan. Informasi ini bukan survei kadastral, bukan bukti hak atas tanah, bukan persetujuan pemanfaatan ruang, dan tidak menggantikan peta, keputusan, perizinan, maupun produk hukum resmi. Konfirmasikan kebutuhan resmi kepada instansi berwenang dan dokumen sumber yang berlaku.</p><p><b>Versi aplikasi:</b> 1.5<br><b>Terakhir diperbarui:</b> 29 Juli 2026</p></section>
+    <section class="data-warning"><h3>Batas penggunaan</h3><p>Hasil SOBAT TARU bersifat <b>indikatif</b> untuk identifikasi awal. Ini bukan bukti hak atas tanah, bukan izin pemanfaatan ruang, dan tidak menggantikan dokumen resmi. Konfirmasikan kepada instansi berwenang.</p><details class="data-warning-more"><summary>Baca selengkapnya</summary><p>SOBAT TARU v1.5 merupakan media informasi dan identifikasi spasial awal Kabupaten Sumbawa Barat. Seluruh hasil bersifat indikatif, termasuk klasifikasi lokasi, persinggungan, jarak, persentase, dan estimasi luas. Hasil dapat dipengaruhi oleh skala dan tanggal sumber data, ketelitian geometri, sistem koordinat, generalisasi peta, serta perbedaan antara luas atribut dan luas geometri. Layer yang ditampilkan atau disembunyikan hanya mengatur visual peta; analisis tetap memeriksa seluruh dataset yang tersedia. Data daring dapat gagal diperbarui ketika server sumber atau koneksi bermasalah, dan dalam kondisi tersebut aplikasi mempertahankan data terakhir yang berhasil dimuat serta menampilkan status kegagalan. Informasi ini bukan survei kadastral, bukan bukti hak atas tanah, bukan persetujuan pemanfaatan ruang, dan tidak menggantikan peta, keputusan, perizinan, maupun produk hukum resmi. Konfirmasikan kebutuhan resmi kepada instansi berwenang dan dokumen sumber yang berlaku.</p></details><p><b>Versi aplikasi:</b> 1.5<br><b>Terakhir diperbarui:</b> 29 Juli 2026</p></section>
     <section class="data-source-section"><h3 class="data-section-title">Sumber Informasi Data Spasial</h3><p class="data-section-copy">Data tata ruang yang tersedia pada aplikasi ini meliputi:</p>
     <div id="dataInfoDetails" class="data-info-details"><div class="data-list">
       <div class="data-row"><b>RTRW Kabupaten Sumbawa Barat 2020–2040</b><span>Peraturan Daerah Kabupaten Sumbawa Barat Nomor 11 Tahun 2020.</span></div>
@@ -282,7 +309,7 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
       <div class="data-row"><b>Lahan Pertanian Pangan Berkelanjutan (LP2B)</b><span>Data indikatif sesuai layer yang tersedia pada aplikasi.</span></div>
       <div class="data-row"><b>LBS</b><span>Data tematik sesuai layer yang tersedia pada aplikasi.</span></div>
     </div></div></section>
-  </div><div class="data-info-foot"><label><input id="hideDataInfo" type="checkbox"> Jangan tampilkan lagi di perangkat ini</label><button id="acceptDataInfo" class="data-info-ok" type="button">Saya Mengerti</button></div></div>
+  </div><div class="data-info-foot"><input id="hideDataInfo" type="checkbox" checked hidden><span class="data-info-foot-note">Pesan ini tidak muncul lagi di perangkat ini. Buka kembali lewat menu Info.</span><button id="acceptDataInfo" class="data-info-ok" type="button">Saya Mengerti</button></div></div>
 </div>
 <script>
 (function(){
@@ -309,7 +336,7 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
     <div class="tutorial-step active" data-step="0"><div class="tutorial-demo"><div class="tutorial-basemap-demo basemap-select-demo"><i class="fas fa-map" aria-hidden="true"></i><span>Google Hybrid</span><b>▾</b></div></div><p>Pilih peta dasar di bagian atas panel <b>Layer Tata Ruang</b>: <b>Hybrid</b>, <b>Satelit</b>, <b>Jalan</b>, atau <b>OSM</b>. Google Hybrid digunakan saat aplikasi pertama dibuka.</p></div>
     <div class="tutorial-step" data-step="1"><div class="tutorial-demo"><span class="tutorial-control-demo layer-control"><img src="css/images/layers.png" alt="Ikon pengaturan layer"></span></div><p>Buka panel <b>Layer</b> (di kiri layar, atau tombol <b>Layer</b> di bawah layar HP), lalu nyalakan sakelar <b>RTRW, RDTR Taliwang, RDTR Maluk, LSD, LP2B,</b> atau <b>LBS</b>. Tombol <b>Legenda</b> menampilkan keterangan warna.</p></div>
     <div class="tutorial-step" data-step="2"><div class="tutorial-demo"><span class="tutorial-map-click">Klik langsung pada area peta</span></div><p>Klik satu titik pada peta, atau ketik koordinat/tautan Google Maps di kolom pencarian. Panel <b>Analisis Spasial Koordinat</b> menampilkan RTRW, zona RDTR, SIGAP, PIPPIB, serta status LSD, LP2B, dan LBS.</p></div>
-    <div class="tutorial-step" data-step="3"><div class="tutorial-demo"><span class="tutorial-upload-demo"><i class="fas fa-cloud-upload-alt" aria-hidden="true"></i><span><b>Analisis Spasial</b><small style="display:block;font-size:8px;opacity:.8">Upload KML/SHP</small></span></span></div><p>Tekan tombol <b>Upload SHP/KML</b>, lalu pilih KML atau ZIP Shapefile. Proses unggah dan analisis akan ditampilkan melalui progress bar. ZIP minimal memuat SHP, SHX, dan DBF.</p></div>
+    <div class="tutorial-step" data-step="3"><div class="tutorial-demo"><span class="tutorial-upload-demo"><i class="fas fa-cloud-upload-alt" aria-hidden="true"></i><span><b>Analisis Spasial</b><small style="display:block;font-size:8px;opacity:.8">Unggah KML/SHP</small></span></span></div><p>Tekan tombol <b>Unggah SHP/KML</b>, lalu pilih KML atau ZIP Shapefile. Proses unggah dan analisis akan ditampilkan melalui progress bar. ZIP minimal memuat SHP, SHX, dan DBF.</p></div>
     <div class="tutorial-step" data-step="4"><div class="tutorial-demo tutorial-tools"><span class="tutorial-zoom-demo"><span>+</span><span>−</span></span><span class="tutorial-control-demo"><i class="fas fa-map-marker-alt"></i></span><span class="tutorial-control-demo"><i class="fas fa-wrench"></i></span><span class="tutorial-control-demo"><i class="fas fa-search"></i></span><span class="tutorial-control-demo layer-control"><img src="css/images/layers.png" alt="Ikon pengaturan layer"></span></div><p>Tekan menu <b>Alat</b> untuk memilih <b>Ukur Jarak</b>, <b>Ukur Luas &amp; Analisis</b>, konversi <b>SHP–KML</b>, atau membaca <b>PDF KKPR</b> menjadi poligon. Setiap fungsi dilengkapi ikon dan petunjuk berbahasa Indonesia.</p></div>
   </div><div class="tutorial-foot"><button id="tutorialPrev" class="tutorial-secondary" type="button">Sebelumnya</button><button id="tutorialNext" class="tutorial-primary" type="button">Berikutnya</button></div></div>
 </div>
@@ -323,29 +350,19 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
 </div>
 
 <button id="uploadToggle" class="upload-analysis-toggle" type="button" aria-label="Upload KML atau Shapefile untuk analisis spasial" title="Upload KML/SHP untuk analisis spasial"><span class="upload-icon"><i class="fas fa-cloud-upload-alt" aria-hidden="true"></i></span><span class="upload-toggle-copy"><b>Analisis Spasial</b><small>Upload KML/SHP untuk analisis spasial</small></span></button>
-<div id="uploadBox" class="upload-analysis-box"><button id="closeUploadBox" class="upload-box-close" type="button" aria-label="Tutup panel unggah">×</button>
-
-<div class="upload-analysis-title" style="
-font-size:13px;
-font-weight:600;
-margin-bottom:4px;
-color:#333;
-">
-📂 Upload Data Analisis
-</div>
-
-<input
-type="file"
-id="uploadFile"
-accept=".kml,.zip">
-
-<div class="upload-analysis-help" style="
-font-size:11px;
-color:#666;
-margin-top:4px;
-">
-Format: KML atau ZIP Shapefile
-</div>
+<div id="uploadBox" class="upload-analysis-box" role="dialog" aria-labelledby="uploadBoxTitle"><button id="closeUploadBox" class="upload-box-close" type="button" aria-label="Tutup panel unggah">×</button>
+<div id="uploadBoxTitle" class="upload-analysis-title">Unggah bidang untuk dianalisis</div>
+<label id="uploadDrop" class="st-dropzone" for="uploadFile">
+<i class="fas fa-upload" aria-hidden="true"></i>
+<span class="st-dropzone-main"><b>Pilih berkas</b><span class="st-drop-desktop"> atau seret ke sini</span></span>
+<span class="st-dropzone-sub">KML, atau ZIP Shapefile</span>
+<input type="file" id="uploadFile" accept=".kml,.zip">
+</label>
+<ul class="upload-analysis-help">
+<li>ZIP Shapefile wajib berisi berkas <b>.shp</b>, <b>.shx</b>, dan <b>.dbf</b>. Sertakan <b>.prj</b> agar sistem koordinat terbaca benar.</li>
+<li>Satu berkas boleh berisi banyak bidang; lebih dari satu bidang akan dibuka di mode Eksplorasi Bidang.</li>
+<li>Berkas diproses di perangkat Anda dan tidak dikirim ke server.</li>
+</ul>
 <div id="uploadProgress" class="upload-progress" role="status" aria-live="polite"><div class="upload-progress-head"><span id="uploadProgressText">Menyiapkan berkas…</span><span id="uploadProgressValue" class="upload-progress-value">0%</span></div><div id="uploadProgressTrack" class="upload-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="uploadProgressBar" class="upload-progress-bar"></div></div></div>
 
 </div>
@@ -377,18 +394,18 @@ Format: KML atau ZIP Shapefile
 window.map=L.map('map',{zoomControl:false,maxZoom:28,minZoom:1}).setView([-8.753883,116.853075],17);
 window.layer_OpenStreetMap_0=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{opacity:1,minZoom:1,maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(window.map);
 </script>
-        <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
-        <script src="data/RDTRMALUK_1.js"></script>
-        <script src="data/RDTRTALIWANG_2.js"></script>
-        <script src="data/RTRWSUMBAWABARAT20202040_3.js"></script>
-        <script src="data/LSD_Kabupaten_Sumbawa_Barat_4.js"></script>
-        <script src="data/LP2BSUMBAWABARAT_5.js"></script>
-        <script src="data/LBS_Kabupaten_Sumbawa_Barat_6.js"></script>
-        <script src="data/kawasan_hutan_sigap_ksb.js"></script>
-        <script src="data/pippib_2025_ntb.js"></script>
-        <script src="data/sigap_status.js"></script>
-        <script src="data/batas_kecamatan_ksb.js"></script>
-        <script src="data/jaringan_jalan_ksb.js"></script>
+        <script src="https://unpkg.com/@turf/turf@6/turf.min.js" onload="stDataLoaded('pustaka analisis')" onerror="stDataLoaded()"></script>
+        <script src="data/RDTRMALUK_1.js" onload="stDataLoaded('RDTR Maluk')" onerror="stDataLoaded()"></script>
+        <script src="data/RDTRTALIWANG_2.js" onload="stDataLoaded('RDTR Taliwang')" onerror="stDataLoaded()"></script>
+        <script src="data/RTRWSUMBAWABARAT20202040_3.js" onload="stDataLoaded('RTRW')" onerror="stDataLoaded()"></script>
+        <script src="data/LSD_Kabupaten_Sumbawa_Barat_4.js" onload="stDataLoaded('LSD')" onerror="stDataLoaded()"></script>
+        <script src="data/LP2BSUMBAWABARAT_5.js" onload="stDataLoaded('LP2B')" onerror="stDataLoaded()"></script>
+        <script src="data/LBS_Kabupaten_Sumbawa_Barat_6.js" onload="stDataLoaded('LBS')" onerror="stDataLoaded()"></script>
+        <script src="data/kawasan_hutan_sigap_ksb.js" onload="stDataLoaded('Kawasan Hutan')" onerror="stDataLoaded()"></script>
+        <script src="data/pippib_2025_ntb.js" onload="stDataLoaded('PIPPIB')" onerror="stDataLoaded()"></script>
+        <script src="data/sigap_status.js" onload="stDataLoaded('status SIGAP')" onerror="stDataLoaded()"></script>
+        <script src="data/batas_kecamatan_ksb.js" onload="stDataLoaded('batas kecamatan')" onerror="stDataLoaded()"></script>
+        <script src="data/jaringan_jalan_ksb.js" onload="stDataLoaded('jaringan jalan')" onerror="stDataLoaded()"></script>
         <script>
         var map = window.map;
         var hash = new L.Hash(map);
@@ -3751,8 +3768,8 @@ map.on('moveend zoomend resize',refreshAnalysisConnector);
   document.getElementById('smartSearchClose').addEventListener('click',close);modal.addEventListener('click',function(event){if(event.target===modal)close();});submit.addEventListener('click',run);input.addEventListener('keydown',function(event){if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();run();}});method.addEventListener('change',function(){var examples={auto:'Sistem mendeteksi format, urutan, dan sistem koordinat secara otomatis.',xy:'Contoh: 116.853075 -8.753883 atau 116,853075; -8,753883',latlng:'Contoh: -8.753883, 116.853075',utm:'Contoh EPSG:32750: X=448145,674 Y=9056566,657',dms:'Contoh: 8°45\'14"S 116°51\'11"E',maps:'Tempel URL lengkap atau tautan pendek maps.app.goo.gl.'};document.getElementById('smartSearchExample').textContent=examples[this.value];setState('');});
 })();
 </script>
-<link rel="stylesheet" href="css/sobat-ux.css?v=2">
-<script src="js/sobat-ux.js?v=2"></script>
+<link rel="stylesheet" href="css/sobat-ux.css?v=3">
+<script src="js/sobat-ux.js?v=3"></script>
 </body>
 
 
