@@ -48,3 +48,20 @@ Saat seluruh isi folder ini diunggah sebagai repositori GitHub:
   GeoJSON yang dimuat di belakang layar meskipun layer visual belum dicentang.
 - Perhitungan irisan memakai geometri vektor SIGAP skala 1:250.000. Raster hanya
   digunakan sebagai cadangan apabila data vektor gagal dimuat.
+
+## Sinkronisasi layer dari Bale Ruang NTB
+
+Layer RDTR Maluk, RDTR Taliwang, RTRW Sumbawa Barat, LSD, LP2B, LBS dan
+PIPPIB 2025 diambil langsung dari repositori Bale Ruang NTB
+(https://github.com/atrbpnproject/baleruangntb) dan disaring ke wilayah
+Kabupaten Sumbawa Barat. Geometri dipakai apa adanya, tanpa penyederhanaan.
+
+- GitHub Actions **Sinkronkan Bale Ruang** memeriksa Bale Ruang setiap 6 jam
+  dan hanya memperbarui data bila Bale Ruang berubah.
+- Workflow juga bisa dijalankan manual dari tab **Actions**, atau dipicu dari
+  Bale Ruang lewat `repository_dispatch` dengan tipe `baleruang-updated`.
+- Bila jumlah fitur suatu layer turun drastis (di bawah 30% data lama), data
+  lama dipertahankan dan alasannya dicatat di `data/baleruang_status.json`.
+- Sinkron manual di komputer: `python scripts/sync_baleruang.py`
+  (atau `--source "D:\DATA KSB\APLIKASI\BALE-RUANG-NTB-GITHUB"` untuk memakai
+  salinan lokal Bale Ruang).

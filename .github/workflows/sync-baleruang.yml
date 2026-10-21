@@ -1,0 +1,63 @@
+name: Sinkronkan Bale Ruang
+
+on:
+  schedule:
+    - cron: "47 */6 * * *"
+  workflow_dispatch:
+  # Bisa dipicu langsung dari repositori Bale Ruang setelah data diperbarui.
+  repository_dispatch:
+    types: [baleruang-updated]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-data
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ambil proyek
+        uses: actions/checkout@v4
+
+      - name: Siapkan Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cek versi terbaru Bale Ruang
+        id: ref
+        run: |
+          sha=$(git ls-remote https://github.com/atrbpnproject/baleruangntb HEAD | cut -f1)
+          last=$(python -c "import json;print(json.load(open('data/baleruang_status.json')).get('ref',''))" 2>/dev/null || true)
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          if [ "$sha" = "$last" ] && [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "Bale Ruang belum berubah sejak sinkronisasi terakhir ($sha)."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Ambil layer dari Bale Ruang
+        if: steps.ref.outputs.skip != 'true'
+        run: python scripts/sync_baleruang.py --ref "${{ steps.ref.outputs.sha }}"
+
+      - name: Simpan hasil sinkronisasi
+        if: steps.ref.outputs.skip != 'true'
+        run: |
+          git config user.name "sobat-taru-sync"
+          git config user.email "sobat-taru-sync@users.noreply.github.com"
+          git add data/RDTRMALUK_1.js data/RDTRTALIWANG_2.js \
+                  data/RTRWSUMBAWABARAT20202040_3.js \
+                  data/LSD_Kabupaten_Sumbawa_Barat_4.js \
+                  data/LP2BSUMBAWABARAT_5.js \
+                  data/LBS_Kabupaten_Sumbawa_Barat_6.js \
+                  data/pippib_2025_ntb.js data/pippib_2025_ntb.geojson \
+                  data/baleruang_status.json data/baleruang_status.js
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan data."
+          else
+            git commit -m "chore: sinkronkan layer dari Bale Ruang NTB"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi
