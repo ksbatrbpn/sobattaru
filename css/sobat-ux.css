@@ -211,6 +211,21 @@ body.st-layers-open .st-layer-open{display:none}
 .sobat-header .st-nav-btn.st-install-btn{order:9;background:rgba(255,255,255,.14)}
 .sobat-header .st-nav-btn.st-install-btn:hover{background:rgba(255,255,255,.24)}
 .st-install-phone{display:none}
+/* Bilah alat gambar poligon */
+.st-draw-bar{position:fixed;left:50%;bottom:22px;z-index:12500;display:flex;align-items:center;gap:14px;max-width:calc(100vw - 24px);padding:9px 10px 9px 16px;transform:translateX(-50%);border-radius:16px;background:var(--st-glass-strong);-webkit-backdrop-filter:var(--st-blur);backdrop-filter:var(--st-blur);box-shadow:var(--st-shadow)}
+.st-draw-bar[hidden]{display:none}
+.st-draw-info{display:flex;flex-direction:column;min-width:0}
+.st-draw-info b{font-size:13px;font-weight:600;color:var(--st-ink)}
+.st-draw-info span{color:var(--st-muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-draw-actions{display:flex;gap:6px;flex:0 0 auto}
+.st-draw-btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border:0;border-radius:10px;background:var(--st-fill);color:var(--st-ink);font:500 13px var(--st-font);cursor:pointer;white-space:nowrap}
+.st-draw-btn:hover:not(:disabled){background:var(--st-fill-strong)}
+.st-draw-btn.danger{color:var(--st-red)}
+.st-draw-btn.primary{background:var(--st-accent);color:#fff;font-weight:600}
+.st-draw-btn.primary:hover:not(:disabled){background:var(--st-green-700)}
+.st-draw-btn:disabled{opacity:.45;cursor:default}
+body.st-drawing .st-legend-wrap,body.st-drawing .st-status,body.st-drawing .st-hint,body.st-drawing .tutorial-coach{display:none!important}
+body.st-drawing .tool-toast{bottom:92px}
 .leaflet-control-scale-line{border-color:rgba(0,0,0,.55)!important;background:rgba(255,255,255,.8)!important;color:var(--st-ink)!important;font:500 11px var(--st-font)!important;border-radius:0 0 3px 3px}
 .leaflet-control-attribution{border-radius:7px 0 0 0;background:rgba(255,255,255,.78)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font:400 11px var(--st-font)!important;color:var(--st-muted)!important}
 .leaflet-control-attribution a,.sobat-about-link{color:var(--st-accent)!important}
@@ -620,6 +635,16 @@ body.st-result-open .tutorial-coach,body.st-layers-open .tutorial-coach{display:
   .leaflet-top{top:calc(var(--st-header-h) + 62px)!important}
   body.st-layers-open .leaflet-top.leaflet-left{left:0}
   .leaflet-control-zoom{display:none!important}
+  .st-draw-bar{left:8px;right:8px;bottom:calc(var(--st-nav-h) + 8px + env(safe-area-inset-bottom,0px));transform:none;flex-direction:column;align-items:stretch;gap:8px;padding:10px}
+  .st-draw-info{flex-direction:row;align-items:baseline;gap:8px}
+  .st-draw-info b{font-size:15px}
+  .st-draw-info span{font-size:13px}
+  .st-draw-actions{display:grid;grid-template-columns:44px minmax(0,1fr) minmax(0,1fr)}
+  .st-draw-btn{min-width:0;height:44px;justify-content:center;gap:5px;font-size:13.5px;padding:0 6px;overflow:hidden}
+  .st-draw-btn span{overflow:hidden;text-overflow:ellipsis}
+  .st-draw-long{display:none}
+  .st-draw-btn[data-st-draw="undo"] span{display:none}
+  body.st-drawing .tool-toast{top:calc(var(--st-header-h) + 62px);bottom:auto!important}
   .st-layer-open{display:none}
   .st-map-nav button{width:44px;height:44px;font-size:16px}
   .st-install-phone:not([hidden]){display:inline-flex;align-items:center;gap:6px;position:absolute;right:12px;top:calc(env(safe-area-inset-top,0px) + 9px);height:34px;padding:0 13px;border:0;border-radius:999px;background:#fff;color:var(--st-green-700);font:600 14px var(--st-font);box-shadow:0 1px 2px rgba(0,0,0,.18);cursor:pointer}
@@ -774,3 +799,69 @@ body.st-result-open .tutorial-coach,body.st-layers-open .tutorial-coach{display:
 /* Pilihan tabel koordinat PDF KKPR */
 .kkpr-table-pick{display:block;margin:0 0 5px;color:var(--st-muted);font-size:12px;font-weight:600}
 .kkpr-table-select{width:100%;height:36px;margin:0 0 10px;padding:0 10px;border:1px solid var(--st-line-strong);border-radius:8px;background:#fff;color:var(--st-ink);font:13px var(--st-font)}
+
+/* ---------- Pengaturan Cetak Peta (Cetak PDF seperti Bale Ruang NTB) ---------- */
+.print-setup-shell{position:fixed;inset:0;z-index:16500;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(8,30,26,.52);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.print-setup-shell.open{display:flex}
+.print-setup-dialog{width:min(1180px,96vw);height:min(790px,92vh);display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;border-radius:var(--st-radius);background:var(--st-card);box-shadow:var(--st-shadow)}
+.print-setup-head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 18px;border-bottom:.5px solid var(--st-line)}
+.print-setup-head h2{margin:0;color:var(--st-ink);font:600 17px var(--st-font-display)}
+.print-setup-head p{margin:3px 0 0;color:var(--st-muted);font-size:12px}
+.print-setup-close{flex:0 0 30px;width:30px;height:30px;border:0;border-radius:50%;background:var(--st-fill);color:var(--st-muted);font-size:18px;line-height:1;cursor:pointer}
+.print-setup-body{display:grid;grid-template-columns:minmax(0,1fr) 330px;min-height:0}
+.print-preview-wrap{min-width:0;padding:16px;border-right:.5px solid var(--st-line);background:var(--st-surface-2)}
+.print-preview-frame{position:relative;height:100%;min-height:420px;padding:26px 40px 30px;border:1px solid #b9c7c2;background:#fff}
+.print-preview-map{height:100%;min-height:360px;border:1px solid #4e6560;background:#dde7e3}
+.print-preview-note{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);color:var(--st-faint);font-size:10px;white-space:nowrap}
+.print-preview-scale{position:absolute;z-index:950;right:14px;top:14px;padding:6px 10px;border-radius:7px;background:rgba(255,255,255,.95);color:var(--st-green-700);font-size:11.5px;font-weight:600;box-shadow:var(--st-shadow-sm)}
+.print-preview-loading{position:absolute;z-index:1200;left:50%;top:50%;display:none;transform:translate(-50%,-50%);padding:8px 12px;border-radius:8px;background:rgba(11,59,53,.88);color:#fff;font-size:12px}
+.print-preview-loading.show{display:block}
+.print-preview-legend{position:absolute;z-index:1180;left:50px;bottom:40px;max-width:260px;padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.94);box-shadow:var(--st-shadow-sm);color:var(--st-ink);font-size:11px;line-height:1.3;pointer-events:none}
+.print-preview-legend b{display:block;margin-bottom:4px;font-size:11.5px}
+.print-preview-legend-row{display:flex;align-items:center;gap:6px;margin:3px 0}
+.print-preview-legend-row.pending{opacity:.55}
+.print-preview-legend-swatch{flex:0 0 15px;height:9px;border-radius:1px}
+.print-preview-legend-swatch.subject{background:rgba(255,0,140,.04);border:2px solid #ff008c}
+.print-setup-panel{min-height:0;overflow:auto;padding:16px}
+.print-setup-section{margin-bottom:16px}
+.print-setup-section h3{margin:0 0 7px;color:var(--st-ink);font-size:13px;font-weight:600}
+.print-base-select{width:100%;height:36px;padding:0 10px;border:0;border-radius:var(--st-radius-sm);background:var(--st-fill);color:var(--st-ink);font:400 13px var(--st-font)}
+.print-setup-hint{display:block;margin-top:6px;color:var(--st-muted);font-size:11.5px;line-height:1.4}
+.print-setup-hint[hidden]{display:none}
+.print-layer-fixed{padding:9px 11px;border-radius:var(--st-radius-sm);background:#fff3f8;color:#71314e;font-size:12px;line-height:1.4}
+.print-layer-fixed b{color:#d0006a;font-weight:600}
+.print-layer-list{margin-top:8px;overflow:auto;max-height:380px;border-radius:var(--st-radius-sm);box-shadow:0 0 0 .5px var(--st-line-strong)}
+.print-layer-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:9px 11px;border-bottom:.5px solid var(--st-line);background:#fff;cursor:pointer}
+.print-layer-row:last-child{border-bottom:0}
+.print-layer-row input{width:16px;height:16px;margin:1px 0 0;accent-color:var(--st-accent)}
+.print-layer-row strong{display:block;color:var(--st-ink);font-size:12.5px;font-weight:600;line-height:1.35}
+.print-layer-row small{display:block;margin-top:2px;color:var(--st-muted);font-size:11.5px}
+.print-layer-empty{padding:10px 12px;border:1px dashed var(--st-line-strong);border-radius:var(--st-radius-sm);color:var(--st-muted);font-size:12px;line-height:1.45}
+.print-page-hint{display:block;margin-top:8px;color:var(--st-muted);font-size:11.5px;line-height:1.45}
+.print-setup-status{padding:8px 10px;border-radius:var(--st-radius-sm);background:var(--st-green-50);color:var(--st-green-900);font-size:12px;line-height:1.45}
+.print-progress{height:6px;margin-top:8px;overflow:hidden;border-radius:999px;background:var(--st-fill-strong)}
+.print-progress[hidden]{display:none}
+.print-progress i{display:block;width:0;height:100%;border-radius:inherit;background:var(--st-accent);transition:width .2s ease}
+.print-setup-foot{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:.5px solid var(--st-line)}
+.print-setup-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:100px;height:36px;padding:0 15px;border:0;border-radius:var(--st-radius-sm);background:var(--st-fill);color:var(--st-ink);font:500 13px var(--st-font);cursor:pointer}
+.print-setup-btn.primary{background:var(--st-accent);color:#fff;font-weight:600}
+.print-setup-btn:disabled{opacity:.55;cursor:wait}
+@media (max-width:760px){
+  .print-setup-shell{padding:0;align-items:stretch}
+  .print-setup-dialog{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}
+  .print-setup-head{padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  .print-setup-head p{display:none}
+  .print-setup-body{grid-template-columns:1fr;grid-template-rows:minmax(300px,1fr) minmax(0,42%)}
+  .print-preview-wrap{padding:8px;border-right:0;border-bottom:.5px solid var(--st-line)}
+  .print-preview-frame{min-height:280px;padding:18px 22px 22px}
+  .print-preview-map{min-height:240px}
+  .print-preview-legend{display:none}
+  .print-preview-note{display:none}
+  .print-setup-panel{padding:12px}
+  .print-layer-list{max-height:none}
+  .print-base-select{height:44px;font-size:15px}
+  .print-layer-row strong{font-size:14px}
+  .print-layer-row small,.print-setup-hint,.print-page-hint,.print-setup-status{font-size:13px}
+  .print-setup-foot{padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px))}
+  .print-setup-btn{flex:1;height:46px;font-size:15px}
+}
