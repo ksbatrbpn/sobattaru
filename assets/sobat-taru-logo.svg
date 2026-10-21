@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Logo SOBAT TARU">
+<defs><clipPath id="stPin"><path d="M64 114 L35.2 68.1 A34 34 0 1 1 92.8 68.1 Z"/></clipPath></defs>
+<rect width="128" height="128" rx="29" fill="#fff"/>
+<rect x="1" y="1" width="126" height="126" rx="28" fill="none" stroke="#dfe9e5" stroke-width="2"/>
+<g clip-path="url(#stPin)">
+<rect x="20" y="10" width="44" height="40" fill="#8cc63f"/><rect x="64" y="10" width="44" height="40" fill="#fbbc17"/>
+<rect x="20" y="50" width="44" height="70" fill="#0391e3"/><rect x="64" y="50" width="44" height="70" fill="#0f7a63"/>
+<path d="M64 0 V128 M0 50 H128" stroke="#fff" stroke-width="5"/>
+</g>
+<circle cx="64" cy="50" r="11" fill="#fff"/><circle cx="64" cy="50" r="5" fill="#042b52"/>
+</svg>

@@ -10,7 +10,9 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <link rel="icon" href="data:,">
+        <link rel="icon" type="image/svg+xml" href="assets/sobat-taru-logo.svg">
+        <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+        <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
         <link rel="stylesheet" href="css/leaflet.css">
         <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
         <link rel="stylesheet" href="css/L.Control.Locate.min.css">
@@ -263,8 +265,24 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
     <body>
         <div id="stLoader" class="st-splash" role="status" aria-live="polite" aria-label="Memuat SOBAT TARU">
           <div class="st-splash-inner">
-            <div class="st-splash-logo"><span class="st-splash-ring" aria-hidden="true"></span><img src="assets/sobat-taru-logo.png" alt="" width="84" height="84"></div>
-            <div class="st-splash-title">SOBAT TARU</div>
+            <div class="st-splash-logo" aria-hidden="true">
+              <span class="st-splash-pulse"></span><span class="st-splash-pulse st-splash-pulse2"></span>
+              <svg class="st-splash-mark" viewBox="0 0 128 128">
+                <defs><clipPath id="stSplashPin"><path d="M64 114 L35.2 68.1 A34 34 0 1 1 92.8 68.1 Z"/></clipPath></defs>
+                <rect class="st-sm-tile" width="128" height="128" rx="29" fill="#fff"/>
+                <g clip-path="url(#stSplashPin)">
+                  <rect class="st-sm-q st-sm-q1" x="20" y="10" width="44" height="40" fill="#8cc63f"/>
+                  <rect class="st-sm-q st-sm-q2" x="64" y="10" width="44" height="40" fill="#fbbc17"/>
+                  <rect class="st-sm-q st-sm-q3" x="20" y="50" width="44" height="70" fill="#0391e3"/>
+                  <rect class="st-sm-q st-sm-q4" x="64" y="50" width="44" height="70" fill="#0f7a63"/>
+                  <path class="st-sm-line" d="M64 0 V128" stroke="#fff" stroke-width="5"/>
+                  <path class="st-sm-line st-sm-line2" d="M0 50 H128" stroke="#fff" stroke-width="5"/>
+                </g>
+                <circle class="st-sm-ping" cx="64" cy="50" r="11" fill="none" stroke="#fff" stroke-width="3"/>
+                <g class="st-sm-dot"><circle cx="64" cy="50" r="11" fill="#fff"/><circle cx="64" cy="50" r="5" fill="#042b52"/></g>
+              </svg>
+            </div>
+            <div class="st-splash-title"><span>SOBAT</span> <span>TARU</span></div>
             <div class="st-splash-sub">Sumbawa Barat dalam Tata Ruang</div>
             <div class="st-splash-progress"><div class="st-splash-track"><div id="stLoaderBar" class="st-splash-bar"></div></div><span id="stLoaderPct" class="st-splash-pct">0%</span></div>
             <div id="stLoaderText" class="st-splash-text">Menyiapkan peta…</div>
@@ -311,7 +329,7 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
 
 <header class="sobat-header">
   <div class="sobat-brand">
-    <div class="sobat-logo"><img src="assets/sobat-taru-logo.png" alt="Logo SOBAT TARU"></div>
+    <div class="sobat-logo"><img src="assets/sobat-taru-logo.svg" alt="Logo SOBAT TARU"></div>
     <div class="sobat-copy"><div class="sobat-name">SOBAT TARU</div><div class="sobat-tagline">Sumbawa Barat dalam Tata Ruang</div></div>
   </div>
   <form id="stSearch" class="st-search" role="search" autocomplete="off"><i class="fas fa-search st-search-icon" aria-hidden="true"></i><input id="stSearchInput" type="search" inputmode="text" placeholder="Cari koordinat, UTM 50S, atau tempel tautan Maps" aria-label="Cari koordinat, UTM 50S, atau tautan Google Maps"><button id="stSearchLocate" class="st-search-btn" type="button" title="Lokasi saya" aria-label="Tampilkan lokasi saya"><i class="fas fa-crosshairs" aria-hidden="true"></i></button><button id="stSearchAdvanced" class="st-search-btn" type="button" title="Pilih format koordinat" aria-label="Pilih format koordinat"><i class="fas fa-sliders-h" aria-hidden="true"></i></button></form><nav class="header-actions st-nav" aria-label="Menu utama"><button id="stNavLayers" class="st-nav-btn" type="button" title="Layer tata ruang" aria-controls="stLayerPanel"><svg class="st-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 1 7.5l11 5.5 11-5.5L12 2zm0 13.2L3.4 10.9 1 12.1l11 5.5 11-5.5-2.4-1.2L12 15.2zm0 4.5-8.6-4.3L1 16.6 12 22l11-5.4-2.4-1.2L12 19.7z"/></svg><span>Layer</span></button><button id="stNavTools" class="st-nav-btn" type="button" title="Alat ukur dan konversi" aria-haspopup="true" aria-expanded="false"><i class="fas fa-wrench" aria-hidden="true"></i><span>Alat</span></button><button id="stNavUpload" class="st-nav-btn st-nav-primary" type="button" title="Unggah SHP/KML untuk dianalisis"><i class="fas fa-upload" aria-hidden="true"></i><span>Unggah SHP/KML</span></button><button id="openTutorial" class="st-nav-btn" type="button" title="Panduan penggunaan" aria-label="Panduan penggunaan"><i class="fas fa-book-open" aria-hidden="true"></i><span>Panduan</span></button><button id="stNavAbout" class="st-nav-btn" type="button" title="Informasi dan tentang aplikasi"><i class="fas fa-info-circle" aria-hidden="true"></i><span>Tentang</span></button><div id="basemapPicker" class="basemap-picker"><button id="basemapTrigger" class="basemap-trigger" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="basemapMenu"><i class="fas fa-map" aria-hidden="true"></i><span id="basemapCurrent" class="basemap-current">Google Hybrid</span><i class="fas fa-chevron-down" aria-hidden="true"></i></button><div id="basemapMenu" class="basemap-menu" role="menu"><button class="basemap-option active" type="button" role="menuitemradio" aria-checked="true" data-basemap-option="hybrid"><i class="fas fa-map" aria-hidden="true"></i><span>Google Hybrid</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button><button class="basemap-option" type="button" role="menuitemradio" aria-checked="false" data-basemap-option="satellite"><i class="fas fa-image" aria-hidden="true"></i><span>Google Satelit</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button><button class="basemap-option" type="button" role="menuitemradio" aria-checked="false" data-basemap-option="road"><i class="fas fa-road" aria-hidden="true"></i><span>Google Road</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button><button class="basemap-option" type="button" role="menuitemradio" aria-checked="false" data-basemap-option="osm"><i class="fas fa-globe" aria-hidden="true"></i><span>OpenStreetMap</span><i class="fas fa-check basemap-check" aria-hidden="true"></i></button></div></div></nav>
@@ -363,7 +381,7 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
 
 <div id="aboutSobatModal" class="data-info-backdrop" role="dialog" aria-modal="true" aria-labelledby="aboutSobatTitle">
   <div class="data-info-dialog about-sobat-dialog"><div class="data-info-head"><h2 id="aboutSobatTitle">Tentang SOBAT TARU</h2><p>Informasi pengembangan WebGIS</p><button id="closeAboutSobat" class="data-info-close" type="button" aria-label="Tutup informasi">×</button></div><div class="data-info-body">
-    <div class="about-sobat-intro"><img class="about-sobat-logo" src="assets/sobat-taru-logo.png" alt="Logo SOBAT TARU"><p class="about-sobat-name">WebGIS SOBAT TARU Kabupaten Sumbawa Barat</p></div>
+    <div class="about-sobat-intro"><img class="about-sobat-logo" src="assets/sobat-taru-logo.svg" alt="Logo SOBAT TARU"><p class="about-sobat-name">WebGIS SOBAT TARU Kabupaten Sumbawa Barat</p></div>
     <p class="about-sobat-description">SOBAT TARU merupakan media informasi tata ruang dan peta tematik yang dikembangkan untuk mendukung proses pelayanan pertanahan di Kabupaten Sumbawa Barat melalui penyajian informasi spasial secara cepat, mudah, dan terpadu.</p>
 <dl class="about-sobat-list"><div class="about-sobat-row"><dt>Inisiator &amp; Konseptor</dt><dd>Ferdian Setyo Wibowo</dd></div><div class="about-sobat-row"><dt>Pengembang Teknis</dt><dd>I Made Arjita</dd></div><div class="about-sobat-row"><dt>Versi</dt><dd>1.5</dd></div><div class="about-sobat-row"><dt>Terakhir Diperbarui</dt><dd>29 Juli 2026</dd></div></dl>
   </div></div>

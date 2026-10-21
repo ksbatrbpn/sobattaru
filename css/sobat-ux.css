@@ -56,24 +56,54 @@ button,input,select,textarea{font-size:inherit}
 ::selection{background:rgba(15,122,99,.22)}
 
 /* ---------- Splash ---------- */
-.st-splash{position:fixed;inset:0;z-index:20000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;
-  background:radial-gradient(120% 80% at 50% 30%,#13836b 0%,#0d6655 45%,#082d28 100%);color:#fff;transition:opacity .55s ease,visibility .55s}
-.st-splash.done{opacity:0;visibility:hidden;pointer-events:none}
+/* Logo dirakit dari empat petak pola ruang, lalu titik lokasi memancarkan sinyal selama data dimuat. */
+.st-splash{position:fixed;inset:0;z-index:20000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow:hidden;
+  background:radial-gradient(120% 80% at 50% 32%,#13836b 0%,#0d6655 45%,#082d28 100%);color:#fff;transition:opacity .6s ease,visibility .6s,transform .6s cubic-bezier(.4,0,.2,1)}
+/* Grid peta samar yang bergeser pelan. */
+.st-splash:before{content:"";position:absolute;inset:-48px;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:48px 48px;
+  -webkit-mask-image:radial-gradient(60% 55% at 50% 42%,#000 0%,transparent 100%);mask-image:radial-gradient(60% 55% at 50% 42%,#000 0%,transparent 100%);
+  animation:stGridDrift 14s linear infinite}
+.st-splash.done{opacity:0;visibility:hidden;pointer-events:none;transform:scale(1.04)}
 .st-splash[hidden]{display:none}
-.st-splash-inner{display:flex;flex-direction:column;align-items:center;width:min(300px,100%);animation:stSplashIn .7s cubic-bezier(.2,.8,.2,1) both}
-.st-splash-logo{position:relative;width:104px;height:104px;display:grid;place-items:center;margin-bottom:22px}
-.st-splash-logo img{position:relative;width:84px;height:84px;padding:6px;border-radius:22px;background:#fff;object-fit:contain;box-shadow:0 12px 40px rgba(0,0,0,.28);animation:stBreathe 2.4s ease-in-out infinite}
-.st-splash-ring{position:absolute;inset:0;border-radius:30px;border:2px solid rgba(255,255,255,.18);border-top-color:#f4c56b;animation:stSpin 1.4s linear infinite}
-.st-splash-title{font:600 24px/1.1 var(--st-font-display);letter-spacing:.4px}
-.st-splash-sub{margin-top:6px;font-size:13.5px;color:rgba(255,255,255,.78)}
-.st-splash-progress{display:flex;align-items:center;gap:10px;width:100%;margin-top:30px}
-.st-splash-track{flex:1;height:6px;border-radius:999px;background:rgba(255,255,255,.18);overflow:hidden}
-.st-splash-bar{width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#f4c56b,#fff);box-shadow:0 0 12px rgba(255,255,255,.5)}
+.st-splash-inner{position:relative;display:flex;flex-direction:column;align-items:center;width:min(300px,100%)}
+.st-splash-logo{position:relative;width:112px;height:112px;margin-bottom:24px;animation:stFloat 3.2s ease-in-out 1.6s infinite}
+.st-splash-pulse{position:absolute;inset:0;border-radius:29%;border:2px solid rgba(251,188,23,.7);opacity:0;animation:stRipple 2.4s cubic-bezier(.2,.6,.3,1) 1.5s infinite}
+.st-splash-pulse2{animation-delay:2.7s}
+.st-splash-mark{position:relative;width:100%;height:100%;overflow:visible;display:block;filter:drop-shadow(0 14px 34px rgba(0,0,0,.32))}
+.st-splash-mark *{transform-box:fill-box;transform-origin:center}
+.st-sm-tile{animation:stTileIn .6s cubic-bezier(.2,.9,.3,1.15) both}
+.st-sm-q{animation:stQuadIn .6s cubic-bezier(.2,.9,.3,1.2) both}
+.st-sm-q1{--dx:-18px;--dy:-18px;animation-delay:.3s}
+.st-sm-q2{--dx:18px;--dy:-18px;animation-delay:.42s}
+.st-sm-q3{--dx:-18px;--dy:18px;animation-delay:.54s}
+.st-sm-q4{--dx:18px;--dy:18px;animation-delay:.66s}
+.st-sm-line{stroke-dasharray:128;animation:stDraw .5s ease-out .85s both}
+.st-sm-line2{animation-delay:.95s}
+.st-sm-dot{animation:stPop .5s cubic-bezier(.2,.9,.3,1.5) 1.1s both}
+.st-sm-ping{opacity:0;animation:stPing 1.8s cubic-bezier(.2,.6,.3,1) 1.5s infinite}
+.st-splash-title{font:700 26px/1.1 var(--st-font-display);letter-spacing:.06em;animation:stTrack .9s cubic-bezier(.2,.8,.2,1) 1s both}
+.st-splash-title span:last-child{color:#fbbc17}
+.st-splash-sub{margin-top:8px;font-size:13.5px;color:rgba(255,255,255,.78);animation:stRise .6s ease-out 1.25s both}
+.st-splash-progress{display:flex;align-items:center;gap:10px;width:100%;margin-top:30px;animation:stRise .6s ease-out 1.4s both}
+.st-splash-track{position:relative;flex:1;height:6px;border-radius:999px;background:rgba(255,255,255,.16);overflow:hidden}
+.st-splash-bar{position:relative;width:0;height:100%;border-radius:inherit;overflow:hidden;
+  background:linear-gradient(90deg,#8cc63f 0%,#fbbc17 40%,#0391e3 75%,#ffffff 100%);background-size:300px 100%;box-shadow:0 0 12px rgba(251,188,23,.45)}
+.st-splash-bar:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-100%);animation:stShine 1.6s ease-in-out infinite}
 .st-splash-pct{min-width:36px;text-align:right;font:500 12.5px var(--st-font);font-variant-numeric:tabular-nums;color:rgba(255,255,255,.9)}
-.st-splash-text{min-height:18px;margin-top:10px;font-size:12.5px;color:rgba(255,255,255,.72)}
-.st-splash-foot{position:absolute;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;font-size:12px;color:rgba(255,255,255,.55)}
-@keyframes stSplashIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
-@keyframes stBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+.st-splash-text{min-height:18px;margin-top:10px;font-size:12.5px;color:rgba(255,255,255,.72);animation:stRise .6s ease-out 1.5s both}
+.st-splash-foot{position:absolute;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;font-size:12px;color:rgba(255,255,255,.55);animation:stRise .6s ease-out 1.6s both}
+@keyframes stTileIn{from{opacity:0;transform:scale(.55) rotate(-8deg)}to{opacity:1;transform:none}}
+@keyframes stQuadIn{from{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.7)}to{opacity:1;transform:none}}
+@keyframes stDraw{from{stroke-dashoffset:128}to{stroke-dashoffset:0}}
+@keyframes stPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:none}}
+@keyframes stPing{0%{opacity:.95;transform:scale(1)}100%{opacity:0;transform:scale(3.4)}}
+@keyframes stRipple{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.9)}}
+@keyframes stFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes stTrack{from{opacity:0;letter-spacing:.5em;filter:blur(6px)}to{opacity:1;letter-spacing:.06em;filter:none}}
+@keyframes stRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes stShine{to{transform:translateX(100%)}}
+@keyframes stGridDrift{to{transform:translate(48px,48px)}}
 
 /* ---------- Header ---------- */
 .sobat-header{
@@ -88,8 +118,9 @@ button,input,select,textarea{font-size:inherit}
   box-shadow:0 .5px 0 rgba(0,0,0,.25),0 4px 18px rgba(6,40,35,.18)!important;
 }
 .sobat-header .sobat-brand{gap:10px!important;min-width:0}
-.sobat-header .sobat-logo{flex:0 0 auto;width:36px!important;height:36px!important;padding:2px!important;border-radius:9px!important;box-shadow:0 1px 3px rgba(0,0,0,.25)}
-.sobat-header .sobat-logo img{width:100%!important;height:100%!important;object-fit:contain!important;border-radius:7px!important}
+.sobat-header .sobat-logo{flex:0 0 auto;width:36px!important;height:36px!important;padding:0!important;background:transparent!important;border-radius:9px!important;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sobat-header .sobat-logo img{width:100%!important;height:100%!important;object-fit:contain!important;border-radius:0!important}
+.about-sobat-logo{padding:0!important;border:0!important;background:transparent!important;border-radius:0!important;filter:drop-shadow(0 2px 6px rgba(8,48,41,.14))}
 .sobat-header .sobat-copy{min-width:0}
 .sobat-header .sobat-name{font:600 15px/1.15 var(--st-font-display)!important;letter-spacing:-.1px;white-space:nowrap}
 .sobat-header .sobat-tagline{font-size:11.5px!important;font-weight:400!important;letter-spacing:0!important;text-transform:none!important;opacity:.78;white-space:nowrap}
@@ -625,7 +656,8 @@ body.st-result-open .tutorial-coach,body.st-layers-open .tutorial-coach{display:
 
 @media (prefers-reduced-motion:reduce){
   .st-layer-panel,.leaflet-top.leaflet-left,.st-panel,.st-legend-wrap,.st-toast,.st-splash{transition:none!important}
-  .st-splash-ring,.st-splash-logo img,.st-splash-inner{animation:none!important}
+  .st-splash *,.st-splash:before{animation:none!important}
+  .st-sm-ping,.st-splash-pulse{display:none}
 }
 /* Peramban tanpa backdrop-filter: panel dibuat hampir pekat agar teks tetap terbaca. */
 @supports not ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
