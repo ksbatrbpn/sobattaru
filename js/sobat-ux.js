@@ -6,10 +6,7 @@
  */
 (function(){
   'use strict';
-  function hideLoader(){
-    var loader=document.getElementById('stLoader');if(!loader||loader.classList.contains('done'))return;
-    loader.classList.add('done');setTimeout(function(){loader.hidden=true;},350);
-  }
+  function hideLoader(){if(typeof window.stSplashDone==='function')window.stSplashDone();}
   if(!window.L||!window.map){hideLoader();return;}
 
   var phoneQuery=window.matchMedia('(max-width:760px)');
@@ -23,18 +20,15 @@
   /* ---------- Struktur DOM baru ---------- */
   var layerPanel=append(
     '<aside id="stLayerPanel" class="st-panel st-layer-panel" aria-label="Layer Tata Ruang" hidden>'+
-      '<div class="st-panel-head"><div><h2>'+layersIcon+'Layer Tata Ruang</h2>'+
-      '<p>Nyalakan layer untuk menampilkannya di peta. Ketuk peta untuk memeriksa satu titik.</p></div>'+
+      '<div class="st-panel-head"><div><h2>'+layersIcon+'Layer Tata Ruang</h2></div>'+
       '<button class="st-close" type="button" data-st-close="layers" aria-label="Tutup panel layer">&times;</button></div>'+
       '<div class="st-panel-body">'+
         '<div class="st-section-label">Peta dasar</div>'+
         '<div id="stBasemapSegment" class="st-segment" role="radiogroup" aria-label="Peta dasar"></div>'+
         '<div class="st-section-label"><label for="stOpacity">Ketebalan warna layer</label><output id="stOpacityValue" for="stOpacity">75%</output></div>'+
-        '<div class="st-range-row"><i class="fas fa-adjust" aria-hidden="true"></i><input id="stOpacity" class="st-range" type="range" min="20" max="100" step="5" value="75" aria-describedby="stOpacityHelp"></div>'+
-        '<p id="stOpacityHelp" class="st-range-help">Turunkan agar citra satelit di bawah RTRW, RDTR, LP2B, LSD, dan LBS tetap terlihat.</p>'+
-        '<div class="st-section-label"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>Kabupaten Sumbawa Barat</div>'+
+        '<div class="st-range-row"><i class="fas fa-adjust" aria-hidden="true"></i><input id="stOpacity" class="st-range" type="range" min="20" max="100" step="5" value="75" title="Turunkan agar citra satelit di bawah RTRW, RDTR, LP2B, LSD, dan LBS tetap terlihat"></div>'+
+        '<div class="st-section-label">Data Kabupaten Sumbawa Barat</div>'+
         '<div id="stLayerTreeSlot"></div>'+
-        '<div class="st-layer-foot">Data RTRW, RDTR, LSD, LP2B, LBS, dan PIPPIB disinkronkan otomatis dari <b>Bale Ruang NTB</b>. Analisis memakai seluruh data meskipun layer tidak ditampilkan.</div>'+
       '</div>'+
     '</aside>');
 

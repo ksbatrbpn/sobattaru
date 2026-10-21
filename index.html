@@ -258,29 +258,49 @@ body.explorer-mode #analysisPanel{right:72px!important;top:92px!important;max-wi
 #analysisPanel .analysis-panel-head .panel-close:hover{background:#f4f8f7!important}
 .field-analysis-loading{display:flex;align-items:flex-start;gap:10px;margin:0 0 10px;padding:11px 12px;border:1px solid #cfe1db;border-radius:10px;background:#f4faf8;color:#315b52;font-size:11px;line-height:1.45}.field-analysis-loading i{flex:0 0 18px;width:18px;height:18px;border:2px solid #b8d8d0;border-top-color:#0d806a;border-radius:50%;animation:fieldAnalysisSpin .8s linear infinite}.field-analysis-loading b{display:block;margin-bottom:2px;color:#0d6655;font-size:12px}@keyframes fieldAnalysisSpin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.field-analysis-loading i{animation:none;border-top-color:#b8d8d0}}
 </style>
+        <link rel="stylesheet" href="css/sobat-ux.css?v=4">
 </head>
     <body>
-        <div id="stLoader" class="st-loader" role="status" aria-live="polite">
-          <div class="st-loader-card">
-            <img src="assets/sobat-taru-logo.png" alt="" width="56" height="56">
-            <div class="st-loader-title">SOBAT TARU</div>
-            <div id="stLoaderText" class="st-loader-text">Memuat data tata ruang…</div>
-            <div class="st-loader-track"><div id="stLoaderBar" class="st-loader-bar"></div></div>
-            <div class="st-loader-note">Pemuatan pertama bisa memakan waktu di jaringan seluler.</div>
+        <div id="stLoader" class="st-splash" role="status" aria-live="polite" aria-label="Memuat SOBAT TARU">
+          <div class="st-splash-inner">
+            <div class="st-splash-logo"><span class="st-splash-ring" aria-hidden="true"></span><img src="assets/sobat-taru-logo.png" alt="" width="84" height="84"></div>
+            <div class="st-splash-title">SOBAT TARU</div>
+            <div class="st-splash-sub">Sumbawa Barat dalam Tata Ruang</div>
+            <div class="st-splash-progress"><div class="st-splash-track"><div id="stLoaderBar" class="st-splash-bar"></div></div><span id="stLoaderPct" class="st-splash-pct">0%</span></div>
+            <div id="stLoaderText" class="st-splash-text">Menyiapkan peta…</div>
           </div>
+          <div class="st-splash-foot">WebGIS Informasi Ruang Kabupaten Sumbawa Barat</div>
         </div>
         <script>
         window.__stInitialHash=location.hash;
         (function(){
-          var total=12,done=0;
-          window.stDataLoaded=function(name){
-            done++;
-            var bar=document.getElementById('stLoaderBar'),text=document.getElementById('stLoaderText');
-            if(bar)bar.style.width=Math.min(100,Math.round(done/total*100))+'%';
-            if(text)text.textContent='Memuat data tata ruang… '+Math.min(done,total)+' dari '+total+(name?' ('+name+')':'');
+          // Bobot kira-kira ukuran tiap berkas (MB) agar bilah progres bergerak sebanding dengan unduhan.
+          var steps=[['pustaka analisis',.6],['RDTR Maluk',38.8],['RDTR Taliwang',8.4],['RTRW',12.7],['LSD',4.1],['LP2B',3.6],['LBS',6],['Kawasan Hutan',2],['PIPPIB',.6],['status SIGAP',.1],['batas kecamatan',1],['jaringan jalan',.8]];
+          var total=steps.reduce(function(sum,step){return sum+step[1];},0)+2;
+          var index=0,done=0,shown=0,finished=false;
+          function label(){return index<steps.length?'Memuat '+steps[index][0]+'…':'Menyiapkan tampilan…';}
+          function paint(){
+            var bar=document.getElementById('stLoaderBar'),pct=document.getElementById('stLoaderPct'),text=document.getElementById('stLoaderText');
+            if(bar)bar.style.width=shown.toFixed(1)+'%';
+            if(pct)pct.textContent=Math.floor(shown)+'%';
+            if(text&&!finished)text.textContent=label();
+          }
+          // Bilah bergerak pelan menuju akhir berkas yang sedang dimuat, lalu melompat saat berkas selesai.
+          var timer=setInterval(function(){
+            var next=index<steps.length?steps[index][1]:2;
+            var cap=finished?100:Math.min(99,(done+next*0.92)/total*100);
+            shown+=(cap-shown)*(finished?0.35:0.06);
+            if(finished&&shown>99.5){shown=100;clearInterval(timer);}
+            paint();
+          },80);
+          window.stDataLoaded=function(){if(index<steps.length){done+=steps[index][1];index++;}};
+          window.stSplashDone=function(){
+            if(finished)return;finished=true;
+            var text=document.getElementById('stLoaderText');if(text)text.textContent='Siap';
+            setTimeout(function(){var splash=document.getElementById('stLoader');if(!splash)return;splash.classList.add('done');setTimeout(function(){splash.hidden=true;},600);},450);
           };
-          // Cadangan bila skrip antarmuka gagal dimuat: jangan biarkan layar muat menutup peta.
-          window.addEventListener('load',function(){setTimeout(function(){var loader=document.getElementById('stLoader');if(loader&&!loader.classList.contains('done')){loader.classList.add('done');setTimeout(function(){loader.hidden=true;},350);}},2500);});
+          // Cadangan bila skrip antarmuka gagal dimuat: jangan biarkan splash menutup peta.
+          window.addEventListener('load',function(){setTimeout(window.stSplashDone,2500);});
         })();
         </script>
         <div id="map">
@@ -3768,8 +3788,7 @@ map.on('moveend zoomend resize',refreshAnalysisConnector);
   document.getElementById('smartSearchClose').addEventListener('click',close);modal.addEventListener('click',function(event){if(event.target===modal)close();});submit.addEventListener('click',run);input.addEventListener('keydown',function(event){if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();run();}});method.addEventListener('change',function(){var examples={auto:'Sistem mendeteksi format, urutan, dan sistem koordinat secara otomatis.',xy:'Contoh: 116.853075 -8.753883 atau 116,853075; -8,753883',latlng:'Contoh: -8.753883, 116.853075',utm:'Contoh EPSG:32750: X=448145,674 Y=9056566,657',dms:'Contoh: 8°45\'14"S 116°51\'11"E',maps:'Tempel URL lengkap atau tautan pendek maps.app.goo.gl.'};document.getElementById('smartSearchExample').textContent=examples[this.value];setState('');});
 })();
 </script>
-<link rel="stylesheet" href="css/sobat-ux.css?v=3">
-<script src="js/sobat-ux.js?v=3"></script>
+<script src="js/sobat-ux.js?v=4"></script>
 </body>
 
 
