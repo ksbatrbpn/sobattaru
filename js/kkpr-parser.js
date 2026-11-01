@@ -27,7 +27,9 @@
       if(!pair)for(var r=0;r<values.length-1;r++)if(validPair(values[r+1],values[r])){pair=[values[r+1],values[r]];no=r>0?values[r-1]:rows.length+1;break}
       if(pair)rows.push({no:no,x:pair[0],y:pair[1],source:lines[n]});
     }
-    var unique=[],seen=Object.create(null);rows.forEach(function(row){var key=row.x.toFixed(4)+'|'+row.y.toFixed(4);if(!seen[key]){seen[key]=true;unique.push(row)}});
+    // Jangan buang titik berdasarkan koordinat yang dibulatkan: titik penutup bagian poligon memang berulang, dan titik
+    // yang berdekatan (< 10 m) tetap titik sah. Yang dibuang hanya baris kembar persis (nomor dan koordinat sama).
+    var unique=[],seen=Object.create(null);rows.forEach(function(row){var key=row.no+'|'+row.x+'|'+row.y;if(!seen[key]){seen[key]=true;unique.push(row)}});
     if(unique.length<3)throw new Error('Koordinat disetujui kurang dari tiga titik atau tabel tidak terbaca.');
     var allText=normalized.join(' '),crs=/32750|ZONA\s*50\s*(SELATAN|S\b)|UTM\s*50\s*S/.test(allText)?'EPSG:32750':(unique[0].x>=95&&unique[0].x<=145&&unique[0].y>=-15&&unique[0].y<=5?'EPSG:4326':'UNKNOWN');
     if(crs==='UNKNOWN')throw new Error('Sistem koordinat belum dapat dikenali.');
@@ -46,6 +48,17 @@
     if(!tables.length)throw new Error('Tidak ditemukan lampiran/tabel koordinat yang memiliki minimal tiga titik.');
     return tables;
   }
-  function toFeature(result){var coordinates=result.rows.map(function(row){return result.crs==='EPSG:32750'?utm50SToLonLat(row.x,row.y):[row.x,row.y]});if(coordinates[0][0]!==coordinates[coordinates.length-1][0]||coordinates[0][1]!==coordinates[coordinates.length-1][1])coordinates.push(coordinates[0].slice());return{type:'Feature',properties:{nama:'Koordinat Disetujui KKPR',sumber:'PDF KKPR',crs_asal:result.crs,jumlah_titik:result.rows.length,tabel_asal:result.section||''},geometry:{type:'Polygon',coordinates:[coordinates]}}}
-  root.LontarKkprParser={parseLines:parseLines,parseTables:parseTables,utm50SToLonLat:utm50SToLonLat,toFeature:toFeature};
+  // OSS menulis bidang yang terdiri dari beberapa bagian (mis. per peruntukan) sebagai satu tabel: setiap bagian
+  // ditutup dengan mengulang titik awalnya, lalu bagian berikutnya dimulai. Pisahkan menjadi cincin tersendiri agar
+  // poligon tidak saling silang.
+  function samePoint(a,b){return Math.abs(a[0]-b[0])<1e-9&&Math.abs(a[1]-b[1])<1e-9}
+  function splitRings(coordinates){var rings=[],current=[];coordinates.forEach(function(point){if(current.length>=3&&samePoint(point,current[0])){current.push(point);rings.push(current);current=[]}else current.push(point)});if(current.length>=3){current.push(current[0].slice());rings.push(current)}else if(current.length&&rings.length===0){current.push(current[0].slice());rings.push(current)}return rings}
+  function ringIndexes(rows,coordinates){var out=[],current=0,start=null,count=0;coordinates.forEach(function(point,index){if(start&&count>=3&&samePoint(point,start)){out.push(current);current++;start=null;count=0;return}if(!start)start=point;count++;out.push(current)});return out}
+  function pointInRing(point,ring){var inside=false;for(var i=0,j=ring.length-1;i<ring.length;j=i++){var a=ring[i],b=ring[j];if((a[1]>point[1])!==(b[1]>point[1])&&point[0]<(b[0]-a[0])*(point[1]-a[1])/(b[1]-a[1])+a[0])inside=!inside}return inside}
+  function strictlyInside(inner,outer){var hits=0,total=0;inner.slice(0,-1).forEach(function(p){if(outer.some(function(q){return samePoint(p,q)}))return;total++;if(pointInRing(p,outer))hits++});return total>0&&hits===total}
+  function toFeature(result){var coordinates=result.rows.map(function(row){return result.crs==='EPSG:32750'?utm50SToLonLat(row.x,row.y):[row.x,row.y]}),rings=splitRings(coordinates),polygons=[];
+    rings.forEach(function(ring,index){var host=-1;polygons.forEach(function(poly,p){if(host<0&&strictlyInside(ring,poly[0]))host=p});if(host>=0)polygons[host].push(ring);else polygons.push([ring])});
+    var geometry=polygons.length===1?{type:'Polygon',coordinates:polygons[0]}:{type:'MultiPolygon',coordinates:polygons};
+    return{type:'Feature',properties:{nama:'Koordinat Disetujui KKPR',sumber:'PDF KKPR',crs_asal:result.crs,jumlah_titik:result.rows.length,jumlah_bagian:rings.length,tabel_asal:result.section||''},geometry:geometry}}
+  root.LontarKkprParser={parseLines:parseLines,parseTables:parseTables,utm50SToLonLat:utm50SToLonLat,toFeature:toFeature,ringIndexes:function(result){return ringIndexes(result.rows,result.rows.map(function(row){return[row.x,row.y]}))}};
 })(typeof globalThis!=='undefined'?globalThis:this);
