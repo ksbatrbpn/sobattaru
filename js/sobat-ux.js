@@ -929,8 +929,23 @@
     return {mode:'point',latlng:latlng,results:results,kecamatan:kecamatan,places:kecamatan?[{name:kecamatan,kind:'kecamatan'}]:[]};
   }
 
+  // Bagian-bagian bidang (mis. KKPR multi-bagian dari OSS atau SHP berisi beberapa poligon) disatukan (union) dulu
+  // sebelum dipotong dengan layer: bagian yang bersinggungan/tumpang tidak lagi membuat luas irisan salah hitung
+  // atau terhitung ganda. Hasil union dicek terhadap jumlah luas bagian; bila gagal, bagian asli yang dipakai.
+  function dissolveParts(geojson){
+    var polys=turf.flatten(geojson).features.filter(function(f){return f.geometry&&/Polygon/.test(f.geometry.type);});
+    if(polys.length<2||polys.length>300)return polys;
+    try{
+      var acc={type:'Feature',properties:{},geometry:polys[0].geometry};
+      for(var i=1;i<polys.length;i++){var next=turf.union(acc,{type:'Feature',properties:{},geometry:polys[i].geometry});if(!next||!next.geometry)throw new Error('union');acc=next;}
+      var sum=polys.reduce(function(total,f){return total+areaOf(f);},0),merged=areaOf(acc);
+      if(merged>0&&merged<=sum*1.001+1)return turf.flatten(acc).features;
+    }catch(_unionError){}
+    return polys;
+  }
+  window.sobatDissolveParts=dissolveParts;
   function analysePolygon(geojson){
-    var parts=turf.flatten(geojson).features.filter(function(f){return f.geometry&&/Polygon/.test(f.geometry.type);}).map(function(f){var box=null;try{box=turf.bbox(f);}catch(_bboxError){}return {feature:f,box:box};});
+    var parts=dissolveParts(geojson).map(function(f){var box=null;try{box=turf.bbox(f);}catch(_bboxError){}return {feature:f,box:box};});
     var total=0;parts.forEach(function(part){total+=areaOf(part.feature);});
     var results=[];
     function intersectArea(layerGeojson,layerBoxValue){
@@ -944,7 +959,7 @@
     ANALYSIS_DEFS.forEach(function(def){
       var result={def:def,hits:[],values:[],categories:[],area:0};
       if(def.sigap){
-        var sigap=typeof window.analyzeSigapGeometry==='function'?window.analyzeSigapGeometry(geojson,total):null;
+        var sigap=typeof window.analyzeSigapGeometry==='function'?window.analyzeSigapGeometry({type:'FeatureCollection',features:parts.map(function(part){return part.feature;})},total):null;
         if(sigap&&sigap.ready&&sigap.items&&sigap.items.length){
           sigap.items.forEach(function(item){result.categories.push({name:item.category.label,area:total?Math.min(item.area,total):item.area,hex:item.category.hex});result.area+=item.area;if(item.category.key!=='apl')result.forest=true;});
           result.sigapMethod=sigap.sourceType==='vector'?'Luas dihitung dari irisan poligon vektor SIGAP skala 1:250.000.':'Estimasi dari klasifikasi piksel raster cadangan SIGAP.';
@@ -1060,11 +1075,19 @@
     var utm=null;try{if(model.latlng&&typeof window.projectToUtm50S==='function')utm=window.projectToUtm50S([lng,lat]);}catch(_utmError){}
     var html='<div class="st-print-head"><b>SOBAT TARU — Hasil Analisis Spasial '+(polygon?'Bidang':'Koordinat')+'</b><span id="stPrintStamp"></span></div>';
     if(polygon){
-      html+='<div class="st-card"><div class="st-card-title">Bidang yang diperiksa</div><div class="st-coords">'+
-        '<div><span>'+esc(options.areaLabel||'Luas bidang')+'</span> <b>'+esc(fmtAreaLong(model.total))+'</b></div>'+
-        (options.cadastral?'<div><span>Luas atribut bidang</span> '+esc(fmtAreaLong(options.cadastral))+'</div>':'')+
-        (model.latlng?'<div><span>Titik tengah</span> <code>'+lat.toFixed(6)+', '+lng.toFixed(6)+'</code></div>':'')+
-      '</div></div>';
+      // Data bidang terpilih: luas, keliling, dan export ada di panel (bukan popup di atas bidang).
+      var fieldRows=[];
+      if(options.nib)fieldRows.push(['NIB',esc(options.nib)]);
+      fieldRows.push(['Sumber',esc(options.sourceLabel||'Data bidang')]);
+      fieldRows.push([esc(options.areaLabel||'Luas bidang'),'<b>'+esc(fmtAreaLong(model.total))+'</b>']);
+      if(options.cadastral)fieldRows.push(['Luas atribut bidang',esc(fmtAreaLong(options.cadastral))]);
+      if(options.perimeter)fieldRows.push(['Keliling',esc(options.perimeter>=1000?(options.perimeter/1000).toLocaleString('id-ID',{maximumFractionDigits:3})+' km':Math.round(options.perimeter).toLocaleString('id-ID')+' m')]);
+      if(model.parts&&model.parts.length>1)fieldRows.push(['Bagian poligon',model.parts.length.toLocaleString('id-ID')+' bagian terpisah']);
+      if(model.latlng)fieldRows.push(['Titik tengah','<code>'+lat.toFixed(6)+', '+lng.toFixed(6)+'</code>']);
+      html+='<div class="st-card st-field-card"><div class="st-card-title">Data bidang terpilih<span class="st-field-badge">Dianalisis</span></div><table class="st-field-table">'+
+        fieldRows.map(function(row){return '<tr><th>'+row[0]+'</th><td>'+row[1]+'</td></tr>';}).join('')+'</table>'+
+        (options.explorer?'':'<div class="st-field-export"><button type="button" data-st-export="kml"><i class="fas fa-download" aria-hidden="true"></i>Export KML</button><button type="button" data-st-export="shp"><i class="fas fa-download" aria-hidden="true"></i>Export SHP</button></div>')+
+      '</div>';
     }else{
       html+='<div class="st-card"><div class="st-card-title">Lokasi yang diperiksa</div><div class="st-coords">'+
         '<div><span>Lintang, Bujur</span> <code>'+lat.toFixed(6)+', '+lng.toFixed(6)+'</code></div>'+
@@ -1081,7 +1104,6 @@
     html+='<div class="st-actions-sub">'+
       (model.latlng?'<button type="button" data-st-copy="'+lat.toFixed(6)+', '+lng.toFixed(6)+'"><i class="fas fa-copy" aria-hidden="true"></i>Salin koordinat</button>':'')+
       (polygon?'':'<button type="button" data-st-print><i class="fas fa-print" aria-hidden="true"></i>Cetak PDF</button>')+
-      (options.measured?'<button type="button" data-digitized-action="export"><i class="fas fa-download" aria-hidden="true"></i>Export SHP</button><button type="button" data-digitized-action="delete"><i class="fas fa-trash-alt" aria-hidden="true"></i>Hapus bidang</button>':'')+
     '</div>';
     if(forest)html+='<div class="st-alert danger"><i class="fas fa-tree" aria-hidden="true"></i><div><b>'+subject+(polygon?' beririsan dengan kawasan hutan':' berada di kawasan hutan')+'</b>'+esc((forest.sigapCategory&&forest.sigapCategory.action)||'Konfirmasikan kepada instansi kehutanan yang berwenang.')+'</div></div>';
     if(flags.length)html+='<div class="st-alert'+(flags.indexOf('PIPPIB')>=0?' danger':'')+'"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i><div><b>'+subject+' beririsan dengan '+esc(flags.join(', '))+'</b>Pemanfaatan ruang di sini terikat ketentuan khusus perlindungan lahan/izin. Konfirmasikan kepada instansi berwenang.</div></div>';
@@ -1115,6 +1137,8 @@
       if(token!==analysisToken||!villages||!villages.length)return;
       body.querySelectorAll('[data-st-places]').forEach(function(node){node.innerHTML=placesHtml(model,villages);});
     });
+    // Modul bidang (js/sobat-bidang.js) menambahkan kartu sesi, tombol akhiri analisis, dan cek irisan.
+    try{document.dispatchEvent(new CustomEvent('sobat:analysis-rendered',{detail:{model:model,options:options||{},body:body}}));}catch(_hookError){}
   }
   // Rincian per layer (panel hasil maupun panel eksplorasi bidang lama).
   document.addEventListener('click',function(event){
@@ -1154,7 +1178,11 @@
       var cadastral=features.reduce(function(sum,f){var v=Number(props(f).__SOBAT_KADASTRAL_M2);return sum+(v>0?v:0);},0);
       var hasNib=features.length&&features.every(function(f){var p=props(f);return p.__SOBAT_HAS_NIB===true||Object.keys(p).some(function(k){return /^(NIB|NIBIDANG|NOMORNIB)$/.test(String(k).toUpperCase().replace(/[^A-Z0-9]/g,''))&&String(p[k]||'').trim();});});
       var model=analysePolygon(geojson);
-      var options={measured:measured,cadastral:cadastral,areaLabel:measured?'Luas hasil pengukuran':'Luas bidang',bhumiUrl:!explorer&&!hasNib&&typeof window.bhumiUrlForGeojson==='function'?window.bhumiUrlForGeojson(geojson):''};
+      var kkpr=features.some(function(f){return props(f).sumber==='PDF KKPR';});
+      var perimeter=0;try{dissolveParts(geojson).forEach(function(f){if(f.geometry&&/Polygon/.test(f.geometry.type))(f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.coordinates).forEach(function(poly){poly.forEach(function(ring){perimeter+=turf.length(turf.lineString(ring),{units:'kilometers'})*1000;});});});}catch(_perimeterError){perimeter=0;}
+      var nib='';features.some(function(f){var p=props(f);return Object.keys(p).some(function(k){if(/^(NIB|NIBIDANG|NOMORNIB)$/.test(String(k).toUpperCase().replace(/[^A-Z0-9]/g,''))&&String(p[k]||'').trim()){nib=String(p[k]).trim();return true;}return false;});});
+      var sourceLabel=explorer?'Explor Bidang':measured?'Digitasi di SOBAT TARU':kkpr?'PDF KKPR'+(window.sobatSpatialSource&&window.sobatSpatialSource.fileName?' • '+window.sobatSpatialSource.fileName:''):(window.sobatSpatialSource&&window.sobatSpatialSource.label)||'Upload SHP/KML';
+      var options={measured:measured,explorer:explorer,kkpr:kkpr,nib:nib,perimeter:perimeter,sourceLabel:sourceLabel,cadastral:cadastral,areaLabel:measured?'Luas hasil pengukuran':'Luas bidang',bhumiUrl:!explorer&&!hasNib&&typeof window.bhumiUrlForGeojson==='function'?window.bhumiUrlForGeojson(geojson):''};
       lastIdentification={mode:'polygon',latlng:model.latlng,kecamatan:model.kecamatan,geojson:geojson};
       hideHint(true);
       if(explorer){
@@ -1175,6 +1203,14 @@
   document.addEventListener('click',function(event){
     if(event.target.closest&&event.target.closest('[data-digitized-action="delete"]')){lastIdentification=null;lastAnalysis=null;hideResult(true);}
   });
+
+  // API kecil untuk js/sobat-bidang.js (sesi bidang, akhiri analisis, paskan bidang ke area peta yang terlihat).
+  window.sobatUx={
+    isPhone:isPhone,showToast:showToast,showResult:showResult,hideResult:hideResult,visibleMapRect:visibleMapRect,
+    lastAnalysis:function(){return lastAnalysis;},lastIdentification:function(){return lastIdentification;},
+    analysisDefs:ANALYSIS_DEFS,areaOf:areaOf,fmtArea:fmtArea,fmtAreaLong:fmtAreaLong,fmtPct:fmtPct,esc:esc,
+    reset:function(){analysisToken++;lastIdentification=null;lastAnalysis=null;hideResult(false);$('stResultBody').innerHTML='';refreshBottomNav();}
+  };
 
   /* ---------- Petunjuk awal ---------- */
   function hideHint(remember){hint.hidden=true;if(remember)store('sobatTaruHintSeen','1');}

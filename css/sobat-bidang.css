@@ -1,0 +1,169 @@
+/* SOBAT TARU — dialog KKPR, cek irisan bidang, kartu data bidang, sesi analisis bidang (lihat js/sobat-bidang.js). */
+
+/* ---------- Dialog Konfirmasi Koordinat KKPR ---------- */
+.kkpr-review-modal .tool-modal{display:flex;flex-direction:column;overflow:hidden;width:min(580px,100%)}
+.kkpr-review-modal .tool-modal-head{flex:0 0 auto}
+.kkpr-review-modal .tool-modal-body{flex:1 1 auto;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+.kkpr-review-modal .kr-actions{flex:0 0 auto;display:grid!important;grid-template-columns:1fr 1.4fr;flex-direction:row!important;gap:10px;margin:0!important;padding:12px 19px calc(12px + env(safe-area-inset-bottom,0px));background:#fff;border-top:1px solid #e3ebe8;box-shadow:0 -6px 16px rgba(8,45,40,.06)}
+.kkpr-review-modal .kr-actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;font-size:14px}
+.kkpr-review-modal .kr-summary{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-bottom:14px;font-size:13px;color:var(--st-muted,#48484a)}
+.kkpr-review-modal .kr-file{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:4px 10px;border-radius:999px;background:#fdecea;color:#a1231b;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kkpr-review-modal .kr-label{margin:0 0 7px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#6e6e73}
+.kkpr-review-modal .kr-options{display:grid;gap:8px;margin-bottom:14px}
+.kkpr-review-modal .kr-option{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border:1px solid #d3e3de;border-radius:11px;background:#fff;color:#1d1d1f;font:inherit;text-align:left;cursor:pointer;transition:border-color .15s,background .15s}
+.kkpr-review-modal .kr-option:hover{border-color:#8fc7b8;background:#f6fbf9}
+.kkpr-review-modal .kr-option.active{border-color:#0f7a63;background:#eef8f4;box-shadow:0 0 0 1px #0f7a63 inset}
+.kkpr-review-modal .kr-option:focus-visible{outline:2px solid #0f7a63;outline-offset:2px}
+.kkpr-review-modal .kr-radio{flex:0 0 18px;width:18px;height:18px;border:2px solid #a9b8b3;border-radius:50%;background:#fff}
+.kkpr-review-modal .kr-option.active .kr-radio{border-color:#0f7a63;background:radial-gradient(circle,#0f7a63 0 4px,#fff 4.5px)}
+.kkpr-review-modal .kr-option-text{flex:1 1 auto;min-width:0}
+.kkpr-review-modal .kr-option-text b{display:block;font-size:13.5px;font-weight:600;line-height:1.3}
+.kkpr-review-modal .kr-option-text small{display:block;margin-top:2px;font-size:12px;color:#48484a}
+.kkpr-review-modal .kr-tag{flex:0 0 auto;padding:2px 8px;border-radius:999px;background:#e3f4e6;color:#1f6b2e;font-size:11px;font-weight:700}
+.kkpr-review-modal .kr-option-all{border-style:dashed}
+.kkpr-review-modal .kr-option-all.active{border-style:solid}
+.kkpr-review-modal .kr-tag-all{background:#f1e9ff;color:#6d28d9}
+.kkpr-review-modal .kr-dot{display:inline-block;width:9px;height:9px;margin-right:6px;border-radius:50%;vertical-align:0}
+.kkpr-review-modal .kr-preview{border:1px solid #dbe7e3;border-radius:12px;background:#fff;overflow:hidden}
+.kkpr-review-modal .kr-head{display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid #e6eeeb;background:#f7faf9}
+.kkpr-review-modal .kr-thumb{flex:0 0 64px;width:64px;height:64px;border-radius:9px;background:#fff;border:1px solid #e1e9e6}
+.kkpr-review-modal .kr-thumb path{stroke-width:1.4;stroke-linejoin:round}
+.kkpr-review-modal .kr-thumb circle{fill:#fff;stroke:#e0306b;stroke-width:1}
+.kkpr-review-modal .kr-stats{flex:1 1 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;min-width:0}
+.kkpr-review-modal .kr-stats span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#6e6e73}
+.kkpr-review-modal .kr-stats b{display:block;margin-top:2px;font-size:15px;font-weight:700;line-height:1.25;color:#1d1d1f;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kkpr-review-modal .kr-stats small{display:block;font-size:11px;color:#48484a}
+.kkpr-review-modal .kr-table-wrap{max-height:min(300px,38vh);overflow:auto}
+.kkpr-review-modal .kr-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.kkpr-review-modal .kr-table th{position:sticky;top:0;z-index:1;padding:8px 14px;background:#f1f6f4;color:#48484a;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;text-align:right;white-space:nowrap;border-bottom:1px solid #e1e9e6}
+.kkpr-review-modal .kr-table td{padding:7px 14px;text-align:right;border-bottom:1px solid #eef3f1;color:#1d1d1f;white-space:nowrap}
+.kkpr-review-modal .kr-table tbody tr:nth-child(even) td{background:#fafcfb}
+.kkpr-review-modal .kr-table tbody tr:last-child td{border-bottom:0}
+.kkpr-review-modal .kr-table .kr-no{width:56px;text-align:center;color:#48484a}
+.kkpr-review-modal .kr-table .kr-part td{padding:5px 14px;background:#eef8f4!important;color:#0d6655;font-size:11px;font-weight:700;letter-spacing:.02em;text-align:left;text-transform:uppercase}
+.kkpr-review-modal .kr-table .kr-group td{padding:8px 14px;background:#e8efed!important;color:#1d1d1f;font-size:12px;font-weight:700;text-align:left}
+.kkpr-review-modal .kr-note{display:flex;gap:7px;margin:0;padding:9px 12px;border-top:1px solid #e6eeeb;font-size:11.5px;line-height:1.45;color:#48484a}
+.kkpr-review-modal .kr-note i{margin-top:2px;color:#0f7a63}
+@media (max-width:640px){
+  .kkpr-review-modal .tool-modal{max-height:88dvh!important}
+  .kkpr-review-modal .kr-head{align-items:flex-start}
+  .kkpr-review-modal .kr-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kkpr-review-modal .kr-stats>div:last-child{grid-column:1/-1}
+  .kkpr-review-modal .kr-stats-all>div:last-child{grid-column:auto}
+  .kkpr-review-modal .kr-table th,.kkpr-review-modal .kr-table td{padding-left:9px;padding-right:9px}
+  /* Di HP hanya isi dialog yang digulir (tanpa gulir bersarang); tombol tetap berdampingan di bawah. */
+  .kkpr-review-modal .kr-table-wrap{max-height:none;overflow:visible}
+  .kkpr-review-modal .kr-table th{top:-15px}
+  .kkpr-review-modal .kr-actions{grid-template-columns:1fr 1.5fr;gap:8px;padding:10px 15px calc(10px + env(safe-area-inset-bottom,0px))}
+}
+
+/* ---------- Kartu "Data bidang terpilih" ---------- */
+.st-field-card .st-card-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px!important}
+.st-field-badge{padding:2px 9px;border-radius:999px;background:var(--st-green-50,#eef8f4);color:var(--st-green-700,#0d6655);font-size:11px;font-weight:700}
+.st-field-table{width:100%;border-collapse:collapse;font-size:13px}
+.st-field-table th{width:42%;padding:5px 8px 5px 0;color:var(--st-muted,#48484a);font-weight:500;text-align:left;vertical-align:top}
+.st-field-table td{padding:5px 0;color:var(--st-ink,#1d1d1f);text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.st-field-table tr+tr th,.st-field-table tr+tr td{border-top:1px solid var(--st-line,rgba(0,0,0,.08))}
+.st-field-table code{font-family:var(--st-mono,monospace);font-size:12.5px}
+.st-field-export{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.st-field-export button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;border:1px solid #cfe3dc;border-radius:9px;background:#fff;color:var(--st-accent,#0f7a63);font:600 12.5px var(--st-font,inherit);cursor:pointer}
+.st-field-export button:hover{background:var(--st-green-50,#eef8f4)}
+
+/* ---------- Sesi bidang: kartu tersimpan & akhiri analisis ---------- */
+.st-recall{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 12px;padding:10px 12px;border:1px solid #ffc6d8;border-left:4px solid #ff4f87;border-radius:10px;background:#fff4f8;color:#4a1a2c}
+.st-recall>i{color:#e0306b;font-size:18px}
+.st-recall-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.st-recall-text strong{font-size:13px}
+.st-recall-text span{font-size:12px;color:#7a4458;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-recall-acts{display:flex;gap:6px;align-items:center;width:100%}
+.st-recall-main{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:6px 11px;border:0;border-radius:9px;background:#e0306b;color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.st-recall-main:hover{background:#c41f58}
+.st-recall-drop{width:36px;height:36px;border:1px solid #f1a9c1;border-radius:9px;background:#fff;color:#b0234f;cursor:pointer}
+.st-recall-drop:hover{background:#ffe3ec}
+.st-end-analysis{display:flex;width:100%;align-items:center;justify-content:center;gap:7px;margin:0 0 12px;min-height:38px;padding:7px 10px;border:1px solid #f0b4b4;border-radius:10px;background:#fff;color:#b42318;font-weight:700;font-size:12.5px;cursor:pointer}
+.st-end-analysis:hover{background:#fff1f0}
+.st-end-analysis.armed{background:#b42318;border-color:#b42318;color:#fff}
+body.st-printing .st-recall,body.st-printing .st-end-analysis,body.st-printing #kkprPbtBox{display:none!important}
+
+/* ---------- Glow tepi bidang digitasi ---------- */
+.st-digit-glow{filter:drop-shadow(0 0 4px #ffcc33) drop-shadow(0 0 10px #ff8a00);animation:stDigitGlow 1.25s ease-in-out 2 both}
+@keyframes stDigitGlow{0%{stroke-opacity:0;stroke-width:2px}40%{stroke-opacity:1;stroke-width:8px}100%{stroke-opacity:0;stroke-width:3px}}
+@media (prefers-reduced-motion:reduce){.st-digit-glow{animation:none;stroke-opacity:.9}}
+
+/* ---------- Cek irisan bidang (sandingan) ---------- */
+#kkprPbtBox{margin:0 0 12px}
+#kkprPbtBox[hidden]{display:none}
+#stResultPanel .kp-choices{display:grid;gap:8px;margin-top:12px}
+#stResultPanel .kp-choice{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border:1px solid #d3e3de;border-radius:11px;background:#fff;color:#1d1d1f;font:inherit;text-align:left;cursor:pointer}
+#stResultPanel .kp-choice:hover{border-color:#0f7a63;background:#f3faf7}
+#stResultPanel .kp-choice>span:nth-child(2){flex:1 1 auto;min-width:0}
+#stResultPanel .kp-choice b{display:block;font-size:13.5px;font-weight:600}
+#stResultPanel .kp-choice small{display:block;margin-top:1px;font-size:12px;color:#48484a}
+#stResultPanel .kp-choice>.fa-chevron-right{color:#9aaab9;font-size:12px}
+#stResultPanel .kp-choice-ico{flex:0 0 30px;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px}
+#stResultPanel .kp-choice-ico.tbl{background:#f1e9ff;color:#7c3aed}
+#stResultPanel .kp-choice-ico.pbt{background:#fff4d1;color:#a66b00}
+#stResultPanel .kp-card{padding:12px 13px;border:1px solid #cfe3dc;border-radius:12px;background:#fff;color:#1d1d1f;box-shadow:0 1px 2px rgba(8,45,40,.05)}
+#stResultPanel .kp-ask{background:linear-gradient(180deg,#f2faf7,#fff);border-color:#b7dccf}
+#stResultPanel .kp-in{border-color:#a9d8f3}
+#stResultPanel .kp-warn{border-color:#f3d29a}
+#stResultPanel .kp-far{border-color:#f2b8b5}
+#stResultPanel .kp-head{display:flex;align-items:flex-start;gap:10px}
+#stResultPanel .kp-ico{flex:0 0 32px;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:#e2f3ed;color:#0f7a63;font-size:15px}
+#stResultPanel .kp-in .kp-ico{background:#e4f1fc;color:#0b6fc0}
+#stResultPanel .kp-warn .kp-ico{background:#fff3dc;color:#a65300}
+#stResultPanel .kp-far .kp-ico{background:#fde8e7;color:#b3261e}
+#stResultPanel .kp-title{flex:1 1 auto;min-width:0}
+#stResultPanel .kp-title strong{display:block;font-size:14px;line-height:1.3;color:#0b3b35}
+#stResultPanel .kp-title small{display:block;margin-top:2px;font-size:12px;line-height:1.4;color:#48484a;overflow-wrap:anywhere}
+#stResultPanel .kp-badge{flex:0 0 auto;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+#stResultPanel .kp-badge.in{background:#e1f3ff;color:#00558f}
+#stResultPanel .kp-badge.warn{background:#fff1d6;color:#8a5200}
+#stResultPanel .kp-badge.far{background:#fde2e0;color:#a1231b}
+#stResultPanel .kp-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0 0}
+#stResultPanel .kp-stat{min-width:0;padding:8px 10px;border-radius:9px;background:#f5f7f6}
+#stResultPanel .kp-stat span{display:block;font-size:10.5px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:#6e6e73}
+#stResultPanel .kp-stat b{display:block;margin-top:2px;font-size:15px;font-weight:700;line-height:1.25;color:#1d1d1f;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#stResultPanel .kp-stat small{display:block;margin-top:1px;font-size:11.5px;line-height:1.35;color:#48484a;overflow-wrap:anywhere}
+#stResultPanel .kp-stat.hl{background:#e6f5fe}
+#stResultPanel .kp-stat.hl b{color:#00558f}
+#stResultPanel .kp-stat.bad{background:#fdecea}
+#stResultPanel .kp-stat.bad b{color:#a1231b}
+#stResultPanel .kp-bar{height:8px;margin:12px 0 5px;border-radius:99px;background:repeating-linear-gradient(135deg,#eef1f5 0 6px,#e2e7ee 6px 12px);overflow:hidden}
+#stResultPanel .kp-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#00b3ff,#0b6fc0)}
+#stResultPanel .kp-bar-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11px;color:#48484a}
+#stResultPanel .kp-bar-legend i{display:inline-block;width:9px;height:9px;margin-right:5px;border-radius:2px;background:#e2e7ee;vertical-align:-1px}
+#stResultPanel .kp-bar-legend i.in{background:#0b8fd8}
+#stResultPanel .kp-table-wrap{margin-top:10px;max-height:260px;overflow:auto;border:1px solid var(--st-line,rgba(0,0,0,.08));border-radius:9px}
+#stResultPanel .kp-table{width:100%;border-collapse:collapse;font-size:12.5px}
+#stResultPanel .kp-table th{position:sticky;top:0;z-index:1;padding:7px 8px;background:#f1f6f4;color:#48484a;font-size:10.5px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;text-align:left;white-space:nowrap}
+#stResultPanel .kp-table th:nth-child(n+3){text-align:right}
+#stResultPanel .kp-table td{padding:7px 8px;border-top:1px solid var(--st-line,rgba(0,0,0,.08));vertical-align:top;line-height:1.35}
+#stResultPanel .kp-table td b{display:block;font-weight:600;color:#1d1d1f;overflow-wrap:anywhere}
+#stResultPanel .kp-table td small{display:block;margin-top:1px;font-size:11px;color:#48484a}
+#stResultPanel .kp-table .kp-r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+#stResultPanel .kp-table .kp-n{width:30px}
+#stResultPanel .kp-table .kp-n span{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#0b3a66;color:#fff;font-size:10.5px;font-weight:700}
+#stResultPanel .kp-msg{display:flex;gap:9px;margin:10px 0 0;padding:9px 11px;border-radius:9px;font-size:12.5px;line-height:1.45}
+#stResultPanel .kp-msg i{margin-top:2px}
+#stResultPanel .kp-msg.warn{background:#fff7e8;color:#5c3b00}
+#stResultPanel .kp-msg.bad{background:#fdecea;color:#6b1a14}
+#stResultPanel .kp-error{display:flex;gap:7px;margin:10px 0 0;padding:8px 10px;border-radius:9px;background:#fdecea;color:#8c1d16;font-size:12.5px;line-height:1.4}
+#stResultPanel .kp-error i{margin-top:2px}
+#stResultPanel .kp-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+#stResultPanel .kp-btn{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border:1px solid #c8ded6;border-radius:9px;background:#fff;color:#0d6655;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+#stResultPanel .kp-btn:hover{background:#eef8f4}
+#stResultPanel .kp-btn.ghost{border-color:transparent;background:transparent;color:#48484a}
+#stResultPanel .kp-btn.ghost:hover{background:rgba(0,0,0,.045)}
+#stResultPanel .kp-switch{display:flex;flex:1 0 100%;align-items:center;gap:7px;margin-bottom:2px;font-size:12.5px;color:#1d1d1f;cursor:pointer}
+#stResultPanel .kp-switch input{position:absolute;opacity:0;pointer-events:none}
+#stResultPanel .kp-switch i{position:relative;flex:0 0 34px;width:34px;height:20px;border-radius:99px;background:#c7ccd3;transition:background .15s}
+#stResultPanel .kp-switch i:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+#stResultPanel .kp-switch input:checked+i{background:#0f7a63}
+#stResultPanel .kp-switch input:checked+i:after{transform:translateX(14px)}
+#stResultPanel .kp-switch input:focus-visible+i{outline:2px solid #0f7a63;outline-offset:2px}
+#stResultPanel .kp-hint{margin:9px 0 0;font-size:11.5px;line-height:1.4;color:#6e6e73}
+#stResultPanel .kp-reopen{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px dashed #8fc7b8;border-radius:9px;background:#f4fbf8;color:#0d6655;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+#stResultPanel .kp-reopen:hover{background:#e8f6f0}
+.kp-map-num{display:flex!important;align-items:center;justify-content:center;border:2px solid #fff;border-radius:50%;background:#0b3a66;color:#fff;font:700 11px/1 Arial,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,.45)}
+@media (max-width:420px){#stResultPanel .kp-stat b{font-size:14px}}

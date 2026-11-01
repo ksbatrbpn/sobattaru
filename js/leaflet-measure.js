@@ -7403,6 +7403,11 @@ L.Control.Measure = L.Control.extend({
     }
 
     resultFeature.addTo(this._layer);
+    // SOBAT TARU: hasil ukur luas (poligon) tidak memakai popup agar bidang tidak tertutup;
+    // luas, keliling, dan export tersedia di kartu "Data bidang terpilih" pada panel analisis.
+    if (latlngs.length > 2) {
+      return;
+    }
     resultFeature.bindPopup(popupContainer, this.options.popupOptions);
     if (resultFeature.getBounds) {
       resultFeature.openPopup(resultFeature.getBounds().getCenter());
