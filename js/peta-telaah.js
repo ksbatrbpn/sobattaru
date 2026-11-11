@@ -239,14 +239,22 @@
     });
     return rows.sort(function(a,b){return b.area-a.area;});
   }
+  // Luas dibandingkan setelah dibulatkan ke m², sama seperti angka yang tercetak; selisih sekecil apa pun disebutkan.
+  function luasLine(total,luas){
+    if(!(luas>0))return '';
+    var t=Math.round(total),l=Math.round(luas),d=t-l;
+    if(!d)return 'Luas spasial bidang ('+num(t)+' m²) sesuai dengan luas permohonan ('+num(l)+' m²).';
+    return 'Luas spasial bidang ('+num(t)+' m²) tidak sama dengan luas permohonan ('+num(l)+' m²); luas spasial '+(d<0?'lebih kecil':'lebih besar')+' '+num(Math.abs(d))+' m² ('+pct(Math.abs(d),l)+').';
+  }
+  function luasInput(){return Number(String($('ptLuas').value||'').replace(/\./g,'').replace(',','.'));}
   function autoLines(){
     var m=st.model,lines=[],kkp={},excel=isExcel(st.feature);
     shell.querySelectorAll('[data-pt-kkp]').forEach(function(c){kkp[c.getAttribute('data-pt-kkp')]=c.checked;});
-    var total=totalArea(),luas=Number(String($('ptLuas').value||'').replace(/\./g,'').replace(',','.'));
+    var total=totalArea(),luas=luasInput();
     if(kkp.nib&&!excel)lines.push(KKP[0].text);
     if(kkp.luas&&!excel)lines.push(KKP[1].text);
     if(excel)lines.push('Bidang dimohon belum terdaftar/belum ber-NIB; batas bidang berasal dari koordinat '+(st.excel?st.excel.crsLabel:'Excel')+(st.excel?' ('+st.excel.points.length+' titik)':'')+'.');
-    if(luas>0){var diff=total-luas;lines.push(Math.abs(diff)<=Math.max(1,luas*0.01)?'Luas spasial bidang ('+num(total)+' m²) sesuai dengan luas permohonan ('+num(luas)+' m²).':'Luas spasial bidang ('+num(total)+' m²) berselisih '+num(Math.abs(diff))+' m² ('+pct(Math.abs(diff),luas)+') dari luas permohonan ('+num(luas)+' m²).');}
+    var ll=luasLine(total,luas);if(ll)lines.push(ll);
     if(!m){lines.push('(Menunggu hasil analisis kawasan…)');return lines;}
     var hutan=result('sigap'),forest=hutan&&hutan.forest,hutanPending=!hutan||hutan.pending;
     if(hutanPending)lines.push('Status kawasan hutan belum dapat dipastikan (data SIGAP belum termuat).');
@@ -255,7 +263,7 @@
     var pippib=result('pippib');
     lines.push(pippib&&pippib.inside?'Bidang beririsan dengan kawasan PIPPIB ('+joinDan(catList(pippib,total))+') seluas '+num(pippib.area)+' m² ('+pct(pippib.area,total)+').':'Kawasan PIPPIB clear and clean.');
     var ov=overlaps();
-    lines.push(ov.length?'Areal terindikasi tumpang tindih dengan '+ov.length+' persil terdaftar: '+ov.slice(0,6).map(function(o){return 'NIB '+o.nib+' ('+num(o.area)+' m²)';}).join(', ')+(ov.length>6?' dan '+(ov.length-6)+' bidang lain':'')+'.':'Areal tidak terindikasi tumpang tindih dengan Persil Terdaftar KKP.');
+    lines.push(ov.length?'Areal terindikasi tumpang tindih dengan '+ov.length+' persil terdaftar: '+ov.slice(0,6).map(function(o){return 'NIB '+o.nib+' ('+num(o.area)+' m², '+pct(o.area,total)+')';}).join(', ')+(ov.length>6?' dan '+(ov.length-6)+' bidang lain':'')+'.':'Areal tidak terindikasi tumpang tindih dengan Persil Terdaftar KKP.');
     if(kkp.hgu)lines.push(KKP[2].text);
     var src=polaSource(),pr=result(src.id);
     if(pr&&pr.inside){
@@ -478,7 +486,14 @@
   $('ptBase').addEventListener('change',function(){switchBase();});
   $('ptPola').addEventListener('change',function(){regen(false);if(st.view==='pola')renderPreview();});
   $('ptLabelMode').addEventListener('change',renderPreview);
-  $('ptLuas').addEventListener('input',function(){regen(false);});
+  $('ptLuas').addEventListener('input',function(){
+    if(!st.edited){regen(false);return;}
+    if(!st.feature)return;
+    var ll=luasLine(totalArea(),luasInput()),rows=$('ptHasil').value.split('\n'),at=-1;
+    rows.forEach(function(r,i){if(at<0&&/^Luas spasial bidang \(/.test(r))at=i;});
+    if(at>=0){if(ll)rows[at]=ll;else rows.splice(at,1);}else if(ll){var k=0;while(k<rows.length&&!/^Kawasan hutan|^Bidang beririsan dengan kawasan hutan|^Status kawasan hutan/.test(rows[k]))k++;rows.splice(Math.min(k,rows.length),0,ll);}
+    $('ptHasil').value=rows.join('\n');
+  });
   shell.querySelectorAll('[data-pt-kkp]').forEach(function(c){c.addEventListener('change',function(){
     var line=KKP.filter(function(k){return k.id===c.getAttribute('data-pt-kkp');})[0].text;
     if(!st.edited){regen(false);return;}
@@ -704,10 +719,10 @@
       '.inset{position:relative;width:'+sm(30)+';height:'+sm(24)+';border:.25mm solid #1b2a33;background:#eef3f6;overflow:hidden}.inset-map{position:absolute;inset:0;background:#eef3f6}.inset small{position:absolute;left:1mm;bottom:.6mm;z-index:500;font-size:'+pt(5.4)+';color:#1b2a33}'+
       '.lg{display:grid;grid-template-columns:1fr 1fr;gap:'+sm(1.2)+' '+sm(2.5)+'}.li{display:flex;align-items:center;gap:'+sm(1.8)+';font-size:'+pt(7.4)+';line-height:1.2}.sw{flex:0 0 '+sm(7)+';height:'+sm(3.6)+'}.stat{margin-top:'+sm(1.4)+';font-size:'+pt(7.2)+';color:#9a3412;font-weight:700}'+
       '.hasil{flex:1 1 auto;overflow:hidden}.hasil ol{margin:0;padding:0;list-style:none;counter-reset:h}.hasil li{position:relative;margin:0 0 '+sm(1.5)+';padding-left:'+sm(6)+';font-size:'+pt(8)+';line-height:1.38}.hasil li:before{counter-increment:h;content:counter(h);position:absolute;left:0;top:'+sm(.2)+';width:'+sm(4.2)+';height:'+sm(4.2)+';border-radius:50%;background:#1b2a33;color:#fff;font-size:'+pt(6.4)+';font-weight:700;line-height:'+sm(4.2)+';text-align:center}'+
-      '.sah{display:grid;grid-template-columns:1.25fr 1fr;gap:'+sm(2.4)+';align-items:end}'+
+      '.sah{border-bottom:0}.sah .sign{width:70%;margin-left:auto}'+
       '.telaah{width:100%;border-collapse:collapse;font-size:'+pt(6.8)+'}.telaah th{background:#1b2a33;color:#fff;font-weight:700;text-align:left;padding:'+sm(1)+' '+sm(1.4)+'}.telaah td{border:.2mm solid #9aa9b1;padding:'+sm(1)+' '+sm(1.4)+';height:'+sm(6.2)+'}.telaah td.s{width:'+sm(13)+'}'+
       '.sign{text-align:center;font-size:'+pt(7.6)+';line-height:1.3}.sign .sp{height:'+sm(13)+'}.sign b{display:block}'+
-      '.src{padding:'+sm(1.6)+' '+sm(3.2)+';font-size:'+pt(5.8)+';line-height:1.35;color:#4b5d66}';
+      '';
   }
 
   // Dijalankan di tab cetak.
@@ -722,6 +737,8 @@
       if(started)return;started=true;document.title=R.filename;
       var btn=document.querySelector('.screen-bar button');if(btn)btn.addEventListener('click',function(){window.print();});
       var sheets=[].slice.call(document.querySelectorAll('.sheet')),pending=sheets.length;
+      // Hasil analisis yang panjang (mis. kertas A4) dikecilkan hurufnya sampai muat, tidak dipotong.
+      [].slice.call(document.querySelectorAll('.hasil')).forEach(function(box){var ol=box.querySelector('ol');if(!ol)return;var base=parseFloat(getComputedStyle(ol.querySelector('li')||ol).fontSize)||12,f=base,guard=0;while(box.scrollHeight>box.clientHeight+1&&f>base*.62&&guard++<30){f*=.95;ol.style.fontSize=f+'px';[].slice.call(ol.children).forEach(function(li){li.style.fontSize=f+'px';li.style.marginBottom=(f*.35)+'px';});}});
       sheets.forEach(function(sheet,idx){
         var page=R.pages[idx],el=sheet.querySelector('.map'),box=sheet.querySelector('.mapbox');
         var map=L.map(el,{zoomControl:false,attributionControl:false,zoomSnap:0,fadeAnimation:false,zoomAnimation:false,markerZoomAnimation:false,inertia:false,dragging:false,scrollWheelZoom:false,maxZoom:23});
@@ -812,7 +829,6 @@
   function sideTheme2(R,page,n,total){
     var t=R.title,i=R.info,u=function(p){return new URL(p,location.href).href;};
     var kv=[['NIB',i.excel?'Belum ada (koordinat Excel)':(i.nib||'—')],['Luas permohonan',t.luas?t.luas+' m²':'—'],['Luas spasial',i.luasSpasial+' m²'],['Lokasi',[t.lokasi,t.kec?'Kec. '+t.kec:''].filter(Boolean).join(', ')||'—'],['Kabupaten','Sumbawa Barat, '+String(t.prov||'').replace(/^Provinsi\s+/i,'')]];
-    var sources=['Bidang sandingan: SHP unggahan'+(i.excel?'; bidang dimohon: '+i.excelFile+' ('+i.excelCrs+')':''),page.kind==='citra'?R.base.credit:page.source,'Analisis SOBAT TARU (SIGAP, PIPPIB 2025, LSD, LP2B usulan 2026, RTRW/RDTR)'];
     return '<aside class="side">'+
       '<header class="kop"><img src="'+u('assets/app/logo-atr-bpn.jpg')+'" alt=""><div><b>KEMENTERIAN AGRARIA DAN TATA RUANG/</b><b>BADAN PERTANAHAN NASIONAL</b><span>'+esc(R.kantor)+'</span><span>'+esc(R.provinsi)+'</span></div></header>'+
       '<section class="sec ttl"><p class="cap">Peta Telaah Spasial</p><h1>'+esc(t.jenis||'Permohonan')+'</h1>'+(t.pemohon?'<div class="pm">'+esc(t.pemohon)+'</div>':'<div class="pm" style="color:#9aa9b1">Nama pemohon belum diisi</div>')+
@@ -821,9 +837,8 @@
       '<section class="sec carto"><div class="north"><span>U</span><img src="'+u('assets/app/compass-rose.png')+'" alt=""></div><div class="scl">'+barSvg(R.bar)+'<div class="skala">Skala 1 : '+R.scale.toLocaleString('id-ID')+'</div><div class="proj">Datum WGS 84 • grid geografis<br>dan UTM Zona 50S (meter)</div></div><div class="inset"><div class="inset-map"></div><small>Kab. Sumbawa Barat</small></div></section>'+
       '<section class="sec"><p class="cap">Keterangan</p><div class="lg">'+legendItems(R,page)+'</div>'+(page.stat?'<div class="stat">'+esc(page.title)+': '+esc(page.stat)+'</div>':'')+'</section>'+
       '<section class="sec hasil"><p class="cap">Hasil Analisis</p><ol>'+R.hasil.map(function(h){return '<li>'+esc(h)+'</li>';}).join('')+'</ol></section>'+
-      '<section class="sec sah"><table class="telaah"><tr><th colspan="2">Ditelaah tanggal '+esc(R.telaah.tgl)+'</th><th>Paraf</th></tr><tr><td style="width:32%">Penelaah 1</td><td>'+esc(R.telaah.p1)+'</td><td class="s"></td></tr><tr><td>Penelaah 2</td><td>'+esc(R.telaah.p2)+'</td><td class="s"></td></tr></table>'+
-        '<div class="sign">'+esc(R.sah.tgl)+'<br>Mengetahui,<b>'+esc(R.sah.jabatan)+'</b><div class="sp"></div><b>'+esc(R.sah.nama||'………………………………')+'</b>NIP '+esc(R.sah.nip||'………………………')+'</div></section>'+
-      '<footer class="src">Sumber: '+sources.map(esc).join(' • ')+'. Dicetak dari SOBAT TARU, '+esc(R.printed)+'. Hasil analisis bersifat indikatif dan perlu dikonfirmasi dengan data resmi.</footer>'+
+      '<section class="sec tl"><p class="cap">Ditelaah oleh</p><table class="telaah"><tr><th style="width:30%">Penelaah</th><th>Nama</th><th class="s">Paraf</th></tr><tr><td>Penelaah 1</td><td>'+esc(R.telaah.p1)+'</td><td class="s"></td></tr><tr><td>Penelaah 2</td><td>'+esc(R.telaah.p2)+'</td><td class="s"></td></tr><tr><td>Tanggal telaah</td><td colspan="2">'+esc(R.telaah.tgl)+'</td></tr></table></section>'+
+      '<section class="sec sah"><div class="sign">'+esc(R.sah.tgl)+'<br>Mengetahui,<b>'+esc(R.sah.jabatan)+'</b><div class="sp"></div><b>'+esc(R.sah.nama||'………………………………')+'</b>NIP '+esc(R.sah.nip||'………………………')+'</div></section>'+
     '</aside>';
   }
   function printNow(){
