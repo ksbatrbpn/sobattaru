@@ -65,3 +65,20 @@ Kabupaten Sumbawa Barat. Geometri dipakai apa adanya, tanpa penyederhanaan.
 - Sinkron manual di komputer: `python scripts/sync_baleruang.py`
   (atau `--source "D:\DATA KSB\APLIKASI\BALE-RUANG-NTB-GITHUB"` untuk memakai
   salinan lokal Bale Ruang).
+
+## Peta Telaah Permohonan (A3)
+
+Menu **Eksplorasi Bidang** memiliki tombol **Buat Peta Telaah (A3)** pada kartu bidang
+terpilih dan **Peta Telaah A3** di Pusat Analisis Data.
+
+1. Unggah ZIP SHP bidang di sekitar lokasi (lebih dari satu poligon) lewat Unggah SHP/KML.
+2. Pilih NIB yang dimohon pada daftar, peta, atau kolom NIB di dialog.
+3. Isi jenis permohonan, nama pemohon, luas tekstual, penelaah, dan pejabat yang mengetahui.
+4. Butir **Hasil Analisis** disusun otomatis dari kawasan hutan (SIGAP), PIPPIB, pola ruang
+   (RDTR/RTRW), LSD, LP2B, selisih luas, dan tumpang tindih dengan bidang lain di SHP.
+   Butir yang perlu dicek di KKP dicentang manual. Semua butir bisa disunting.
+5. **Cetak Peta Telaah** membuka satu atau dua halaman A3 lanskap (latar citra satelit dan
+   latar pola ruang). Cetak dengan kertas A3, lanskap, margin tidak ada, skala 100%.
+
+Bidang lain di SHP tampil sebagai Bidang Sandingan berlabel NIB (5 digit terakhir atau lengkap).
+Nama penelaah, pejabat, dan kantor diingat di perangkat untuk cetakan berikutnya.
