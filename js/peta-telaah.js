@@ -16,6 +16,7 @@
   function ux(){return window.sobatUx||{};}
   function toast(text,ms){var u=ux();if(u.showToast)u.showToast(text,ms);else if(window.brToast)window.brToast(text,ms);}
   function areaOf(g){var u=ux();try{return u.areaOf?u.areaOf(g):turf.area(g);}catch(_e){return 0;}}
+  function fmtNip(v){var d=String(v||'').replace(/\s+/g,'');return /^\d{18}$/.test(d)?d.slice(0,8)+' '+d.slice(8,14)+' '+d.slice(14,15)+' '+d.slice(15):String(v||'').trim();}
   function num(v){return Math.round(Number(v)||0).toLocaleString('id-ID');}
   function pct(part,base){if(!base||!part)return '';var v=Math.min(100,part/base*100);return (v<0.1?'<0,1':v.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}))+'%';}
   function boxesOverlap(a,b){return !(a[0]>b[2]||a[2]<b[0]||a[1]>b[3]||a[3]<b[1]);}
@@ -63,6 +64,8 @@
     {id:'luas',text:'Luas spasial dan tekstual KKP sudah sesuai dengan PBT yang dimohon.'},
     {id:'hgu',text:'Areal tidak terindikasi tumpang tindih dengan HGU Terdaftar KKP.'}
   ];
+  // Nama bawaan sesuai dokumen contoh peta telaah Kantor Pertanahan Kab. Sumbawa Barat; bisa diubah di dialog.
+  var DEF={penelaah1:'Ronanda Ispremadana',penelaah2:'Muhammad Sofyan Satari, S.T.',pejabat:'Yudi Wahyu Miharman, S.ST.',nip:'19870609 200804 1 001'};
   var MM=96/25.4,SUBJECT='#e6007e',NEIGHBOR='#f5a300';
 
   // Tata letak halaman (mm). Panel keterangan dan huruf diskalakan terhadap A3.
@@ -226,6 +229,8 @@
   // Rincian irisan: setiap kelas selalu disertai luas (m²) dan persentase terhadap luas bidang.
   function areaPct(a,total){var p=pct(a,total);return num(a)+' m²'+(p?' ('+p+')':'');}
   function cats(r){return (r.categories||[]).filter(function(c){return c.area>=0.5;}).sort(function(a,b){return b.area-a.area;});}
+  // Istilah pola ruang: RDTR memakai "zona", RTRW memakai "kawasan".
+  function polaName(n,src){var w=src.word,re=new RegExp('^'+w+'\\b','i');return re.test(n)?w+n.slice(w.length):w+' '+n;}
   function catList(r,total){return cats(r).map(function(c){return c.name+' seluas '+areaPct(c.area,total);});}
   function withCats(r,total){var c=cats(r);return ' seluas '+areaPct(r.area,total)+(c.length>1?', terdiri atas '+joinDan(c.map(function(x){return x.name+' '+areaPct(x.area,total);})):'');}
   function remainder(r,total,label){var rest=total-r.area;return rest>=1?'; sisanya '+areaPct(rest,total)+' '+label:'';}
@@ -272,7 +277,7 @@
     if(kkp.hgu)lines.push(KKP[2].text);
     var src=polaSource(),pr=result(src.id);
     if(pr&&pr.inside){
-      var names=catList(pr,total).map(function(n){return /^(kawasan|zona)\b/i.test(n)?n:src.word+' '+n;});
+      var names=catList(pr,total).map(function(n){return polaName(n,src);});
       lines.push('Bidang Permohonan Tata Guna Lahan berdasarkan '+src.text+' masuk dalam '+joinDan(names)+remainder(pr,total,'di luar cakupan '+src.label)+'.');
     }else lines.push('Bidang Permohonan berada di luar cakupan '+src.label+'.');
     var lsd=result('lsd');
@@ -453,8 +458,8 @@
     if(mode!=='excel'&&!f){toast('Pilih bidang (NIB) yang dimohon pada daftar Eksplorasi Bidang, atau gunakan Telaah dari Excel.',5000);return;}
     var p=prefs();
     $('ptJenis').value=p.jenis||JENIS[0];$('ptPemohon').value='';
-    $('ptPenelaah1').value=p.penelaah1||'';$('ptPenelaah2').value=p.penelaah2||'';
-    $('ptJabatan').value=p.jabatan||'Kepala Seksi Survei dan Pemetaan';$('ptPejabat').value=p.pejabat||'';$('ptNip').value=p.nip||'';
+    $('ptPenelaah1').value=p.penelaah1||DEF.penelaah1;$('ptPenelaah2').value=p.penelaah2||DEF.penelaah2;
+    $('ptJabatan').value=p.jabatan||'Kepala Seksi Survei dan Pemetaan';$('ptPejabat').value=p.pejabat||DEF.pejabat;$('ptNip').value=p.nip||DEF.nip;
     $('ptKantor').value=p.kantor||'Kantor Pertanahan Kabupaten Sumbawa Barat';$('ptProvinsi').value=p.provinsi||'Provinsi Nusa Tenggara Barat';
     $('ptTglTelaah').value=today();$('ptTglSah').value=today();
     $('ptLabelMode').value=p.labelMode||'short';$('ptBase').value=p.base||'0';$('ptScale').value='auto';
@@ -670,7 +675,7 @@
       if(p.kind==='citra')return {kind:'citra',title:'Latar Citra Satelit',source:base.credit};
       var list=layerFeatures(p.id,frame),legend=legendOf(list);
       var T=totalArea();
-      if(p.kind==='pola'){var pr=result(src.id);return {kind:'pola',title:'Pola Ruang '+src.label,features:list,legend:legend,stat:pr&&pr.inside?'irisan '+cats(pr).map(function(c){return c.name+' '+areaPct(c.area,T);}).join('; ')+(T-pr.area>=1?'; di luar cakupan '+areaPct(T-pr.area,T):''):'',source:src.label};}
+      if(p.kind==='pola'){var pr=result(src.id);return {kind:'pola',title:'Pola Ruang '+src.label,features:list,legend:legend,stat:pr&&pr.inside?'irisan '+cats(pr).map(function(c){return polaName(c.name,src)+' '+areaPct(c.area,T);}).join('; ')+(T-pr.area>=1?'; di luar cakupan '+areaPct(T-pr.area,T):''):'',source:src.label};}
       var r=result(p.id),def=defById(p.id)||{};
       return {kind:'limit',title:p.title,features:list,legend:legend,stat:r?'irisan '+areaPct(r.area,T)+(cats(r).length>1?' — '+cats(r).map(function(c){return c.name+' '+areaPct(c.area,T);}).join('; '):''):'',source:p.title+(def.sub?' — '+def.sub:'')};
     });
@@ -684,7 +689,7 @@
       info:{nib:excel?'':nibOf(f),excel:excel,excelFile:excel&&st.excel?st.excel.fileName:'',excelCrs:excel&&st.excel?st.excel.crsLabel:'',luasSpasial:num(totalArea())},
       hasil:$('ptHasil').value.split('\n').map(function(s){return s.trim().replace(/^\d+[\.\)]\s*/,'');}).filter(Boolean),
       telaah:{tgl:dateId($('ptTglTelaah').value),p1:$('ptPenelaah1').value.trim(),p2:$('ptPenelaah2').value.trim()},
-      sah:{tgl:dateId($('ptTglSah').value),jabatan:$('ptJabatan').value.trim(),nama:$('ptPejabat').value.trim(),nip:$('ptNip').value.trim()},
+      sah:{tgl:dateId($('ptTglSah').value),jabatan:$('ptJabatan').value.trim(),nama:$('ptPejabat').value.trim(),nip:fmtNip($('ptNip').value)},
       kantor:$('ptKantor').value.trim(),provinsi:$('ptProvinsi').value.trim(),printed:new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}),
       filename:['PETA_TELAAH',excel?'EXCEL':'NIB',excel?'':fileToken(labelFor(f)||nibOf(f)||'TANPA'),fileToken($('ptPemohon').value),fileToken(desa),$('ptPaper').value].filter(Boolean).join('_')
     };
