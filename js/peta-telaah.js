@@ -223,7 +223,12 @@
   }
   function result(id){var m=st.model&&st.model.model;if(!m)return null;return m.results.filter(function(r){return r.def.id===id;})[0]||null;}
   function totalArea(){return st.model?st.model.model.total:areaOf(st.feature);}
-  function catList(r,total){return r.categories.map(function(c){var p=pct(c.area,total);return c.name+(r.categories.length>1?' ('+num(c.area)+' m²'+(p?', '+p:'')+')':'');});}
+  // Rincian irisan: setiap kelas selalu disertai luas (m²) dan persentase terhadap luas bidang.
+  function areaPct(a,total){var p=pct(a,total);return num(a)+' m²'+(p?' ('+p+')':'');}
+  function cats(r){return (r.categories||[]).filter(function(c){return c.area>=0.5;}).sort(function(a,b){return b.area-a.area;});}
+  function catList(r,total){return cats(r).map(function(c){return c.name+' seluas '+areaPct(c.area,total);});}
+  function withCats(r,total){var c=cats(r);return ' seluas '+areaPct(r.area,total)+(c.length>1?', terdiri atas '+joinDan(c.map(function(x){return x.name+' '+areaPct(x.area,total);})):'');}
+  function remainder(r,total,label){var rest=total-r.area;return rest>=1?'; sisanya '+areaPct(rest,total)+' '+label:'';}
   function defaultPola(){
     for(var i=0;i<POLA.length;i++){var r=result(POLA[i].id);if(r&&r.inside)return POLA[i].id;}
     return 'rtrw';
@@ -258,23 +263,23 @@
     if(!m){lines.push('(Menunggu hasil analisis kawasan…)');return lines;}
     var hutan=result('sigap'),forest=hutan&&hutan.forest,hutanPending=!hutan||hutan.pending;
     if(hutanPending)lines.push('Status kawasan hutan belum dapat dipastikan (data SIGAP belum termuat).');
-    else if(forest)lines.push('Bidang beririsan dengan kawasan hutan: '+joinDan(hutan.categories.filter(function(c){return !/areal penggunaan lain|^apl$/i.test(c.name);}).map(function(c){return c.name+' '+num(c.area)+' m² ('+pct(c.area,total)+')';}))+'.');
+    else if(forest)lines.push('Bidang beririsan dengan kawasan hutan: '+joinDan(hutan.categories.filter(function(c){return !/areal penggunaan lain|^apl$/i.test(c.name);}).map(function(c){return c.name+' seluas '+areaPct(c.area,total);}))+'.');
     else lines.push('Kawasan hutan clear and clean.');
     var pippib=result('pippib');
-    lines.push(pippib&&pippib.inside?'Bidang beririsan dengan kawasan PIPPIB ('+joinDan(catList(pippib,total))+') seluas '+num(pippib.area)+' m² ('+pct(pippib.area,total)+').':'Kawasan PIPPIB clear and clean.');
+    lines.push(pippib&&pippib.inside?'Bidang beririsan dengan kawasan PIPPIB'+(cats(pippib).length===1?' ('+cats(pippib)[0].name+')':'')+withCats(pippib,total)+remainder(pippib,total,'di luar PIPPIB')+'.':'Kawasan PIPPIB clear and clean.');
     var ov=overlaps();
     lines.push(ov.length?'Areal terindikasi tumpang tindih dengan '+ov.length+' persil terdaftar: '+ov.slice(0,6).map(function(o){return 'NIB '+o.nib+' ('+num(o.area)+' m², '+pct(o.area,total)+')';}).join(', ')+(ov.length>6?' dan '+(ov.length-6)+' bidang lain':'')+'.':'Areal tidak terindikasi tumpang tindih dengan Persil Terdaftar KKP.');
     if(kkp.hgu)lines.push(KKP[2].text);
     var src=polaSource(),pr=result(src.id);
     if(pr&&pr.inside){
       var names=catList(pr,total).map(function(n){return /^(kawasan|zona)\b/i.test(n)?n:src.word+' '+n;});
-      lines.push('Bidang Permohonan Tata Guna Lahan berdasarkan '+src.text+' masuk dalam '+joinDan(names)+(pr.area<total*0.99?'; sisanya ('+num(total-pr.area)+' m²) di luar cakupan '+src.label:'')+'.');
+      lines.push('Bidang Permohonan Tata Guna Lahan berdasarkan '+src.text+' masuk dalam '+joinDan(names)+remainder(pr,total,'di luar cakupan '+src.label)+'.');
     }else lines.push('Bidang Permohonan berada di luar cakupan '+src.label+'.');
     var lsd=result('lsd');
-    lines.push(lsd&&lsd.inside?'Bidang yang dimohon masuk dalam kawasan LSD KSB seluas '+num(lsd.area)+' m² ('+pct(lsd.area,total)+').':'Bidang yang dimohon tidak masuk dalam kawasan LSD KSB.');
+    lines.push(lsd&&lsd.inside?'Bidang yang dimohon masuk dalam kawasan LSD KSB'+withCats(lsd,total)+remainder(lsd,total,'di luar LSD')+'.':'Bidang yang dimohon tidak masuk dalam kawasan LSD KSB.');
     var lp2b=result('lp2b');
-    if(lp2b&&lp2b.inside)lines.push('Bidang beririsan dengan LP2B Hasil Verifikasi Usulan tahun 2026 seluas '+num(lp2b.area)+' m² ('+pct(lp2b.area,total)+'), belum merupakan penetapan.');
-    ['sempadan-sungai','sempadan-pantai'].forEach(function(id){var r=result(id);if(r&&r.inside)lines.push('Bidang beririsan dengan '+r.def.title+' seluas '+num(r.area)+' m² ('+pct(r.area,total)+').');});
+    if(lp2b&&lp2b.inside)lines.push('Bidang beririsan dengan LP2B Hasil Verifikasi Usulan tahun 2026 (belum merupakan penetapan)'+withCats(lp2b,total)+remainder(lp2b,total,'di luar LP2B')+'.');
+    ['sempadan-sungai','sempadan-pantai'].forEach(function(id){var r=result(id);if(r&&r.inside)lines.push('Bidang beririsan dengan '+r.def.title+withCats(r,total)+remainder(r,total,'di luar sempadan')+'.');});
     if(!hutanPending&&!forest)lines.push('Permohonan bidang di luar kawasan hutan.');
     return lines;
   }
@@ -664,9 +669,10 @@
     var pages=on.map(function(p){
       if(p.kind==='citra')return {kind:'citra',title:'Latar Citra Satelit',source:base.credit};
       var list=layerFeatures(p.id,frame),legend=legendOf(list);
-      if(p.kind==='pola')return {kind:'pola',title:'Pola Ruang '+src.label,features:list,legend:legend,source:src.label};
+      var T=totalArea();
+      if(p.kind==='pola'){var pr=result(src.id);return {kind:'pola',title:'Pola Ruang '+src.label,features:list,legend:legend,stat:pr&&pr.inside?'irisan '+cats(pr).map(function(c){return c.name+' '+areaPct(c.area,T);}).join('; ')+(T-pr.area>=1?'; di luar cakupan '+areaPct(T-pr.area,T):''):'',source:src.label};}
       var r=result(p.id),def=defById(p.id)||{};
-      return {kind:'limit',title:p.title,features:list,legend:legend,stat:r?'irisan '+num(r.area)+' m² ('+pct(r.area,totalArea())+')':'',source:p.title+(def.sub?' — '+def.sub:'')};
+      return {kind:'limit',title:p.title,features:list,legend:legend,stat:r?'irisan '+areaPct(r.area,T)+(cats(r).length>1?' — '+cats(r).map(function(c){return c.name+' '+areaPct(c.area,T);}).join('; '):''):'',source:p.title+(def.sub?' — '+def.sub:'')};
     });
     var desa=$('ptDesa').value.trim(),kec=$('ptKec').value.trim(),excel=isExcel(f);
     return {
