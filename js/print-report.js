@@ -4,6 +4,8 @@
  * lalu laporan A4 di tab baru: satu halaman peta per layer (grid koordinat, kompas,
  * skala, legenda beserta luas irisan) dan satu halaman ringkasan hasil analisis.
  * Laporan dibuka dengan dialog cetak browser sehingga dapat disimpan sebagai PDF.
+ * Bila SHP bidang (mis. satu desa) sudah diunggah, pengguna memilih mencetak hanya bidang analisis
+ * (mis. poligon hasil digitasi) atau lengkap dengan bidang sedesa sebagai informasi bidang sekeliling.
  */
 (function(){
   'use strict';
@@ -109,6 +111,25 @@
     return promise.then(function(result){state.cache[key]=result;return result;});
   }
 
+  /* ---------- Bidang SHP di sekeliling (Eksplorasi Bidang, mis. satu desa) ---------- */
+  var NB_COLOR='#22d3ee',NB_LIMIT=2500;
+  function explorerFeatures(){var e=window.sobatExplorer;return e&&e.features?e.features()||[]:[];}
+  function subjectFeatures(c){var g=c&&c.model&&c.model.geojson;return g?(g.type==='FeatureCollection'?g.features||[]:[g]):[];}
+  function subjectMeasured(c){return !!(c&&c.options&&c.options.measured)||subjectFeatures(c).some(function(f){return !!(f&&f.properties&&f.properties.__SOBAT_MEASURED===true);});}
+  function nbEligible(c){return !!(c&&c.model&&c.model.mode==='polygon'&&explorerFeatures().length);}
+  function nbWanted(){var r=document.querySelector('input[name="printNb"]:checked');return !!(r&&r.value==='all'&&nbEligible(state.ctx));}
+  function widen(b,k){var dx=(b[2]-b[0])*k,dy=(b[3]-b[1])*k;return [b[0]-dx,b[1]-dy,b[2]+dx,b[3]+dy];}
+  function nbFeatures(c,bbox){
+    var subj=subjectFeatures(c),out=[];
+    explorerFeatures().some(function(f){
+      if(!f||!f.geometry||subj.indexOf(f)>=0)return false;
+      if(!f.__prBox)f.__prBox=geometryBox(f.geometry)||[0,0,0,0];
+      if(boxesOverlap(f.__prBox,bbox))out.push({type:'Feature',properties:{},geometry:f.geometry});
+      return out.length>=NB_LIMIT;
+    });
+    return out;
+  }
+
   /* ---------- Dialog Pengaturan Cetak Peta ---------- */
   var shell=document.createElement('div');
   shell.className='print-setup-shell';shell.id='printSetupModal';shell.setAttribute('aria-hidden','true');
@@ -121,6 +142,11 @@
           '<section class="print-setup-section"><h3>Peta dasar</h3><select id="printBaseSelect" class="print-base-select"></select></section>'+
           '<section class="print-setup-section"><h3>Skala cetak</h3><select id="printScaleSelect" class="print-base-select"><option value="auto">Otomatis — seluruh bidang terlihat</option><option value="500">1 : 500 — detail sangat dekat</option><option value="1000">1 : 1.000 — detail bidang</option><option value="2500">1 : 2.500 — bidang dan lingkungan</option><option value="5000">1 : 5.000 — konteks wilayah sekitar</option><option value="10000">1 : 10.000 — konteks kawasan</option></select><small id="printScaleHint" class="print-setup-hint">Skala aktif ditampilkan langsung pada preview.</small></section>'+
           '<section class="print-setup-section"><h3>Label wilayah</h3><select id="printVillageTypeSelect" class="print-base-select"><option value="auto">Otomatis</option><option value="Desa">Desa</option><option value="Kelurahan">Kelurahan</option></select><small id="printVillageTypeHint" class="print-setup-hint">Jenis wilayah dideteksi otomatis.</small></section>'+
+          '<section class="print-setup-section print-nb-section" id="printNbSection" hidden><h3>Poligon yang dicetak</h3>'+
+            '<label class="print-nb-option"><input type="radio" name="printNb" value="none" checked><span><strong id="printNbOnly">Hanya poligon hasil digitasi</strong><small>Peta hanya memuat bidang yang dianalisis.</small></span></label>'+
+            '<label class="print-nb-option"><input type="radio" name="printNb" value="all"><span><strong>Lengkap dengan poligon sedesa</strong><small id="printNbNote">Bidang SHP yang diunggah ditampilkan sebagai informasi bidang di sekeliling.</small></span></label>'+
+            '<button type="button" class="print-nb-telaah" id="printNbTelaah" data-peta-telaah="digit" hidden><i class="fas fa-map" aria-hidden="true"></i>Buat Peta Telaah Spasial dari poligon ini</button>'+
+          '</section>'+
           '<section class="print-setup-section"><h3>Layer peta</h3><div class="print-layer-fixed"><b id="printSubjectName">▣ Bidang analisis</b><br>Selalu aktif dan selalu ditampilkan paling atas.</div><div id="printLayerList" class="print-layer-list"></div><small id="printPageHint" class="print-page-hint"></small></section>'+
           '<section class="print-setup-section"><div id="printSetupStatus" class="print-setup-status">Google Satellite digunakan sebagai peta dasar bawaan.</div><div id="printLayerProgress" class="print-progress" hidden><i id="printLayerProgressBar"></i></div><small id="printLayerProgressText" class="print-setup-hint" hidden></small></section>'+
         '</aside>'+
@@ -129,7 +155,7 @@
     '</section>';
   document.body.appendChild(shell);
 
-  var state={map:null,base:null,group:null,subject:null,views:{},cache:null,token:0,ctx:null,layers:[],bboxKey:''};
+  var state={map:null,base:null,group:null,subject:null,nbLayer:null,views:{},cache:null,token:0,ctx:null,layers:[],bboxKey:''};
   function baseSelect(){return $('printBaseSelect');}
   baseSelect().innerHTML=BASES.map(function(b,i){return '<option value="'+i+'"'+(i===DEFAULT_BASE?' selected':'')+'>'+esc(b.name)+'</option>';}).join('');
 
@@ -168,7 +194,14 @@
     var pbt=state.ctx.model.mode!=='point'&&typeof window.sobatPbtPrintData==='function'?window.sobatPbtPrintData():null;
     if(pbt)state.pbtLayer=L.featureGroup([L.geoJSON(pbt.features,{interactive:false,smoothFactor:0,style:function(f){var hit=(f.properties||{}).hit;return{color:pbt.color,weight:hit?2.4:1.4,opacity:1,dashArray:hit&&!pbt.dashed?null:'5 3',fillColor:pbt.fill,fillOpacity:hit?.14:.05};}})].concat(pbt.pieces?[L.geoJSON(pbt.pieces,{interactive:false,style:{color:'#0057ff',weight:1.2,fillColor:'#00b3ff',fillOpacity:.5}})]:[])).addTo(preview);
     state.subject=L.geoJSON(geometry.type==='FeatureCollection'||geometry.type==='Feature'?geometry:{type:'Feature',properties:{},geometry:geometry},{interactive:false,style:{color:'#ff008c',weight:3,opacity:1,fillColor:'#ff008c',fillOpacity:.03},pointToLayer:function(f,ll){return L.circleMarker(ll,{radius:7,color:'#fff',weight:2,fillColor:'#ff008c',fillOpacity:1});}}).addTo(preview);
-    applyScale();
+    applyScale();renderNbPreview();
+  }
+  function renderNbPreview(){
+    var preview=state.map;if(!preview)return;
+    if(state.nbLayer){preview.removeLayer(state.nbLayer);state.nbLayer=null;}
+    if(!nbWanted())return;
+    state.nbLayer=L.geoJSON(nbFeatures(state.ctx,widen(viewBbox(),.25)),{interactive:false,smoothFactor:0,style:{color:NB_COLOR,weight:1.6,opacity:1,fill:false}}).addTo(preview);
+    if(state.subject)state.subject.bringToFront();
   }
   function checkedIds(){return [].slice.call(document.querySelectorAll('#printLayerList input:checked')).map(function(i){return i.value;});}
   function itemById(id){return state.layers.filter(function(l){return l.id===id;})[0];}
@@ -186,7 +219,7 @@
     };
   }
   function renderPreviewLegend(){
-    var point=state.ctx.model.mode==='point',html='<b>Legenda</b><div class="print-preview-legend-row"><i class="print-preview-legend-swatch subject"></i><span>'+(point?'Titik analisis':'Bidang analisis')+'</span></div>';
+    var point=state.ctx.model.mode==='point',html='<b>Legenda</b><div class="print-preview-legend-row"><i class="print-preview-legend-swatch subject"></i><span>'+(point?'Titik analisis':'Bidang analisis')+'</span></div>'+(nbWanted()?'<div class="print-preview-legend-row"><i class="print-preview-legend-swatch" style="background:transparent;border:2px solid '+NB_COLOR+'"></i><span>Bidang sekeliling (SHP)</span></div>':'');
     checkedIds().forEach(function(id){var item=itemById(id);if(!item)return;var c=LINE_COLORS[id]||'#4c94c7',pending=!state.views[id];html+='<div class="print-preview-legend-row'+(pending?' pending':'')+'"><i class="print-preview-legend-swatch" style="background:'+(item.admin?'transparent':c+'33')+';border:2px '+(item.admin||id==='lp2b'?'dashed':'solid')+' '+c+'"></i><span>'+esc(item.admin?'Batas desa/kelurahan':layerTitle(item.def))+(pending?' …':'')+'</span></div>';});
     $('printPreviewLegend').innerHTML=html;
   }
@@ -201,7 +234,7 @@
   function refreshPreview(){
     if(!state.ctx||!state.group)return;
     var token=++state.token,bbox=viewBbox(),key=bbox.map(function(v){return v.toFixed(5);}).join(','),ids=checkedIds();
-    if(state.bboxKey!==key){state.bboxKey=key;state.group.clearLayers();state.views={};}
+    if(state.bboxKey!==key){state.bboxKey=key;state.group.clearLayers();state.views={};renderNbPreview();}
     Object.keys(state.views).forEach(function(id){if(ids.indexOf(id)<0){state.group.removeLayer(state.views[id]);delete state.views[id];}});
     var todo=ids.filter(function(id){return !state.views[id];});
     renderPreviewLegend();
@@ -242,6 +275,12 @@
     $('printLayerList').innerHTML=state.layers.length>1||(state.layers.length&&!state.layers[0].admin)?state.layers.map(function(item){
       return '<label class="print-layer-row"><input type="checkbox" value="'+esc(item.id)+'"'+(item.checked?' checked':'')+'><span><strong>'+esc(item.name)+(item.legal?' ('+esc(item.legal)+')':'')+'</strong><small>'+esc(item.note)+'</small></span></label>';
     }).join(''):'<div class="print-layer-empty">Tidak ada layer yang '+(c.model.mode==='point'?'mencakup lokasi':'beririsan dengan bidang')+' ini. Cetakan hanya memuat peta dasar dan objek analisis.</div>'+state.layers.map(function(item){return '<label class="print-layer-row"><input type="checkbox" value="'+esc(item.id)+'"><span><strong>'+esc(item.name)+'</strong><small>'+esc(item.note)+'</small></span></label>';}).join('');
+    var nbOk=nbEligible(c),measured=subjectMeasured(c),nbLabel=window.sobatExplorer&&window.sobatExplorer.label?window.sobatExplorer.label():'';
+    $('printNbSection').hidden=!nbOk;
+    $('printNbOnly').textContent=measured?'Hanya poligon hasil digitasi':'Hanya bidang analisis';
+    $('printNbNote').textContent=explorerFeatures().length.toLocaleString('id-ID')+' bidang SHP'+(nbLabel?' ('+(/desa\/kelurahan$/.test(nbLabel)?nbLabel:'Desa/Kel. '+nbLabel)+')':'')+' ditampilkan sebagai informasi bidang di sekeliling.';
+    $('printNbTelaah').hidden=!(measured&&window.sobatDigitizedGeojson&&typeof window.sobatOpenPetaTelaah==='function');
+    var nbDefault=document.querySelector('input[name="printNb"][value="none"]');if(nbDefault)nbDefault.checked=true;
     $('printScaleSelect').value='auto';$('printVillageTypeSelect').value='auto';baseSelect().value=String(DEFAULT_BASE);
     $('printSetupStatus').textContent='Google Satellite digunakan sebagai peta dasar bawaan.';
     updatePageHint();updateVillageHint();
@@ -252,7 +291,8 @@
     setTimeout(function(){var p=ensurePreviewMap();p.invalidateSize();switchBase(DEFAULT_BASE);syncSubject();refreshPreview();updateScaleInfo();},60);
   }
   function close(){shell.classList.remove('open');shell.setAttribute('aria-hidden','true');document.body.classList.remove('st-print-setup-open');state.token++;}
-  shell.addEventListener('click',function(event){if(event.target===shell||event.target.closest('[data-print-close]'))close();});
+  shell.addEventListener('click',function(event){if(event.target===shell||event.target.closest('[data-print-close]')||event.target.closest('[data-peta-telaah]'))close();});
+  shell.querySelectorAll('input[name="printNb"]').forEach(function(r){r.addEventListener('change',function(){renderNbPreview();renderPreviewLegend();});});
   document.addEventListener('keydown',function(event){if(event.key==='Escape'&&shell.classList.contains('open'))close();});
   $('printScaleSelect').addEventListener('change',applyScale);
   baseSelect().addEventListener('change',function(){switchBase(Number(this.value));});
@@ -267,6 +307,8 @@
     button.disabled=true;var label=button.innerHTML;button.textContent='Menyiapkan PDF…';
     $('printSetupStatus').textContent='Mengambil geometri layer yang relevan pada area peta…';
     var bbox=viewBbox(),settings={base:BASES[Number(baseSelect().value)]||BASES[DEFAULT_BASE],scale:selectedScale(),villageWord:villageWord()};
+    // Bingkai cetak A4 bisa sedikit berbeda dari pratinjau; bidang sekeliling diambil dari area yang lebih lebar.
+    settings.neighbors=nbWanted()?nbFeatures(c,widen(bbox,.6)):[];
     Promise.all(checkedIds().map(function(id){return layerResult(c,itemById(id),bbox).catch(function(){return null;});})).then(function(results){
       settings.overlays=results.filter(function(r){return r&&r.data.features.length;});
       writeReport(reportWindow,c,settings);
@@ -324,6 +366,7 @@
         var items=['<div class="li"><i class="sw sw-subject">'+(report.pointShape?pinSvg:'<b class="sw-poly"></b>')+'</i><div><b>'+(report.pointShape?'Titik analisis':pbt?esc(pbt.subjectLabel||'Bidang KKPR'):'Bidang analisis')+'</b></div></div>'];
         if(pbt){items.push('<div class="li"><i class="sw" style="background:rgba(255,214,10,.12);border:2px '+(pbt.dashed?'dashed':'solid')+' '+(pbt.color||'#f5b800')+'"></i><div>'+esc(pbt.otherLabel||'Bidang PBT sertipikat')+(pbt.status==='near'&&!pbt.dashed?'<small>bidang terdekat bergaris tegas</small>':'')+'</div></div>');if(pbt.pieces)items.push('<div class="li"><i class="sw" style="background:#00b3ff;border:1px solid #0057ff"></i><div>Irisan'+((pbt.labels||[]).length?'<small>angka = nomor bidang pada tabel</small>':'')+'</div></div>');}
         if(layer){var cls=(layer.legendItems||[]).filter(function(e){return e.label;}),shown=cls.slice(0,14);shown.forEach(function(e){var st=layer.classStats&&layer.classStats[e.label];items.push('<div class="li"><i class="sw'+(layer.line?' sw-line':'')+'" style="'+swatch(e.color,layer.line)+'"></i><div>'+esc(e.label)+(st?'<small>'+esc(st)+'</small>':'')+'</div></div>');});if(cls.length>14)items.push('<div class="li"><i class="sw" style="background:#eee;border:1px solid #bbb"></i><div>+'+(cls.length-14)+' kelas lain</div></div>');}
+        if((report.neighbors||[]).length)items.push('<div class="li"><i class="sw" style="border:2px solid #22d3ee;background:transparent"></i><div>Bidang sekeliling<small>SHP yang diunggah</small></div></div>');
         if(admins.length)items.push('<div class="li"><i class="sw" style="border:1.6px dashed #1b1b1b;background:transparent"></i><div>Batas desa/kelurahan</div></div>');
         sheet.querySelector('.legend').innerHTML='<h2>Legenda<span class="grid-note"></span></h2><div class="lg">'+items.join('')+'</div>'+(layer&&layer.usulan?'<p class="lg-note">Data hasil verifikasi usulan, belum merupakan penetapan.</p>':'')+(layer&&!(layer.data.features||[]).length?'<p class="lg-note">Layer ini tidak memiliki fitur di dalam bingkai peta.</p>':'');
         var map=L.map(mapEl,{zoomControl:false,attributionControl:false,fadeAnimation:false,zoomAnimation:false,markerZoomAnimation:false}),base=report.base,tiles=L.tileLayer(base.url,{maxZoom:20,maxNativeZoom:base.maxNativeZoom||20}).addTo(map),bounds=L.geoJSON(geo,{pointToLayer:function(f,ll){return L.circleMarker(ll,{radius:1,opacity:0,fillOpacity:0});}}).getBounds();
@@ -336,6 +379,9 @@
           L.geoJSON(pbt.features,{pane:'pbt',interactive:false,smoothFactor:0,style:function(f){var hit=(f.properties||{}).hit;return{color:pbt.dashed?(pbt.color||'#7c3aed'):'#ffd60a',weight:hit?2.2:1.3,opacity:1,dashArray:hit&&!pbt.dashed?null:'6 3',fillColor:pbt.fill||'#ffd60a',fillOpacity:hit?.16:.05};}}).addTo(map);
           if(pbt.pieces)L.geoJSON(pbt.pieces,{pane:'pbt',interactive:false,smoothFactor:0,style:function(){return{color:'#0057ff',weight:1.2,opacity:1,fillColor:'#00b3ff',fillOpacity:.55};}}).addTo(map);
           (pbt.labels||[]).forEach(function(lb){L.marker([lb[1],lb[0]],{interactive:false,keyboard:false,icon:L.divIcon({className:'pbt-num',html:String(lb[2]),iconSize:[16,16],iconAnchor:[8,8]})}).addTo(map);});}
+        if((report.neighbors||[]).length){map.createPane('nb');map.getPane('nb').style.zIndex=375;
+          L.geoJSON(report.neighbors,{pane:'nb',interactive:false,smoothFactor:0,style:function(){return{color:'#1b1b1b',weight:3,opacity:.45,fill:false};}}).addTo(map);
+          L.geoJSON(report.neighbors,{pane:'nb',interactive:false,smoothFactor:0,style:function(){return{color:'#22d3ee',weight:1.5,opacity:1,fill:false};}}).addTo(map);}
         admins.forEach(function(o){if(!map.getPane('adm'))map.createPane('adm');map.getPane('adm').style.zIndex=380;L.geoJSON(o.data,{pane:'adm',interactive:false,smoothFactor:0,style:function(){return{color:'#ffffff',weight:3,opacity:.6,fill:false};}}).addTo(map);L.geoJSON(o.data,{pane:'adm',interactive:false,smoothFactor:0,style:function(){return{color:'#1b1b1b',weight:1.3,opacity:.95,fill:false,dashArray:'5 3'};}}).addTo(map);});
         var gridLayers=[];
         function edgeLabel(cls,text,left,top){var node=document.createElement('span');node.className='edge-coordinate '+cls;node.textContent=text;node.style.left=left+'px';node.style.top=top+'px';frame.appendChild(node);}
@@ -413,10 +459,11 @@
       '<div class="sec-row"><h1 class="sec">'+(o?'Peta '+(n+1)+' dari '+totalMaps+' • '+esc(o.short).replace(/(\d{4}–\d{4})/g,'<span class="nw">$1</span>'):'Peta '+(point?'Lokasi':'Bidang')+' Analisis')+'</h1>'+(o&&o.legal?'<span class="sec-sub">'+(/^(Perda|Perbup|Pergub|Perpres|PP|Permen|Kepmen|Keputusan|Peraturan|SK)\b/i.test(o.legal)?'Dasar hukum: ':'')+esc(o.legal)+'</span>':'')+(o&&o.statLine?'<span class="sec-stat">'+esc(o.statLine)+'</span>':'')+'</div>'+
       '<div class="map-frame"><div class="print-map"></div><div class="carto-card"><div class="carto-compass"><span>U</span><img src="'+u('assets/app/compass-rose.png')+'" alt=""></div><div class="scale-card"><div class="scale-ratio">Skala</div><div class="scale-bar"></div><div class="scale-labels"></div></div></div><div class="map-loc">'+locLine+'</div></div>'+
       '<section class="legend"></section></section>';}).join('');
-    var summary='<section class="summary">'+head+ident+'<h2 class="sec">Ringkasan Hasil Analisis</h2><table class="rt"><colgroup><col style="width:36%"><col style="width:15%"><col></colgroup><thead><tr><th>Layer</th><th>Status</th><th>Keterangan</th></tr></thead><tbody>'+bodyRows+'</tbody></table>'+outHtml+warnHtml+(pbtReport?pbtReport.html:'')+
+    var nbCount=(settings.neighbors||[]).length,nbHtml=nbCount?'<div class="box-out"><b>Bidang sekeliling:</b> '+nbCount.toLocaleString('id-ID')+' bidang dari SHP yang diunggah ditampilkan pada peta (garis biru muda) sebagai informasi bidang di sekitar '+(measured?'poligon hasil digitasi':'bidang analisis')+'.</div>':'';
+    var summary='<section class="summary">'+head+ident+'<h2 class="sec">Ringkasan Hasil Analisis</h2><table class="rt"><colgroup><col style="width:36%"><col style="width:15%"><col></colgroup><thead><tr><th>Layer</th><th>Status</th><th>Keterangan</th></tr></thead><tbody>'+bodyRows+'</tbody></table>'+outHtml+nbHtml+warnHtml+(pbtReport?pbtReport.html:'')+
       (hasLp2b?'<div class="box-lp2b"><b>* LP2B Hasil Verifikasi Usulan tahun 2026</b> belum merupakan penetapan dan masih menunggu Keputusan Bupati. Untuk rencana pemanfaatan, konfirmasikan ke Pemda setempat.</div>':'')+
       '<div class="box-note"><b>Catatan:</b> Hasil ini merupakan informasi awal berbasis data geospasial yang tersedia dan bukan keputusan atau dokumen hukum.'+(polygon?' Luas irisan dihitung dari geometri (UTM 50S), bukan ukuran kadastral.':'')+' Konfirmasikan keputusan formal kepada instansi berwenang.</div></section>';
-    var payload=JSON.stringify({pbt:pbtReport?{subjectLabel:pbtReport.subjectLabel,otherLabel:pbtReport.otherLabel,color:pbtReport.color,fill:pbtReport.fill,dashed:pbtReport.dashed,status:pbtReport.status,features:pbtReport.features,pieces:pbtReport.pieces,labels:pbtReport.labels,extent:pbtReport.extent}:null,geometry:geometry,pointShape:point,base:settings.base,layers:layers,admins:admins,scale:Number(settings.scale||0),filename:filename}).replace(/</g,'\\u003c');
+    var payload=JSON.stringify({pbt:pbtReport?{subjectLabel:pbtReport.subjectLabel,otherLabel:pbtReport.otherLabel,color:pbtReport.color,fill:pbtReport.fill,dashed:pbtReport.dashed,status:pbtReport.status,features:pbtReport.features,pieces:pbtReport.pieces,labels:pbtReport.labels,extent:pbtReport.extent}:null,geometry:geometry,pointShape:point,base:settings.base,layers:layers,admins:admins,neighbors:settings.neighbors||[],scale:Number(settings.scale||0),filename:filename}).replace(/</g,'\\u003c');
     var screenBar='<div class="screen-bar"><span>Pratinjau laporan. Pada dialog cetak, pilih <b>Simpan sebagai PDF</b>.</span><button type="button">Cetak / Simpan PDF</button></div>';
     var doc='<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(filename)+'</title><link rel="stylesheet" href="'+u('css/leaflet.css')+'"><style>'+PRINT_SHEET_CSS+'</style></head><body>'+screenBar+mapHtml+summary+
       '<script src="'+u('js/leaflet.js')+'"><\/script><script>var printDmsId='+printDmsId.toString()+';('+printSheetMain.toString()+')('+payload+');<\/script></body></html>';

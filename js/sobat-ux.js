@@ -45,6 +45,7 @@
       // Isi dan urutan sama dengan menu Alat Bale Ruang NTB.
       '<button type="button" role="menuitem" data-st-tool="distance"><i class="fas fa-ruler-horizontal" aria-hidden="true"></i>Ukur Jarak</button>'+
       '<button type="button" role="menuitem" data-st-tool="area"><i class="fas fa-object-group" aria-hidden="true"></i>Ukur Luas</button>'+
+      '<button type="button" role="menuitem" data-st-tool="coords"><i class="fas fa-map-pin" aria-hidden="true"></i>Input Koordinat Manual</button>'+
       '<button type="button" role="menuitem" data-st-tool="shp-kml"><i class="fas fa-exchange-alt" aria-hidden="true"></i>SHP ke KML</button>'+
       '<button type="button" role="menuitem" data-st-tool="kml-shp"><i class="fas fa-exchange-alt" aria-hidden="true"></i>KML ke SHP</button>'+
       '<button type="button" role="menuitem" data-st-tool="pdf-kkpr"><i class="fas fa-file-pdf" aria-hidden="true"></i>PDF KKPR ke Poligon</button>'+
@@ -374,6 +375,7 @@
     closeMenus();
     if(item.dataset.stTool==='geotag'){if(typeof window.brGeotagOpen==='function')window.brGeotagOpen();return;}
     if(item.dataset.stTool==='install'){installApp();return;}
+    if(item.dataset.stTool==='coords'){if(window.sobatManualCoords){if(isPhone())hideResult(true);window.sobatManualCoords.open();}return;}
     if(item.dataset.stTool==='area'||item.dataset.stTool==='distance')drawMode=item.dataset.stTool;
     var original=document.querySelector('.sobat-toolbox-item[data-tool="'+item.dataset.stTool+'"]');
     if(original)original.click();
@@ -536,6 +538,8 @@
   function activeGeometry(){
     if(lastIdentification&&lastIdentification.mode==='polygon'&&lastIdentification.geojson)return lastIdentification.geojson;
     if(window.uploadLayer&&map.hasLayer(window.uploadLayer)){try{return window.uploadLayer.toGeoJSON();}catch(_uploadError){}}
+    var ex=window.sobatExplorer&&window.sobatExplorer.shown()&&window.sobatExplorer.layer();
+    if(ex){try{return ex.toGeoJSON();}catch(_explorerError){}}
     return null;
   }
   function zoomToActive(){
