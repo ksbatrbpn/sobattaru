@@ -380,6 +380,7 @@
     // Bila penyandingan sudah dihitung, paskan ke bidang dan pembandingnya sekaligus.
     setTimeout(function(){if(pbt.result&&session&&session.kind==='kkpr')fitPbt();else window.sobatFitVisible(geojson);},ux.isPhone()?320:80);
   };
+  function clearExplorerSelection(){var e=window.sobatExplorer;if(e&&e.clearSelection&&e.selectedIndex&&e.selectedIndex()>=0){try{e.clearSelection();}catch(_e){}}}
   function startSession(geojson,sig){
     var previous=session,kind=kindOf(geojson),source=window.sobatSpatialSource||{};
     removeOutline();resetPbt(null);
@@ -387,6 +388,8 @@
     // Hanya satu bidang aktif: visual bidang lama yang tidak dipakai lagi dibersihkan.
     if(previous&&previous.kind!=='explorer'&&kind==='explorer'&&window.uploadLayer&&map.hasLayer(window.uploadLayer)){map.removeLayer(window.uploadLayer);window.uploadLayer=null;}
     if(window.measureControl&&measureControl._layer&&kind!=='digitized'){try{measureControl._layer.clearLayers();}catch(_e){}}
+    // Hanya satu bidang aktif: sorotan bidang SHP terpilih (oranye) dilepas saat bidang lain dianalisis.
+    if(kind!=='explorer')clearExplorerSelection();
     if(kind==='kkpr'){
       var feature=polygonFeatures(geojson)[0],k=session.kkpr,subject='KKPR',others=[],auto=-1;
       if(k&&k.tables){var chosen=k.result;subject=k.tables.length>1&&chosen?shortName(chosen.section):'KKPR';k.tables.forEach(function(t){if(t===chosen)return;try{others.push({name:t.section||'Tabel lain',short:shortName(t.section),count:t.rows.length,feature:parser.toFeature(t)});}catch(_e){}});if(k.showAll&&others.length)auto=0;}
@@ -429,7 +432,7 @@
   function discard(announce){
     var s=session;if(!s)return;session=null;
     removeOutline();resetPbt(null);
-    if(s.kind==='explorer'){var close=$('closeAnalysisPanel');if(close&&!hiddenPanel($('analysisPanel')))close.click();}
+    if(s.kind==='explorer'){var close=$('closeAnalysisPanel');if(close&&!hiddenPanel($('analysisPanel')))close.click();clearExplorerSelection();}
     else{if(window.uploadLayer&&map.hasLayer(window.uploadLayer))map.removeLayer(window.uploadLayer);window.uploadLayer=null;window.sobatDigitizedGeojson=null;}
     if(window.measureControl&&measureControl._layer){try{measureControl._layer.clearLayers();}catch(_e){}}
     window.lastUploadedFeature=null;window.sobatSpatialSource=null;
@@ -493,7 +496,7 @@
     var box=$('kkprPbtBox');if(box&&box.parentNode&&!document.body.contains(box.parentNode))box.remove();
     setTimeout(function(){renderPbt();syncSessionUi();syncPrint();},0);
   });
-  /* ---------- Bidang SHP sedesa di sekeliling bidang digitasi/unggahan ---------- */
+  /* ---------- Poligon sekitar (SHP satu desa/kecamatan/kabupaten) di sekitar bidang digitasi/unggahan ---------- */
   // SHP bidang (Eksplorasi Bidang) tetap di peta saat pengguna mendigit; kartu ini mengatur tampil/sembunyi
   // dan menghitung bidang SHP yang bersinggungan dengan bidang analisis.
   function explorerApi(){var e=window.sobatExplorer;return e&&e.features&&e.features().length?e:null;}
@@ -509,8 +512,8 @@
   function nbCardHtml(e,geojson){
     var list=e.features(),label=e.label?e.label():'',shown=e.shown(),digit=kindOf(geojson)==='digitized';
     var hits=list.length<=6000?touchingCount(geojson,list):-1;
-    return '<div class="st-card-title">Bidang SHP di sekeliling<span class="st-field-badge">'+list.length.toLocaleString('id-ID')+' bidang</span></div>'+
-      '<label class="st-nb-switch"><span><b>Tampilkan poligon sedesa</b><small>'+esc(label?(/desa\/kelurahan$/.test(label)?label:'Desa/Kel. '+label):'SHP yang diunggah')+' • informasi bidang di sekitar '+(digit?'poligon digitasi':'bidang ini')+'</small></span><input type="checkbox" data-st-nb-toggle'+(shown?' checked':'')+'></label>'+
+    return '<div class="st-card-title">Poligon sekitar<span class="st-field-badge">'+list.length.toLocaleString('id-ID')+' poligon</span></div>'+
+      '<label class="st-nb-switch"><span><b>Tampilkan poligon sekitar</b><small>'+esc(label?(/desa\/kelurahan$/.test(label)?label:'Desa/Kel. '+label):'SHP yang diunggah')+' • informasi bidang di sekitar '+(digit?'poligon digitasi':'bidang ini')+'</small></span><input type="checkbox" data-st-nb-toggle'+(shown?' checked':'')+'></label>'+
       (hits>=0?'<p class="st-nb-hit"><i class="fas '+(hits?'fa-exclamation-triangle':'fa-check-circle')+'" aria-hidden="true"></i>'+(hits?esc(hits.toLocaleString('id-ID'))+' bidang SHP bertampalan dengan '+(digit?'poligon digitasi':'bidang ini')+'.':'Tidak bertampalan dengan bidang SHP.')+'</p>':'')+
       (digit?'<button type="button" class="st-nb-telaah" data-peta-telaah="digit"><i class="fas fa-map" aria-hidden="true"></i>Buat Peta Telaah Spasial dari poligon digitasi</button>':'');
   }
@@ -524,7 +527,7 @@
     var anchor=body.querySelector('.st-field-card');if(anchor)anchor.parentNode.insertBefore(card,anchor.nextSibling);else body.insertBefore(card,body.firstChild);
   }
   document.addEventListener('sobat:analysis-rendered',function(event){var d=event.detail||{};if(d.body&&d.body.id!=='stResultBody')return;setTimeout(function(){renderNbCard(d);},0);});
-  document.addEventListener('change',function(event){var t=event.target.closest&&event.target.closest('[data-st-nb-toggle]');if(!t)return;var e=explorerApi();if(e)e.setShown(t.checked);toast(t.checked?'Poligon sedesa ditampilkan.':'Poligon sedesa disembunyikan. Data tetap tersimpan.',2600);});
+  document.addEventListener('change',function(event){var t=event.target.closest&&event.target.closest('[data-st-nb-toggle]');if(!t)return;var e=explorerApi();if(e)e.setShown(t.checked);toast(t.checked?'Poligon sekitar ditampilkan.':'Poligon sekitar disembunyikan. Data tetap tersimpan.',2600);});
   document.addEventListener('sobat:explorer-visibility',function(event){document.querySelectorAll('[data-st-nb-toggle]').forEach(function(t){t.checked=!!(event.detail&&event.detail.shown);});});
 
   // Tombol hapus bidang digitasi lama juga mengakhiri sesi.
