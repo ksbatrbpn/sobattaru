@@ -2,7 +2,7 @@
  * SOBAT TARU — Peta Telaah Spasial, dari menu Eksplorasi Bidang.
  * Alur: unggah SHP bidang (Eksplorasi Bidang) → pilih NIB yang dimohon, atau muat bidang dari
  * Excel koordinat (bidang yang belum diukur/belum ber-NIB), atau pakai bidang hasil digitasi
- * (bidang SHP sedesa tetap tampil sebagai sandingan, bisa disembunyikan) → isi formulir (pemohon, luas,
+ * (poligon sekitar dari SHP tetap tampil sebagai sandingan, bisa disembunyikan) → isi formulir (pemohon, luas,
  * penelaah, pejabat) → draf "Hasil Analisis" disusun otomatis dari irisan kawasan hutan, PIPPIB,
  * LSD, LP2B, sempadan, pola ruang, dan tumpang tindih dengan bidang lain di SHP → cetak.
  * Cetakan: satu halaman per latar (citra satelit, pola ruang, dan tiap faktor pembatas yang
@@ -151,8 +151,8 @@
               '<div class="pt-row"><label>Sistem koordinat<select id="ptCrs"><option value="auto">Deteksi otomatis</option><option value="geo">Geografis (bujur, lintang)</option><option value="utm50s">UTM Zona 50S (WGS 84)</option><option value="tm3-501">TM-3 Zona 50.1</option><option value="tm3-502">TM-3 Zona 50.2</option></select></label><label>Label bidang di peta<input id="ptExcelLabel" value="Dimohon" maxlength="24"></label></div>'+
               '<div id="ptExcelInfo"></div>'+
             '</div>'+
-            '<div id="ptModeDigit" hidden><p class="pt-note" style="margin:0 0 7px">Bidang yang didigit di peta (Ukur Luas &amp; Analisis atau Input Koordinat Manual) dipakai sebagai bidang yang dimohon. Bidang SHP sedesa yang diunggah menjadi informasi bidang di sekelilingnya.</p><label>Label bidang di peta<input id="ptDigitLabel" value="Dimohon" maxlength="24"></label></div>'+
-            '<label class="pt-check"><input type="checkbox" id="ptShowNb" checked>Tampilkan bidang SHP (sedesa) sebagai bidang sandingan</label>'+
+            '<div id="ptModeDigit" hidden><p class="pt-note" style="margin:0 0 7px">Bidang yang didigit di peta (Ukur Luas &amp; Analisis atau Input Koordinat Manual) dipakai sebagai bidang yang dimohon. Poligon sekitar dari SHP yang diunggah (satu desa, kecamatan, atau kabupaten) menjadi informasi bidang di sekitarnya.</p><label>Label bidang di peta<input id="ptDigitLabel" value="Dimohon" maxlength="24"></label></div>'+
+            '<label class="pt-check"><input type="checkbox" id="ptShowNb" checked>Tampilkan poligon sekitar (SHP) sebagai bidang sandingan</label>'+
             '<div class="pt-subject" id="ptSubject"></div></section>'+
           '<section class="pt-sec"><h3><i class="fas fa-heading" aria-hidden="true"></i>Judul peta</h3>'+
             '<label>Jenis permohonan<input id="ptJenis" list="ptJenisList"></label><datalist id="ptJenisList">'+JENIS.map(function(j){return '<option value="'+esc(j)+'">';}).join('')+'</datalist>'+
@@ -454,7 +454,7 @@
     st.mode=mode;
     shell.querySelectorAll('[data-pt-mode]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-pt-mode')===mode);});
     $('ptModeShp').hidden=mode!=='shp';$('ptModeExcel').hidden=mode!=='excel';$('ptModeDigit').hidden=mode!=='digit';
-    $('ptPreviewHint').textContent=mode==='excel'?'Bidang dari Excel tampil magenta; bidang SHP tampil sebagai sandingan.':mode==='digit'?'Bidang hasil digitasi tampil magenta; bidang SHP sedesa tampil sebagai sandingan (dapat disembunyikan).':'Klik bidang sandingan di pratinjau untuk menjadikannya bidang yang dimohon.';
+    $('ptPreviewHint').textContent=mode==='excel'?'Bidang dari Excel tampil magenta; bidang SHP tampil sebagai sandingan.':mode==='digit'?'Bidang hasil digitasi tampil magenta; poligon sekitar dari SHP tampil sebagai sandingan (dapat disembunyikan).':'Klik bidang sandingan di pratinjau untuk menjadikannya bidang yang dimohon.';
     if(silent)return;
     if(mode==='digit'){useDigitFeature();return;}
     if(mode==='excel'){

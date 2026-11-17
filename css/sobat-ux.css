@@ -829,6 +829,12 @@ body.st-result-open .tutorial-coach,body.st-layers-open .tutorial-coach{display:
 .print-setup-hint{display:block;margin-top:6px;color:var(--st-muted);font-size:11.5px;line-height:1.4}
 .print-setup-hint[hidden]{display:none}
 .print-nb-section[hidden]{display:none}
+.print-scale-custom{display:flex;align-items:center;gap:6px;margin-top:8px}
+.print-scale-custom[hidden]{display:none}
+.print-scale-custom span{color:var(--st-ink);font:600 14px var(--st-font)}
+.print-scale-custom input{flex:1 1 auto;min-width:0;height:36px;padding:0 10px;border:0;border-radius:var(--st-radius-sm);background:var(--st-fill);color:var(--st-ink);font:600 14px var(--st-font);font-variant-numeric:tabular-nums}
+.print-scale-step{flex:0 0 36px;width:36px;height:36px;border:0;border-radius:var(--st-radius-sm);background:var(--st-green-50);color:var(--st-green-700);font:700 18px var(--st-font);cursor:pointer}
+.print-scale-step:hover{background:var(--st-green-100)}
 .print-nb-option{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;margin-bottom:6px;padding:9px 11px;border-radius:var(--st-radius-sm);background:#fff;box-shadow:0 0 0 .5px var(--st-line-strong);cursor:pointer}
 .print-nb-option:has(input:checked){box-shadow:0 0 0 1.5px var(--st-accent);background:#f2faf7}
 .print-nb-option input{width:16px;height:16px;margin:1px 0 0;accent-color:var(--st-accent)}
