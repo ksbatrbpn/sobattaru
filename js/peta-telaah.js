@@ -1,7 +1,8 @@
 /*
  * SOBAT TARU — Peta Telaah Spasial, dari menu Eksplorasi Bidang.
  * Alur: unggah SHP bidang (Eksplorasi Bidang) → pilih NIB yang dimohon, atau muat bidang dari
- * Excel koordinat (bidang yang belum diukur/belum ber-NIB) → isi formulir (pemohon, luas,
+ * Excel koordinat (bidang yang belum diukur/belum ber-NIB), atau pakai bidang hasil digitasi
+ * (bidang SHP sedesa tetap tampil sebagai sandingan, bisa disembunyikan) → isi formulir (pemohon, luas,
  * penelaah, pejabat) → draf "Hasil Analisis" disusun otomatis dari irisan kawasan hutan, PIPPIB,
  * LSD, LP2B, sempadan, pola ruang, dan tumpang tindih dengan bidang lain di SHP → cetak.
  * Cetakan: satu halaman per latar (citra satelit, pola ruang, dan tiap faktor pembatas yang
@@ -115,7 +116,7 @@
     '.pt-check{display:flex!important;align-items:flex-start;gap:7px;font-weight:600!important;line-height:1.35}.pt-sec label.pt-check>input{flex:0 0 auto;display:inline-block;width:auto;margin:2px 0 0;padding:0}'+
     '.pt-check small{display:block;color:#9a3412;font-weight:600}'+
     '.pt-subject{padding:8px 9px;border-radius:8px;background:#fff0f8;border:1px solid #f6c3df;font-size:12px;line-height:1.45}.pt-subject b{color:#9d0057}'+
-    '.pt-seg{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:0 0 9px;border:1px solid #c9dad5;border-radius:9px;overflow:hidden}.pt-seg button{padding:7px 6px;border:0;background:#fff;color:#0b4f44;font-size:11.5px;font-weight:800;cursor:pointer}.pt-seg button.on{background:#0b4f44;color:#fff}'+
+    '.pt-seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;margin:0 0 9px;border:1px solid #c9dad5;border-radius:9px;overflow:hidden}.pt-seg button{padding:7px 6px;border:0;background:#fff;color:#0b4f44;font-size:11.5px;font-weight:800;cursor:pointer}.pt-seg button.on{background:#0b4f44;color:#fff}.pt-seg button[hidden]{display:none}'+
     '.pt-note{margin:4px 0 0;color:#5b6e69;font-size:10.5px;line-height:1.4}.pt-warn{color:#9a4a00}.pt-err{color:#b42318}'+
     '.pt-mini{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border:1px solid #c9dad5;border-radius:7px;background:#fff;color:#0b4f44;font-size:11px;font-weight:700;cursor:pointer}.pt-mini.primary{background:#0b4f44;border-color:#0b4f44;color:#fff}'+
     '.pt-actions{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}'+
@@ -132,7 +133,7 @@
   shell.className='pt-shell';shell.id='petaTelaahModal';shell.setAttribute('aria-hidden','true');
   shell.innerHTML=
     '<section class="pt-dialog" role="dialog" aria-modal="true" aria-labelledby="ptTitle">'+
-      '<header class="pt-head"><div><h2 id="ptTitle">Peta Telaah Spasial</h2><p>Pilih bidang yang dimohon (NIB dari SHP atau koordinat dari Excel), lengkapi isian, lalu cetak. Geser pratinjau untuk mengatur posisi; tombol +/− atau pilihan skala mengatur skala cetak.</p></div><button class="pt-close" type="button" data-pt-close aria-label="Tutup">×</button></header>'+
+      '<header class="pt-head"><div><h2 id="ptTitle">Peta Telaah Spasial</h2><p>Pilih bidang yang dimohon (NIB dari SHP, koordinat dari Excel, atau hasil digitasi), lengkapi isian, lalu cetak. Geser pratinjau untuk mengatur posisi; tombol +/− atau pilihan skala mengatur skala cetak.</p></div><button class="pt-close" type="button" data-pt-close aria-label="Tutup">×</button></header>'+
       '<div class="pt-body">'+
         '<div class="pt-preview">'+
           '<div class="pt-tabs" id="ptTabs" role="tablist"></div>'+
@@ -142,7 +143,7 @@
         '</div>'+
         '<div class="pt-form" id="ptForm">'+
           '<section class="pt-sec"><h3><i class="fas fa-vector-square" aria-hidden="true"></i>Bidang yang dimohon</h3>'+
-            '<div class="pt-seg" role="tablist"><button type="button" class="on" data-pt-mode="shp">Dari SHP (NIB)</button><button type="button" data-pt-mode="excel">Dari Excel koordinat</button></div>'+
+            '<div class="pt-seg" role="tablist"><button type="button" class="on" data-pt-mode="shp">Dari SHP (NIB)</button><button type="button" data-pt-mode="excel">Dari Excel koordinat</button><button type="button" data-pt-mode="digit" hidden>Dari digitasi</button></div>'+
             '<div id="ptModeShp"><label>NIB<input id="ptNib" list="ptNibList" autocomplete="off" placeholder="Ketik atau pilih NIB…"></label><datalist id="ptNibList"></datalist></div>'+
             '<div id="ptModeExcel" hidden>'+
               '<p class="pt-note" style="margin:0 0 7px">Untuk bidang yang belum diukur atau belum ber-NIB. Bidang SHP yang sudah diunggah tetap tampil sebagai bidang sandingan.</p>'+
@@ -150,6 +151,8 @@
               '<div class="pt-row"><label>Sistem koordinat<select id="ptCrs"><option value="auto">Deteksi otomatis</option><option value="geo">Geografis (bujur, lintang)</option><option value="utm50s">UTM Zona 50S (WGS 84)</option><option value="tm3-501">TM-3 Zona 50.1</option><option value="tm3-502">TM-3 Zona 50.2</option></select></label><label>Label bidang di peta<input id="ptExcelLabel" value="Dimohon" maxlength="24"></label></div>'+
               '<div id="ptExcelInfo"></div>'+
             '</div>'+
+            '<div id="ptModeDigit" hidden><p class="pt-note" style="margin:0 0 7px">Bidang yang didigit di peta (Ukur Luas &amp; Analisis atau Input Koordinat Manual) dipakai sebagai bidang yang dimohon. Bidang SHP sedesa yang diunggah menjadi informasi bidang di sekelilingnya.</p><label>Label bidang di peta<input id="ptDigitLabel" value="Dimohon" maxlength="24"></label></div>'+
+            '<label class="pt-check"><input type="checkbox" id="ptShowNb" checked>Tampilkan bidang SHP (sedesa) sebagai bidang sandingan</label>'+
             '<div class="pt-subject" id="ptSubject"></div></section>'+
           '<section class="pt-sec"><h3><i class="fas fa-heading" aria-hidden="true"></i>Judul peta</h3>'+
             '<label>Jenis permohonan<input id="ptJenis" list="ptJenisList"></label><datalist id="ptJenisList">'+JENIS.map(function(j){return '<option value="'+esc(j)+'">';}).join('')+'</datalist>'+
@@ -184,20 +187,26 @@
   $('ptScale').innerHTML='<option value="auto">Otomatis</option>'+SCALES.map(function(s){return '<option value="'+s+'">1 : '+s.toLocaleString('id-ID')+'</option>';}).join('');
   var excelInput=document.createElement('input');excelInput.type='file';excelInput.accept='.xlsx,.xls,.csv';excelInput.hidden=true;document.body.appendChild(excelInput);
 
-  var st={open:false,mode:'shp',feature:null,excel:null,excelLayer:null,model:null,villages:null,map:null,base:null,groups:null,view:'citra',center:null,edited:false,token:0,pages:[]};
+  var st={open:false,mode:'shp',feature:null,excel:null,excelLayer:null,digitFeature:null,model:null,villages:null,map:null,base:null,groups:null,view:'citra',center:null,edited:false,token:0,pages:[]};
 
   /* ---------- Data bidang dari Eksplorasi Bidang ---------- */
   function explorer(){return window.sobatExplorer||null;}
   function features(){var e=explorer();return e?e.features():[];}
   function isExcel(f){return !!(f&&f.properties&&f.properties.__SOBAT_EXCEL);}
-  function nibOf(f){if(!f||isExcel(f))return '';var e=explorer();var v=e?e.value(f,'nib'):'';return String(v==null?'':v).trim();}
+  // Bidang hasil digitasi di SOBAT TARU (Ukur Luas & Analisis / koordinat manual): belum ber-NIB, SHP jadi sandingan.
+  function digitized(){var g=window.sobatDigitizedGeojson,list=g&&(g.type==='FeatureCollection'?g.features:[g]);return (list||[]).filter(function(f){return f&&f.geometry&&/Polygon/.test(f.geometry.type);})[0]||null;}
+  function isDigit(f){return !!f&&f===st.digitFeature;}
+  function isOwn(f){return isExcel(f)||isDigit(f);}
+  function showNeighbors(){var c=$('ptShowNb');return !c||c.checked;}
+  function nibOf(f){if(!f||isOwn(f))return '';var e=explorer();var v=e?e.value(f,'nib'):'';return String(v==null?'':v).trim();}
   function labelFor(f){
     if(isExcel(f))return String(f.properties.__SOBAT_LABEL||'').trim();
+    if(isDigit(f))return String($('ptDigitLabel').value||'').trim();
     var mode=$('ptLabelMode').value,nib=nibOf(f);if(mode==='none'||!nib)return '';
     if(mode==='full')return nib;
     var digits=nib.replace(/\D/g,'');return digits.length>5?digits.slice(-5):nib;
   }
-  function attr(f,name){if(!f||isExcel(f))return '';var e=explorer();var v=e?e.value(f,name):'';return String(v==null?'':v).trim();}
+  function attr(f,name){if(!f||isOwn(f))return '';var e=explorer();var v=e?e.value(f,name):'';return String(v==null?'':v).trim();}
   function labelPoint(f){
     if(f.__ptLabel)return f.__ptLabel;
     var pt=null;
@@ -258,12 +267,13 @@
   }
   function luasInput(){return Number(String($('ptLuas').value||'').replace(/\./g,'').replace(',','.'));}
   function autoLines(){
-    var m=st.model,lines=[],kkp={},excel=isExcel(st.feature);
+    var m=st.model,lines=[],kkp={},excel=isOwn(st.feature);
     shell.querySelectorAll('[data-pt-kkp]').forEach(function(c){kkp[c.getAttribute('data-pt-kkp')]=c.checked;});
     var total=totalArea(),luas=luasInput();
     if(kkp.nib&&!excel)lines.push(KKP[0].text);
     if(kkp.luas&&!excel)lines.push(KKP[1].text);
-    if(excel)lines.push('Bidang dimohon belum terdaftar/belum ber-NIB; batas bidang berasal dari koordinat '+(st.excel?st.excel.crsLabel:'Excel')+(st.excel?' ('+st.excel.points.length+' titik)':'')+'.');
+    if(isDigit(st.feature))lines.push('Bidang dimohon belum terdaftar/belum ber-NIB; batas bidang berasal dari hasil digitasi pada SOBAT TARU.');
+    else if(excel)lines.push('Bidang dimohon belum terdaftar/belum ber-NIB; batas bidang berasal dari koordinat '+(st.excel?st.excel.crsLabel:'Excel')+(st.excel?' ('+st.excel.points.length+' titik)':'')+'.');
     var ll=luasLine(total,luas);if(ll)lines.push(ll);
     if(!m){lines.push('(Menunggu hasil analisis kawasan…)');return lines;}
     var hutan=result('sigap'),forest=hutan&&hutan.forest,hutanPending=!hutan||hutan.pending;
@@ -376,11 +386,11 @@
     else if(st.base&&!st.map.hasLayer(st.base))st.base.addTo(st.map);
     var over=page.kind==='citra'?null:layerFeatures(page.id,viewBbox(0));
     if(over)L.geoJSON(over,{interactive:false,style:function(f){return {color:f.properties.color,weight:opaque?.6:1.2,opacity:1,fillColor:f.properties.color,fillOpacity:opaque?.9:.5};}}).addTo(g.overlay);
-    var list=neighborsIn(viewBbox(0.1),2500);
+    var list=showNeighbors()?neighborsIn(viewBbox(0.1),2500):[];
     L.geoJSON(list,{style:{color:NEIGHBOR,weight:2,opacity:1,fill:true,fillOpacity:0},onEachFeature:function(f,layer){layer.on('click',function(){chooseFeature(f);});layer.bindTooltip('NIB '+(nibOf(f)||'—'),{sticky:true});}}).addTo(g.neighbors);
     L.geoJSON(st.feature,{interactive:false,style:{color:SUBJECT,weight:3,opacity:1,fillColor:SUBJECT,fillOpacity:.28}}).addTo(g.subject);
     if(st.map.getZoom()>=16)[st.feature].concat(list).slice(0,600).forEach(function(f){var t=labelFor(f);if(!t)return;var p=labelPoint(f);L.marker([p[1],p[0]],{interactive:false,keyboard:false,icon:L.divIcon({className:'pt-label',html:'<span>'+esc(t)+'</span>',iconSize:[0,0],iconAnchor:[0,0]})}).addTo(g.labels);});
-    var items=[{kind:'neighbor',label:'Bidang Sandingan'},{kind:'subject',label:'Bidang Tanah yang Dimohon'}].concat(over?legendOf(over).map(function(i){return {kind:'cls',label:i.label,color:i.color};}):[]);
+    var items=(showNeighbors()?[{kind:'neighbor',label:'Bidang Sandingan'}]:[]).concat([{kind:'subject',label:'Bidang Tanah yang Dimohon'}]).concat(over?legendOf(over).map(function(i){return {kind:'cls',label:i.label,color:i.color};}):[]);
     $('ptLegend').innerHTML=items.map(function(i){return '<span><i style="'+(i.kind==='subject'?'border:2px solid '+SUBJECT+';background:repeating-linear-gradient(45deg,'+SUBJECT+' 0 1.5px,transparent 1.5px 4px)':i.kind==='neighbor'?'border:2px solid '+NEIGHBOR:'background:'+esc(i.color)+';border:1px solid rgba(0,0,0,.2)')+'"></i>'+esc(i.label)+'</span>';}).join('');
   }
   var previewTimer=null;
@@ -405,6 +415,7 @@
   function subjectInfo(){
     var f=st.feature;if(!f){$('ptSubject').innerHTML='Belum ada bidang yang dipilih.';return;}
     var e=explorer(),total=totalArea();
+    if(isDigit(f)){$('ptSubject').innerHTML='<b>Bidang hasil digitasi</b> (belum ber-NIB)<br>Luas spasial '+num(total)+' m² • '+Math.max(0,((f.geometry.coordinates[0]||[]).length||1)-1)+' titik batas<br>'+(features().length?features().length.toLocaleString('id-ID')+' bidang SHP '+(showNeighbors()?'tampil':'disembunyikan')+' sebagai sandingan':'Belum ada SHP bidang yang diunggah sebagai sandingan');return;}
     if(isExcel(f)){$('ptSubject').innerHTML='<b>Bidang dari Excel koordinat</b> (belum ber-NIB)<br>Luas spasial '+num(total)+' m² • '+st.excel.points.length+' titik • '+esc(st.excel.crsLabel)+'<br>'+esc(st.excel.fileName);return;}
     var cad=e?e.cadastral(f):0;
     $('ptSubject').innerHTML='<b>NIB '+esc(nibOf(f)||'tidak tersedia')+'</b><br>Luas spasial '+num(total)+' m²'+(cad?' • luas atribut '+num(cad)+' m²':'')+(attr(f,'right')?' • '+esc(attr(f,'right')):'')+'<br>'+esc([attr(f,'village'),attr(f,'district')].filter(Boolean).join(', ')||'Wilayah dari atribut SHP tidak tersedia');
@@ -421,7 +432,7 @@
     st.feature=f;st.center=null;st.model=null;st.villages=null;
     var token=++st.token;
     $('ptNib').value=nibOf(f);
-    if(!keepForm){var e=explorer(),cad=!isExcel(f)&&e?e.cadastral(f):0;$('ptLuas').value=cad?String(Math.round(cad)):isExcel(f)?String(Math.round(areaOf(f))):'';$('ptDesa').value='';$('ptKec').value='';}
+    if(!keepForm){var e=explorer(),cad=!isOwn(f)&&e?e.cadastral(f):0;$('ptLuas').value=cad?String(Math.round(cad)):isOwn(f)?String(Math.round(areaOf(f))):'';$('ptDesa').value='';$('ptKec').value='';}
     subjectInfo();fillAdmin();buildPages();regen(true);
     if(st.map){applyView();renderPreview();}
     $('ptStatus').textContent='Menganalisis bidang…';
@@ -442,9 +453,10 @@
   function setMode(mode,silent){
     st.mode=mode;
     shell.querySelectorAll('[data-pt-mode]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-pt-mode')===mode);});
-    $('ptModeShp').hidden=mode!=='shp';$('ptModeExcel').hidden=mode!=='excel';
-    $('ptPreviewHint').textContent=mode==='excel'?'Bidang dari Excel tampil magenta; bidang SHP tampil sebagai sandingan.':'Klik bidang sandingan di pratinjau untuk menjadikannya bidang yang dimohon.';
+    $('ptModeShp').hidden=mode!=='shp';$('ptModeExcel').hidden=mode!=='excel';$('ptModeDigit').hidden=mode!=='digit';
+    $('ptPreviewHint').textContent=mode==='excel'?'Bidang dari Excel tampil magenta; bidang SHP tampil sebagai sandingan.':mode==='digit'?'Bidang hasil digitasi tampil magenta; bidang SHP sedesa tampil sebagai sandingan (dapat disembunyikan).':'Klik bidang sandingan di pratinjau untuk menjadikannya bidang yang dimohon.';
     if(silent)return;
+    if(mode==='digit'){useDigitFeature();return;}
     if(mode==='excel'){
       renderExcelInfo();
       if(st.excel)useExcelFeature();
@@ -453,9 +465,10 @@
   }
 
   function open(mode){
-    var e=explorer(),list=features(),i=e?e.selectedIndex():-1,f=list[i];
-    if(!e||!list.length){toast('Unggah SHP bidang (lebih dari satu poligon) melalui Unggah SHP/KML terlebih dahulu.',5000);return;}
-    if(mode!=='excel'&&!f){toast('Pilih bidang (NIB) yang dimohon pada daftar Eksplorasi Bidang, atau gunakan Telaah dari Excel.',5000);return;}
+    var e=explorer(),list=features(),i=e?e.selectedIndex():-1,f=list[i],dg=digitized();
+    if(mode==='digit'&&!dg){toast('Belum ada bidang hasil digitasi. Gunakan Alat → Ukur Luas & Analisis atau Input Koordinat Manual.',5000);return;}
+    if(mode!=='digit'&&(!e||!list.length)){toast('Unggah SHP bidang (lebih dari satu poligon) melalui Unggah SHP/KML terlebih dahulu.',5000);return;}
+    if(mode!=='excel'&&mode!=='digit'&&!f){toast('Pilih bidang (NIB) yang dimohon pada daftar Eksplorasi Bidang, atau gunakan Telaah dari Excel.',5000);return;}
     var p=prefs();
     $('ptJenis').value=p.jenis||JENIS[0];$('ptPemohon').value='';
     $('ptPenelaah1').value=p.penelaah1||DEF.penelaah1;$('ptPenelaah2').value=p.penelaah2||DEF.penelaah2;
@@ -465,9 +478,10 @@
     $('ptLabelMode').value=p.labelMode||'short';$('ptBase').value=p.base||'0';$('ptScale').value='auto';
     $('ptTheme').value=THEMES[p.theme]?p.theme:'1';$('ptPaper').value=PAPERS[p.paper]?p.paper:'A3';
     shell.querySelectorAll('[data-pt-kkp]').forEach(function(c){c.checked=false;});
+    shell.querySelector('[data-pt-mode="digit"]').hidden=!dg;$('ptShowNb').checked=true;
     $('ptNibList').innerHTML=list.slice(0,5000).map(function(x){var n=nibOf(x);return n?'<option value="'+esc(n)+'">':'';}).join('');
     shell.classList.add('open');shell.setAttribute('aria-hidden','false');document.body.classList.add('pt-open');st.open=true;st.view='citra';st.pages=[];
-    setTimeout(function(){ensureMap();sizeFrame();switchBase();if(mode==='excel')setMode('excel');else{setMode('shp',true);setFeature(f,false);}},60);
+    setTimeout(function(){ensureMap();sizeFrame();switchBase();if(mode==='excel'||mode==='digit')setMode(mode);else{setMode('shp',true);setFeature(f,false);}},60);
   }
   function close(){shell.classList.remove('open');shell.setAttribute('aria-hidden','true');document.body.classList.remove('pt-open');st.open=false;st.token++;}
 
@@ -482,7 +496,7 @@
   });
   shell.addEventListener('change',function(ev){var c=ev.target.closest&&ev.target.closest('[data-pt-page]');if(!c)return;var p=pageById(c.getAttribute('data-pt-page'));if(p)p.on=c.checked;});
   document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&st.open)close();});
-  document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-peta-telaah]');if(b&&!shell.contains(b))open(b.getAttribute('data-peta-telaah')==='excel'?'excel':'shp');});
+  document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('[data-peta-telaah]');if(b&&!shell.contains(b)){var m=b.getAttribute('data-peta-telaah');open(m==='excel'||m==='digit'?m:'shp');}});
   $('ptNib').addEventListener('change',function(){
     var v=this.value.trim();if(!v)return;
     var f=features().filter(function(x){return nibOf(x)===v;})[0];
@@ -496,6 +510,8 @@
   $('ptBase').addEventListener('change',function(){switchBase();});
   $('ptPola').addEventListener('change',function(){regen(false);if(st.view==='pola')renderPreview();});
   $('ptLabelMode').addEventListener('change',renderPreview);
+  $('ptShowNb').addEventListener('change',function(){subjectInfo();renderPreview();});
+  $('ptDigitLabel').addEventListener('input',function(){if(isDigit(st.feature))renderPreview();});
   $('ptLuas').addEventListener('input',function(){
     if(!st.edited){regen(false);return;}
     if(!st.feature)return;
@@ -626,6 +642,15 @@
     if(typeof window.runAnalysis==='function'){try{window.runAnalysis({type:'FeatureCollection',features:[f]});}catch(_e){}}
     setFeature(f,false);renderExcelInfo();
   }
+  function useDigitFeature(){
+    var f=digitized(),e=explorer();
+    if(!f){st.feature=null;st.token++;st.model=null;subjectInfo();buildPages();regen(true);renderPreview();$('ptStatus').textContent='Belum ada bidang hasil digitasi.';return;}
+    if(e&&e.clearSelection)e.clearSelection();
+    st.digitFeature=f;
+    // Bila hasil analisis terakhir bukan bidang digitasi ini, analisis diulang dengan mesin yang sama.
+    if(!modelFor(f)&&typeof window.runAnalysis==='function'){try{window.runAnalysis(window.sobatDigitizedGeojson);}catch(_e){}}
+    setFeature(f,false);
+  }
   function handleExcel(file){
     $('ptStatus').textContent='Membaca '+file.name+'…';
     readExcelFile(file).then(function(rows){
@@ -669,7 +694,7 @@
     // Luas bingkai cetak di permukaan bumi, dipakai untuk memilih bidang sandingan dan kelas layer.
     var mpp=scale*0.0002645833333,halfW=l.mapW*MM*mpp/2,halfH=l.mapH*MM*mpp/2,kx=111320*Math.cos(c.lat*Math.PI/180),ky=110574;
     var frame=[c.lng-halfW/kx,c.lat-halfH/ky,c.lng+halfW/kx,c.lat+halfH/ky],dx=(frame[2]-frame[0])*.05,dy=(frame[3]-frame[1])*.05,wide=[frame[0]-dx,frame[1]-dy,frame[2]+dx,frame[3]+dy];
-    var nb=neighborsIn(wide,4000).map(function(x){return {g:x.geometry,t:labelFor(x),p:labelPoint(x)};});
+    var nb=(showNeighbors()?neighborsIn(wide,4000):[]).map(function(x){return {g:x.geometry,t:labelFor(x),p:labelPoint(x)};});
     var on=st.pages.filter(function(p){return p.on;}),src=polaSource(),base=BASES[Number($('ptBase').value)]||BASES[0];
     var pages=on.map(function(p){
       if(p.kind==='citra')return {kind:'citra',title:'Latar Citra Satelit',source:base.credit};
@@ -679,19 +704,20 @@
       var r=result(p.id),def=defById(p.id)||{};
       return {kind:'limit',title:p.title,features:list,legend:legend,stat:r?'irisan '+areaPct(r.area,T)+(cats(r).length>1?' — '+cats(r).map(function(c){return c.name+' '+areaPct(c.area,T);}).join('; '):''):'',source:p.title+(def.sub?' — '+def.sub:'')};
     });
-    var desa=$('ptDesa').value.trim(),kec=$('ptKec').value.trim(),excel=isExcel(f);
+    var desa=$('ptDesa').value.trim(),kec=$('ptKec').value.trim(),excel=isExcel(f),digit=isDigit(f);
     return {
       theme:theme,layout:l,paper:$('ptPaper').value,
       pages:pages,center:[c.lat,c.lng],zoom:zoom,scale:scale,bar:scaleBar(scale,l.side*(theme==='2'?.4:.7)),base:base,
       subject:{g:f.geometry,t:labelFor(f),p:labelPoint(f)},neighbors:nb,kecamatan:theme==='2'?kecamatanOutline():[],kecName:kec,
       title:{jenis:$('ptJenis').value.trim(),pemohon:$('ptPemohon').value.trim().toUpperCase(),luas:$('ptLuas').value.trim(),
         lokasi:desa?$('ptDesaWord').value+' '+desa:'',kec:kec,kab:'Sumbawa Barat',prov:$('ptProvinsi').value.trim()},
-      info:{nib:excel?'':nibOf(f),excel:excel,excelFile:excel&&st.excel?st.excel.fileName:'',excelCrs:excel&&st.excel?st.excel.crsLabel:'',luasSpasial:num(totalArea())},
+      showNb:showNeighbors(),
+      info:{nib:excel||digit?'':nibOf(f),excel:excel,digit:digit,excelFile:excel&&st.excel?st.excel.fileName:'',excelCrs:excel&&st.excel?st.excel.crsLabel:'',luasSpasial:num(totalArea())},
       hasil:$('ptHasil').value.split('\n').map(function(s){return s.trim().replace(/^\d+[\.\)]\s*/,'');}).filter(Boolean),
       telaah:{tgl:dateId($('ptTglTelaah').value),p1:$('ptPenelaah1').value.trim(),p2:$('ptPenelaah2').value.trim()},
       sah:{tgl:dateId($('ptTglSah').value),jabatan:$('ptJabatan').value.trim(),nama:$('ptPejabat').value.trim(),nip:fmtNip($('ptNip').value)},
       kantor:$('ptKantor').value.trim(),provinsi:$('ptProvinsi').value.trim(),printed:new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}),
-      filename:['PETA_TELAAH',excel?'EXCEL':'NIB',excel?'':fileToken(labelFor(f)||nibOf(f)||'TANPA'),fileToken($('ptPemohon').value),fileToken(desa),$('ptPaper').value].filter(Boolean).join('_')
+      filename:['PETA_TELAAH',digit?'DIGITASI':excel?'EXCEL':'NIB',excel||digit?'':fileToken(labelFor(f)||nibOf(f)||'TANPA'),fileToken($('ptPemohon').value),fileToken(desa),$('ptPaper').value].filter(Boolean).join('_')
     };
   }
 
@@ -815,7 +841,7 @@
     var nb='<div class="li"><svg class="sw" viewBox="0 0 16 8" preserveAspectRatio="none"><rect x="1" y="1" width="14" height="6" fill="none" stroke="'+(R.theme==='2'?'#e0a400':'#f5a300')+'" stroke-width="1.6"/></svg>Bidang Sandingan</div>';
     var sb='<div class="li"><svg class="sw" viewBox="0 0 16 8" preserveAspectRatio="none"><defs><pattern id="lh" patternUnits="userSpaceOnUse" width="2.4" height="2.4" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="2.4" stroke="#e6007e" stroke-width=".7"/></pattern></defs><rect x=".8" y=".8" width="14.4" height="6.4" fill="url(#lh)" stroke="#e6007e" stroke-width="1.4"/></svg>Area Permohonan Bidang Tanah</div>';
     var cls=(page.legend||[]).slice(0,14).map(function(i){return '<div class="li cls"><i class="sw" style="background:'+esc(i.color)+';'+(page.kind==='limit'?'opacity:.75;':'')+'border:.2mm solid rgba(0,0,0,.3)"></i>'+esc(i.label)+'</div>';}).join('');
-    return nb+sb+cls;
+    return (R.showNb===false?'':nb)+sb+cls;
   }
   function barSvg(bar){
     var w=bar.widthMm,segs='',labels='';
@@ -839,7 +865,7 @@
   }
   function sideTheme2(R,page,n,total){
     var t=R.title,i=R.info,u=function(p){return new URL(p,location.href).href;};
-    var kv=[['NIB',i.excel?'Belum ada (koordinat Excel)':(i.nib||'—')],['Luas permohonan',t.luas?t.luas+' m²':'—'],['Luas spasial',i.luasSpasial+' m²'],['Lokasi',[t.lokasi,t.kec?'Kec. '+t.kec:''].filter(Boolean).join(', ')||'—'],['Kabupaten','Sumbawa Barat, '+String(t.prov||'').replace(/^Provinsi\s+/i,'')]];
+    var kv=[['NIB',i.digit?'Belum ada (hasil digitasi)':i.excel?'Belum ada (koordinat Excel)':(i.nib||'—')],['Luas permohonan',t.luas?t.luas+' m²':'—'],['Luas spasial',i.luasSpasial+' m²'],['Lokasi',[t.lokasi,t.kec?'Kec. '+t.kec:''].filter(Boolean).join(', ')||'—'],['Kabupaten','Sumbawa Barat, '+String(t.prov||'').replace(/^Provinsi\s+/i,'')]];
     return '<aside class="side">'+
       '<header class="kop"><img src="'+u('assets/app/logo-atr-bpn.jpg')+'" alt=""><div><b>KEMENTERIAN AGRARIA DAN TATA RUANG/</b><b>BADAN PERTANAHAN NASIONAL</b><span>'+esc(R.kantor)+'</span><span>'+esc(R.provinsi)+'</span></div></header>'+
       '<section class="sec ttl"><p class="cap">Peta Telaah Spasial</p><h1>'+esc(t.jenis||'Permohonan')+'</h1>'+(t.pemohon?'<div class="pm">'+esc(t.pemohon)+'</div>':'<div class="pm" style="color:#9aa9b1">Nama pemohon belum diisi</div>')+
@@ -853,7 +879,7 @@
     '</aside>';
   }
   function printNow(){
-    if(!st.feature){toast(st.mode==='excel'?'Unggah Excel koordinat bidang terlebih dahulu.':'Pilih bidang yang dimohon terlebih dahulu.',4000);return;}
+    if(!st.feature){toast(st.mode==='digit'?'Belum ada bidang hasil digitasi.':st.mode==='excel'?'Unggah Excel koordinat bidang terlebih dahulu.':'Pilih bidang yang dimohon terlebih dahulu.',4000);return;}
     if(!st.pages.some(function(p){return p.on;})){toast('Pilih minimal satu halaman yang dicetak.',3500);return;}
     var win=window.open('','_blank');
     if(!win){toast('Izinkan pop-up untuk membuka Peta Telaah.',5000);return;}
@@ -874,4 +900,6 @@
   $('ptPrint').addEventListener('click',printNow);
 
   window.sobatOpenPetaTelaah=open;
+  // Dipakai alat Input Koordinat Manual (js/koordinat-manual.js): pembacaan angka/DMS dan konversi sistem koordinat.
+  window.sobatCoordTools={parse:cellValue,detectCrs:detectCrs,toLonLat:toLonLat,crs:CRS,ksbBox:KSB_BOX};
 })();

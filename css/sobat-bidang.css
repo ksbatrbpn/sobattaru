@@ -167,3 +167,18 @@ body.st-printing .st-recall,body.st-printing .st-end-analysis,body.st-printing #
 #stResultPanel .kp-reopen:hover{background:#e8f6f0}
 .kp-map-num{display:flex!important;align-items:center;justify-content:center;border:2px solid #fff;border-radius:50%;background:#0b3a66;color:#fff;font:700 11px/1 Arial,sans-serif;box-shadow:0 1px 3px rgba(0,0,0,.45)}
 @media (max-width:420px){#stResultPanel .kp-stat b{font-size:14px}}
+
+/* ---------- Bidang SHP sedesa di sekeliling bidang digitasi ---------- */
+.st-nb-switch{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0 2px;cursor:pointer}
+.st-nb-switch b{display:block;font-size:13px;font-weight:600;color:var(--st-ink,#1d1d1f)}
+.st-nb-switch small{display:block;margin-top:2px;font-size:11.5px;color:var(--st-muted,#48484a);line-height:1.35}
+.st-nb-switch input{appearance:none;-webkit-appearance:none;flex:0 0 38px;width:38px;height:22px;margin:0;border-radius:999px;background:#c7d4d0;position:relative;cursor:pointer;transition:background .15s}
+.st-nb-switch input:after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.st-nb-switch input:checked{background:var(--st-accent,#0f7a63)}
+.st-nb-switch input:checked:after{transform:translateX(16px)}
+.st-nb-switch input:focus-visible{outline:2px solid var(--st-accent,#0f7a63);outline-offset:2px}
+.st-nb-hit{display:flex;gap:7px;margin:8px 0 0;font-size:12px;line-height:1.4;color:var(--st-muted,#48484a)}
+.st-nb-hit i{margin-top:2px;color:#d97706}
+.st-nb-hit .fa-check-circle{color:var(--st-accent,#0f7a63)}
+.st-nb-telaah{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:36px;margin-top:10px;border:1px solid #cfe3dc;border-radius:9px;background:#fff;color:var(--st-accent,#0f7a63);font:600 12.5px var(--st-font,inherit);cursor:pointer}
+.st-nb-telaah:hover{background:var(--st-green-50,#eef8f4)}
