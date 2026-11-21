@@ -1,9 +1,9 @@
 {
   "status": "success",
   "message": "Layer disinkronkan dari Bale Ruang NTB.",
-  "updatedAt": "2026-11-21T15:42:50+08:00",
+  "updatedAt": "2026-11-21T16:41:48+08:00",
   "source": "https://github.com/atrbpnproject/baleruangntb",
-  "ref": "2d8daf36f8c3fad9b6cc2e907bc0936ded5b52fc",
+  "ref": "e38fb732eb09607e32cc3233ca35204be5452531",
   "layers": [
     {
       "layer": "RDTR Maluk",
